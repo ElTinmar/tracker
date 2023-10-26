@@ -1,0 +1,3 @@
+[submodule "qt_widgets"]
+	path = qt_widgets
+	url = git@github.com:ElTinmar/qt_widgets.git
