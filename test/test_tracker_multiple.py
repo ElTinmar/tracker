@@ -3,7 +3,7 @@ import socket
 import pandas as pd
 import numpy as np
 import video_tools 
-import tracker.trackers as trck
+import trackers as trck
 from image_tools import im2gray, im2single
 from tqdm import tqdm
 
