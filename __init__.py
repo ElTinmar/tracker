@@ -1,8 +1,4 @@
-__all__ = ["animal", "assignment", "body", "eyes", "tail", "tracker"]
+__all__ = ["trackers","widgets"]
 
-from .animal import *
-from .assignment import *
-from .body import *
-from .eyes import *
-from .tail import *
-from .tracker import *
+from .trackers import *
+from .widgets import *
