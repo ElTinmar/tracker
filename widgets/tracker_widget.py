@@ -2,7 +2,7 @@ from .animal_widget import AnimalTrackerWidget
 from .body_widget import BodyTrackerWidget
 from .eyes_widget import EyesTrackerWidget
 from .tail_widget import TailTrackerWidget 
-from tracker import Tracker
+from trackers import Tracker
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QMainWindow, QTabWidget, QDockWidget, QLabel, QVBoxLayout, QHBoxLayout, QWidget
 from typing import Protocol, Optional

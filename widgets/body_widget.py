@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import QWidget, QLabel, QHBoxLayout, QVBoxLayout
-from body import BodyTracker, BodyTrackerParamOverlay, BodyTrackerParamTracking
+from trackers import BodyTracker, BodyTrackerParamOverlay, BodyTrackerParamTracking
 from qt_widgets import NDarray_to_QPixmap, LabeledDoubleSpinBox, LabeledSpinBox
 import cv2
 

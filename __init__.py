@@ -1,4 +1,4 @@
-__all__ = ["trackers","widgets"]
+__all__ = ["trackers", "widgets"]
 
 from .trackers import *
 from .widgets import *
