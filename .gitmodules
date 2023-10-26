@@ -7,3 +7,6 @@
 [submodule "geometry"]
 	path = geometry
 	url = git@github.com:ElTinmar/geometry.git
+[submodule "video_tools"]
+	path = video_tools
+	url = git@github.com:ElTinmar/video_tools.git
