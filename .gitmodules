@@ -1,3 +1,9 @@
 [submodule "qt_widgets"]
 	path = qt_widgets
 	url = git@github.com:ElTinmar/qt_widgets.git
+[submodule "image_tools"]
+	path = image_tools
+	url = git@github.com:ElTinmar/image_tools.git
+[submodule "geometry"]
+	path = geometry
+	url = git@github.com:ElTinmar/geometry.git
