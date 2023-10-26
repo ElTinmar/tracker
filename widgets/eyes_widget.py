@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import QWidget, QLabel, QHBoxLayout, QVBoxLayout
-from trackers.eyes import EyesTracker, EyesTrackerParamOverlay, EyesTrackerParamTracking
+from eyes import EyesTracker, EyesTrackerParamOverlay, EyesTrackerParamTracking
 from qt_widgets import NDarray_to_QPixmap, LabeledDoubleSpinBox, LabeledSpinBox
 import cv2
 
