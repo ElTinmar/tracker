@@ -15,6 +15,7 @@ class AssignmentWidget(QWidget):
         self.background_image = background_image 
         self.declare_components()
         self.layout_components()
+        self.on_assignment_update()
     
     def declare_components(self):
         
@@ -61,7 +62,6 @@ class AssignmentWidget(QWidget):
         self.on_assignment_update()
 
     def on_assignment_update(self):
-        
         method = self.assignment_method_combobox.currentIndex()
         if method == 0:
             self.assignment = LinearSumAssignment(
@@ -72,3 +72,6 @@ class AssignmentWidget(QWidget):
             self.assignment = GridAssignment(
                 LUT = LUT
             )
+    
+    def get_assignment(self):
+        return self.assignment

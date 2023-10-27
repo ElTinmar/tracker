@@ -2,6 +2,7 @@ from .animal_widget import AnimalTrackerWidget
 from .body_widget import BodyTrackerWidget
 from .eyes_widget import EyesTrackerWidget
 from .tail_widget import TailTrackerWidget 
+from .assignment_widget import AssignmentWidget
 from .tracker import Tracker
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QMainWindow, QTabWidget, QDockWidget, QLabel, QVBoxLayout, QHBoxLayout, QWidget
@@ -22,7 +23,7 @@ class TrackerWidget(QMainWindow):
 
     def __init__(
             self, 
-            assignment: Assignment, 
+            assignment_widget: AssignmentWidget, 
             animal_tracker_widget: AnimalTrackerWidget,
             body_tracker_widget: Optional[BodyTrackerWidget],
             eyes_tracker_widget: Optional[EyesTrackerWidget],
@@ -31,7 +32,7 @@ class TrackerWidget(QMainWindow):
         ) -> None:
 
         super().__init__(*args, **kwargs)
-        self.assignment = assignment
+        self.assignment_widget = assignment_widget
         self.animal_tracker_widget = animal_tracker_widget        
         self.body_tracker_widget = body_tracker_widget
         self.eyes_tracker_widget = eyes_tracker_widget
@@ -56,6 +57,7 @@ class TrackerWidget(QMainWindow):
         main_widget = QWidget()
 
         images_and_zoom = QVBoxLayout()
+        images_and_zoom.addWidget(self.assignment_widget)
         images_and_zoom.addWidget(self.zoom)
         images_and_zoom.addWidget(self.image_overlay)
         images_and_zoom.addStretch()
@@ -94,6 +96,7 @@ class TrackerWidget(QMainWindow):
         eyes_tracker = None
         tail_tracker = None
         self.animal_tracker_widget.update_tracker()
+        assignment = self.assignment_widget.get_assignment()
         animal_tracker = self.animal_tracker_widget.tracker
         if self.body_tracker_widget is not None:
             self.body_tracker_widget.update_tracker()
@@ -105,14 +108,15 @@ class TrackerWidget(QMainWindow):
             self.tail_tracker_widget.update_tracker()
             tail_tracker = self.tail_tracker_widget.tracker
 
-        self.tracker = Tracker(
-            self.assignment,
-            None,
-            animal_tracker,
-            body_tracker,
-            eyes_tracker,
-            tail_tracker
-        )
+        if assignment is not None:
+            self.tracker = Tracker(
+                assignment,
+                None,
+                animal_tracker,
+                body_tracker,
+                eyes_tracker,
+                tail_tracker
+            )
 
     def display(self, tracking):
         if tracking is not None:
@@ -140,7 +144,9 @@ class TrackerWidget(QMainWindow):
         zoom = self.zoom.value()
         mouse_position = mouse_position * 100.0/zoom
 
-        centroids = self.assignment.get_centroids()
-        ID = self.assignment.get_ID()
-        dist = cdist(mouse_position, centroids)
-        self.current_id = ID[np.argmin(dist)]
+        assignment = self.assignment_widget.get_assignment()
+        if assignment is not None:
+            centroids = assignment.get_centroids()
+            ID = assignment.get_ID()
+            dist = cdist(mouse_position, centroids)
+            self.current_id = ID[np.argmin(dist)]
