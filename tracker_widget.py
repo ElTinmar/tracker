@@ -62,13 +62,16 @@ class TrackerWidget(QMainWindow):
     
         if self.body_tracker_widget is not None:
             dock_widget = QDockWidget('Single Animal', self)
-            tabs = QTabWidget()
-            tabs.addTab(self.body_tracker_widget, 'body')
+            self.tabs = QTabWidget()
+            self.tabs.setMovable(True)
+            self.tabs.setTabsClosable(True)
+            self.tabs.tabCloseRequested.connect(self.on_tab_close)
+            self.tabs.addTab(self.body_tracker_widget, 'body')
             if self.eyes_tracker_widget is not None:
-                tabs.addTab(self.eyes_tracker_widget, 'eyes')
+                self.tabs.addTab(self.eyes_tracker_widget, 'eyes')
             if self.tail_tracker_widget is not None:
-                tabs.addTab(self.tail_tracker_widget, 'tail')      
-            dock_widget.setWidget(tabs)  
+                self.tabs.addTab(self.tail_tracker_widget, 'tail')      
+            dock_widget.setWidget(self.tabs)  
             self.addDockWidget(Qt.RightDockWidgetArea, dock_widget)
 
         mainlayout = QHBoxLayout(main_widget)
@@ -76,7 +79,16 @@ class TrackerWidget(QMainWindow):
         mainlayout.addWidget(self.animal_tracker_widget)
 
         self.setCentralWidget(main_widget)
-        
+
+    def on_tab_close(self, index):
+        text = self.tabs.tabText(index)
+        if text == 'eyes':
+            self.body_tracker_widget = None
+            self.tabs.removeTab(index)
+        elif text == 'tail':
+            self.body_tracker_widget = None
+            self.tabs.removeTab(index)
+
     def update_tracker(self):
         body_tracker = None
         eyes_tracker = None
