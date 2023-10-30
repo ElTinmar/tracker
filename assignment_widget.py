@@ -1,6 +1,7 @@
 from PyQt5.QtWidgets import QWidget, QLabel, QStackedWidget, QVBoxLayout
 from .assignment import LinearSumAssignment, GridAssignment
 from .qt_widgets import LabeledDoubleSpinBox, LabeledComboBox, NDarray_to_QPixmap
+from .image_tools import ROISelectorDialog
 from numpy.typing import NDArray
 import numpy as np
 from typing import Optional
@@ -18,6 +19,7 @@ class AssignmentWidget(QWidget):
         self.background_image = None
         if background_image is not None:
             self.background_image = (255*background_image).astype(np.uint8)
+        self.grid_dialog = ROISelectorDialog(image = self.background_image)
         self.declare_components()
         self.layout_components()
         self.on_assignment_update()
@@ -27,7 +29,7 @@ class AssignmentWidget(QWidget):
 
         image = np.frombuffer(background_image_bytes, dtype=np.float32).reshape(height,width)
         self.background_image = (255*image).astype(np.uint8)
-        self.background_image_label.setPixmap(NDarray_to_QPixmap(self.background_image))
+        self.grid_dialog = ROISelectorDialog(image = self.background_image)
     
     def declare_components(self):
         
@@ -47,9 +49,6 @@ class AssignmentWidget(QWidget):
 
         # grid
         self.parameters_grid = QWidget()
-        self.background_image_label = QLabel(self.parameters_grid)
-        if self.background_image is not None:
-            self.background_image_label.setPixmap(NDarray_to_QPixmap(self.background_image))
 
         # stack
         self.assignment_parameter_stack = QStackedWidget(self)
@@ -66,7 +65,6 @@ class AssignmentWidget(QWidget):
         linearsum_layout.addStretch()
 
         grid_layout = QVBoxLayout(self.parameters_grid)
-        grid_layout.addWidget(self.background_image_label)
         grid_layout.addStretch()
 
     def on_method_change(self, index):
@@ -80,7 +78,13 @@ class AssignmentWidget(QWidget):
                 self.max_distance_spinbox.value()
             )
         elif method == 1:
-            LUT = np.zeros((10,10)) # todo
+            while not self.grid_dialog.exec_():
+                print('select ROIs and click on done')
+            rois = self.grid_dialog.ROIs
+            LUT = np.zeros_like(self.background_image) 
+            for id, rect in enumerate(rois):
+                LUT[rect.top():rect.top()+rect.height(), rect.left():rect.left()+rect.width()] = id 
+            #TODO update background image to show LUT
             self.assignment = GridAssignment(
                 LUT = LUT
             )
