@@ -5,17 +5,29 @@ from numpy.typing import NDArray
 import numpy as np
 from typing import Optional
 
+#TODO make it accept different image formats than single precision
+
 class AssignmentWidget(QWidget):
     
     def __init__(self, background_image: Optional[NDArray] = None, *args, **kwargs):
+        # NOTE THIS IS EXPECTING A SINGLE PRECISION IMAGE
         
         super().__init__(*args, **kwargs)
         
         self.assignment = None
-        self.background_image = background_image 
+        self.background_image = None
+        if background_image is not None:
+            self.background_image = (255*background_image).astype(np.uint8)
         self.declare_components()
         self.layout_components()
         self.on_assignment_update()
+
+    def set_background_image(self, height, width, background_image_bytes: bytes) -> None:
+        # NOTE THIS IS EXPECTING A SINGLE PRECISION IMAGE
+
+        image = np.frombuffer(background_image_bytes, dtype=np.float32).reshape(height,width)
+        self.background_image = (255*image).astype(np.uint8)
+        self.background_image_label.setPixmap(NDarray_to_QPixmap(self.background_image))
     
     def declare_components(self):
         
