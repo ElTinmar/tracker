@@ -1,9 +1,8 @@
-from .image_tools import bwareafilter_centroids, imcontrast
+from image_tools import bwareafilter_centroids, imcontrast
 import numpy as np
 from numpy.typing import NDArray
 from dataclasses import dataclass
 import cv2
-
 
 @dataclass
 class AnimalTrackerParamTracking:

@@ -1,4 +1,4 @@
-from .image_tools import bwareafilter_props, imcontrast
+from image_tools import bwareafilter_props, imcontrast
 from sklearn.decomposition import PCA
 import numpy as np
 from numpy.typing import NDArray

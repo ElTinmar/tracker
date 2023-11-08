@@ -1,0 +1,21 @@
+from distutils.core import setup
+
+setup(
+    name='ipc_tools',
+    author='Martin Privat',
+    version='0.1',
+    packages=['ipc_tools','ipc_tools.tests'],
+    license='Creative Commons Attribution-Noncommercial-Share Alike license',
+    description='share numpy arrays between processes',
+    long_description=open('README.md').read(),
+    install_requires=[
+        "numpy", 
+        "scipy",
+        "scikit-learn",
+        "opencv-python",
+        "PyQt5",
+        "image_tools @ git+https://github.com/ElTinmar/image_tools.git@main",
+        "qt_widgets @ git+https://github.com/ElTinmar/qt_widgets.git@main",
+        "geometry @ git+https://github.com/ElTinmar/geometry.git@main"
+    ]
+)

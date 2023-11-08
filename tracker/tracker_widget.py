@@ -8,7 +8,7 @@ from PyQt5.QtWidgets import QMainWindow, QTabWidget, QDockWidget, QLabel, QVBoxL
 from typing import Protocol, Optional
 from scipy.spatial.distance import cdist
 import numpy as np
-from .qt_widgets import NDarray_to_QPixmap, LabeledSpinBox
+from qt_widgets import NDarray_to_QPixmap, LabeledSpinBox
 import cv2
 
 # TODO add widget to chose assignment method
