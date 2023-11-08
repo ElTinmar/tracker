@@ -1,12 +1,12 @@
 from distutils.core import setup
 
 setup(
-    name='ipc_tools',
+    name='tracker',
     author='Martin Privat',
     version='0.1',
-    packages=['ipc_tools','ipc_tools.tests'],
+    packages=['tracker','tracker.tests'],
     license='Creative Commons Attribution-Noncommercial-Share Alike license',
-    description='share numpy arrays between processes',
+    description='tracking zebrafish larvae',
     long_description=open('README.md').read(),
     install_requires=[
         "numpy", 
