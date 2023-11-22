@@ -2,16 +2,17 @@ from dataclasses import dataclass
 import cv2
 from scipy.spatial.distance import pdist
 import numpy as np
-from numpy.typing import NDArray
-from typing import Optional, Tuple
-from image_tools import bwareafilter_props, bwareafilter, imcontrast
+from numpy.typing import NDArray, ArrayLike
+from typing import Tuple, Dict
+from image_tools import bwareafilter_props, bwareafilter, enhance, im2uint8
 from geometry import ellipse_direction, angle_between_vectors
+from .roi_coords import get_roi_coords
 
 @dataclass
 class EyesTrackerParamTracking:
     pix_per_mm: float = 40.0
     target_pix_per_mm: float = 20.0
-    eye_norm: float = 0.2
+    eye_brightness: float = 0.2
     eye_gamma: float = 1.0
     eye_dyntresh_res: int = 20
     eye_contrast: float = 1.0
@@ -57,22 +58,6 @@ class EyesTrackerParamTracking:
         return self.mm2px(self.crop_offset_mm)
     
 @dataclass
-class EyesTrackerParamOverlay:
-    pix_per_mm: float = 40.0
-    eye_len_mm: float = 0.2
-    color_eye_left: tuple = (255, 255, 128)
-    color_eye_right: tuple = (128, 255, 255)
-    thickness: int = 2
-
-    def mm2px(self, val_mm):
-        val_px = int(val_mm * self.pix_per_mm) 
-        return val_px
-    
-    @property
-    def eye_len_px(self):
-        return self.mm2px(self.eye_len_mm)
-
-@dataclass
 class EyesTracking:
     centroid: NDArray
     left_eye: dict
@@ -84,226 +69,143 @@ class EyesTracking:
         '''export data as csv'''
         pass
 
-class EyesTracker:
-    def __init__(
-            self, 
-            tracking_param: EyesTrackerParamTracking, 
-            overlay_param: EyesTrackerParamOverlay
-        ) -> None:
-        self.tracking_param = tracking_param
-        self.overlay_param = overlay_param
-    
-    @staticmethod
-    def get_eye_prop(blob, resize):
-        # fish must be vertical head up
-        heading = np.array([0, 1], dtype=np.float32)
 
-        eye_dir = ellipse_direction(blob.inertia_tensor, heading)
-        eye_angle = angle_between_vectors(eye_dir, heading)
-        # (row,col) to (x,y) coordinates 
-        y, x = blob.centroid
-        eye_centroid = np.array([x, y],dtype = np.float32)
-        return {'direction': eye_dir, 'angle': eye_angle, 'centroid': eye_centroid/resize}
+def get_eye_prop(blob, resize: float) -> Dict:
+
+    # fish must be vertical head up
+    heading = np.array([0, 1], dtype=np.float32)
+
+    eye_dir = ellipse_direction(blob.inertia_tensor, heading)
+    eye_angle = angle_between_vectors(eye_dir, heading)
+    # (row,col) to (x,y) coordinates 
+    y, x = blob.centroid
+    eye_centroid = np.array([x, y],dtype = np.float32)
+    return {'direction': eye_dir, 'angle': eye_angle, 'centroid': eye_centroid/resize}
+
+
+def assign_features(blob_centroids: ArrayLike) -> Tuple[int, int, int]:
+    """From Duncan, returns indices of swimbladder, left eye and right eye"""
     
-    @staticmethod
-    def assign_features(blob_centroids):
-            """From Duncan, returns indices of swimbladder, left eye and right eye"""
-            centres = np.array(blob_centroids)
-            distances = pdist(blob_centroids)
-            sb_idx = 2 - np.argmin(distances)
-            eye_idxs = [i for i in range(3) if i != sb_idx]
-            eye_vectors = centres[eye_idxs] - centres[sb_idx]
-            cross_product = np.cross(*eye_vectors)
-            if cross_product < 0:
-                eye_idxs = eye_idxs[::-1]
-            left_idx, right_idx = eye_idxs
-            return sb_idx, left_idx, right_idx
+    centroids = np.asarray(blob_centroids)
     
-    @staticmethod 
-    def find_eyes_and_swimbladder(image, eye_dyntresh_res, eye_size_lo_px, eye_size_hi_px):
-        # OPTIM this is slow
-        thresholds = np.linspace(1/eye_dyntresh_res,1,eye_dyntresh_res)
-        found_eyes_and_sb = False
-        for t in thresholds:
-            mask = 1.0*(image >= t)
-            props = bwareafilter_props(
+    # find swimbladder
+    distances = pdist(centroids)
+    sb_idx = 2 - np.argmin(distances)
+
+    # find eyes
+    eye_idxs = [i for i in range(3) if i != sb_idx]
+    
+    # Getting left and right eyes
+    # NOTE: numpy automatically adds 0 to 3rd dimension when 
+    # computing cross-product if input arrays are 2D.
+    eye_vectors = centroids[eye_idxs] - centroids[sb_idx]
+    cross_product = np.cross(*eye_vectors)
+    if cross_product < 0:
+        eye_idxs = eye_idxs[::-1]
+    left_idx, right_idx = eye_idxs
+
+    return sb_idx, left_idx, right_idx
+
+
+def find_eyes_and_swimbladder(
+        image: NDArray, 
+        eye_dyntresh_res: int, 
+        eye_size_lo_px: float, 
+        eye_size_hi_px: float
+    ) -> Tuple:
+    
+    # OPTIM this is slow
+    thresholds = np.linspace(1/eye_dyntresh_res,1,eye_dyntresh_res)
+    found_eyes_and_sb = False
+    for t in thresholds:
+        mask = 1.0*(image >= t)
+        props = bwareafilter_props(
+            mask, 
+            min_size = eye_size_lo_px, 
+            max_size = eye_size_hi_px
+        )
+        if len(props) == 3:
+            found_eyes_and_sb = True
+            mask = bwareafilter(
                 mask, 
                 min_size = eye_size_lo_px, 
                 max_size = eye_size_hi_px
             )
-            if len(props) == 3:
-                found_eyes_and_sb = True
-                mask = bwareafilter(
-                    mask, 
-                    min_size = eye_size_lo_px, 
-                    max_size = eye_size_hi_px
-                )
-                break
-        return (found_eyes_and_sb, props, mask)
+            break
+
+    return (found_eyes_and_sb, props, mask)
+
+def track(
+        image: NDArray, 
+        centroid: NDArray,
+        param: EyesTrackerParamTracking
+    ) -> EyesTracking:
+
+    if (image is None) or (image.size == 0):
+        return None
+
+    if param.resize != 1:
+        image = cv2.resize(
+            image, 
+            None, 
+            None,
+            param.resize,
+            param.resize,
+            cv2.INTER_NEAREST
+        )
+
+    left_eye = None
+    right_eye = None
+    new_heading = None
+
+    # crop image
+    left, bottom, w, h = get_roi_coords(
+        centroid, 
+        param.crop_dimension_px, 
+        param.crop_offset_px, 
+        param.resize
+    )
+    right = left + w
+    top = bottom + h
+    image_crop = image[bottom:top, left:right]
+    if image_crop.size == 0:
+        return None
+
+    # tune image contrast and gamma
+    image_crop = enhance(
+        image_crop,
+        param.eye_contrast,
+        param.eye_gamma,
+        param.eye_brightness,
+        param.blur_sz_px,
+        param.median_filter_sz_px
+    )
+
+    # sweep threshold to obtain 3 connected component within size range (include SB)
+    found_eyes_and_sb, props, mask = find_eyes_and_swimbladder(
+        image_crop, 
+        param.eye_dyntresh_res, 
+        param.eye_size_lo_px, 
+        param.eye_size_hi_px
+    )
     
-    def get_roi_coords(self, centroid):
-        w, h = self.tracking_param.crop_dimension_px
-        left, bottom = centroid * self.tracking_param.resize
-        left = left - w//2
-        bottom = bottom - h//2 + self.tracking_param.crop_offset_px
-        return int(left), int(bottom), w, h
-     
-    def track(self, image: NDArray, centroid: NDArray):
+    if found_eyes_and_sb: 
+        # identify left eye, right eye and swimbladder
+        blob_centroids = np.array([blob.centroid for blob in props])
+        sb_idx, left_idx, right_idx = assign_features(blob_centroids)
 
-        if (image is None) or (image.size == 0):
-            return None
+        # compute eye orientation
+        left_eye = get_eye_prop(props[left_idx], param.resize)
+        right_eye = get_eye_prop(props[right_idx], param.resize)
+        #new_heading = (props[left_idx].centroid + props[right_idx].centroid)/2 - props[sb_idx].centroid
+        #new_heading = new_heading / np.linalg.norm(new_heading)
 
-        if self.tracking_param.resize != 1:
-            image = cv2.resize(
-                image, 
-                None, 
-                None,
-                self.tracking_param.resize,
-                self.tracking_param.resize,
-                cv2.INTER_NEAREST
-            )
+    res = EyesTracking(
+        centroid = centroid,
+        left_eye = left_eye,
+        right_eye = right_eye,
+        mask = im2uint8(mask),
+        image = im2uint8(image_crop)
+    )
 
-        left_eye = None
-        right_eye = None
-        new_heading = None
-    
-        # crop image
-        left, bottom, w, h = self.get_roi_coords(centroid)
-        right = left + w
-        top = bottom + h
-        image_crop = image[bottom:top, left:right]
-        if image_crop.size == 0:
-            return None
-
-        # tune image contrast and gamma
-        image_crop = imcontrast(
-            image_crop,
-            self.tracking_param.eye_contrast,
-            self.tracking_param.eye_gamma,
-            self.tracking_param.eye_norm,
-            self.tracking_param.blur_sz_px,
-            self.tracking_param.median_filter_sz_px
-        )
-
-        # sweep threshold to obtain 3 connected component within size range (include SB)
-        found_eyes_and_sb, props, mask = self.find_eyes_and_swimbladder(
-            image_crop, 
-            self.tracking_param.eye_dyntresh_res, 
-            self.tracking_param.eye_size_lo_px, 
-            self.tracking_param.eye_size_hi_px
-        )
-        
-        if found_eyes_and_sb: 
-            # identify left eye, right eye and swimbladder
-            blob_centroids = np.array([blob.centroid for blob in props])
-            sb_idx, left_idx, right_idx = self.assign_features(blob_centroids)
-
-            # compute eye orientation
-            left_eye = self.get_eye_prop(props[left_idx], self.tracking_param.resize)
-            right_eye = self.get_eye_prop(props[right_idx], self.tracking_param.resize)
-            #new_heading = (props[left_idx].centroid + props[right_idx].centroid)/2 - props[sb_idx].centroid
-            #new_heading = new_heading / np.linalg.norm(new_heading)
-
-        res = EyesTracking(
-            centroid = centroid,
-            left_eye = left_eye,
-            right_eye = right_eye,
-            mask = (255*mask).astype(np.uint8),
-            image = (255*image_crop).astype(np.uint8)
-        )
-        return res
-
-    @staticmethod
-    def disp_eye(
-            image: NDArray, 
-            eye_centroid: NDArray,
-            eye_direction: NDArray,
-            color: tuple, 
-            eye_len_px: float, 
-            thickness: int
-        ) -> NDArray:
-
-        pt1 = eye_centroid
-        pt2 = pt1 + eye_len_px * eye_direction
-        image = cv2.line(
-            image,
-            pt1.astype(np.int32),
-            pt2.astype(np.int32),
-            color,
-            thickness
-        )
-        pt2 = pt1 - eye_len_px * eye_direction
-        image = cv2.line(
-            image,
-            pt1.astype(np.int32),
-            pt2.astype(np.int32),
-            color,
-            thickness
-        )
-        image = cv2.circle(
-            image,
-            pt2.astype(np.int32),
-            2,
-            color,
-            thickness
-        )
-        return image
-    
-    def overlay(
-            self, 
-            image: NDArray, 
-            tracking: EyesTracking, 
-            translation_vec: NDArray,
-            rotation_mat: NDArray
-        ) -> NDArray:
-
-        if tracking is not None:
-
-            left, bottom, _, _ = self.get_roi_coords(tracking.centroid)
-
-            if tracking.left_eye is not None:
-                image = self.disp_eye(
-                    image, 
-                    rotation_mat @ (tracking.left_eye['centroid'] + np.array((left, bottom))/self.tracking_param.resize - tracking.centroid) + translation_vec,
-                    rotation_mat @ tracking.left_eye['direction'],
-                    self.overlay_param.color_eye_left, 
-                    self.overlay_param.eye_len_px, 
-                    self.overlay_param.thickness
-                )
-            if tracking.right_eye is not None:   
-                image = self.disp_eye(
-                    image, 
-                    rotation_mat @ (tracking.right_eye['centroid'] + np.array((left, bottom))/self.tracking_param.resize - tracking.centroid) + translation_vec,
-                    rotation_mat @ tracking.right_eye['direction'],
-                    self.overlay_param.color_eye_right, 
-                    self.overlay_param.eye_len_px, 
-                    self.overlay_param.thickness
-                )
-        
-        return image
-
-    def overlay_local(self, tracking: EyesTracking):
-        image = None
-        if tracking is not None:
-            image = tracking.image.copy()
-            image = np.dstack((image,image,image))
-            if tracking.left_eye is not None:
-                image = self.disp_eye(
-                    image, 
-                    tracking.left_eye['centroid'] * self.tracking_param.resize,
-                    tracking.left_eye['direction'],
-                    self.overlay_param.color_eye_left, 
-                    self.overlay_param.eye_len_px, 
-                    self.overlay_param.thickness
-                )
-            if tracking.right_eye is not None:   
-                image = self.disp_eye(
-                    image, 
-                    tracking.right_eye['centroid'] * self.tracking_param.resize,
-                    tracking.right_eye['direction'],
-                    self.overlay_param.color_eye_right, 
-                    self.overlay_param.eye_len_px, 
-                    self.overlay_param.thickness
-                )
-        
-        return image
+    return res

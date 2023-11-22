@@ -50,12 +50,12 @@ class EyesTrackerWidget(QWidget):
         self.eye_contrast.valueChanged.connect(self.update_tracker) 
 
         # eye norm
-        self.eye_norm = LabeledDoubleSpinBox(self)
-        self.eye_norm.setText('eye norm')
-        self.eye_norm.setRange(0,1)
-        self.eye_norm.setValue(0.3)
-        self.eye_norm.setSingleStep(0.025)
-        self.eye_norm.valueChanged.connect(self.update_tracker) 
+        self.eye_brightness = LabeledDoubleSpinBox(self)
+        self.eye_brightness.setText('eye norm')
+        self.eye_brightness.setRange(0,1)
+        self.eye_brightness.setValue(0.3)
+        self.eye_brightness.setSingleStep(0.025)
+        self.eye_brightness.valueChanged.connect(self.update_tracker) 
 
         # eye dynthresh
         self.eye_dyntresh_res = LabeledSpinBox(self)
@@ -132,7 +132,7 @@ class EyesTrackerWidget(QWidget):
         parameters.addWidget(self.target_pix_per_mm)
         parameters.addWidget(self.eye_gamma)
         parameters.addWidget(self.eye_contrast)
-        parameters.addWidget(self.eye_norm)
+        parameters.addWidget(self.eye_brightness)
         parameters.addWidget(self.eye_dyntresh_res)
         parameters.addWidget(self.eye_size_lo_mm)
         parameters.addWidget(self.eye_size_hi_mm)
@@ -165,7 +165,7 @@ class EyesTrackerWidget(QWidget):
             target_pix_per_mm = self.target_pix_per_mm.value(),
             eye_gamma = self.eye_gamma.value(),
             eye_contrast = self.eye_contrast.value(),
-            eye_norm = self.eye_norm.value(),
+            eye_brightness = self.eye_brightness.value(),
             eye_dyntresh_res = self.eye_dyntresh_res.value(),
             eye_size_lo_mm = self.eye_size_lo_mm.value(),
             eye_size_hi_mm = self.eye_size_hi_mm.value(),

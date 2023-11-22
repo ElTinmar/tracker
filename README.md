@@ -1,5 +1,7 @@
 # tracker
 
+Works best with background subtracted images
+
 code to track zebrafish larvae:
     - centroid
     - orientation

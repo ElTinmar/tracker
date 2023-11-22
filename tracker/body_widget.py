@@ -59,12 +59,12 @@ class BodyTrackerWidget(QWidget):
         self.body_contrast.valueChanged.connect(self.update_tracker) 
 
         # norm
-        self.body_norm = LabeledDoubleSpinBox(self)
-        self.body_norm.setText('body norm')
-        self.body_norm.setRange(0,1)
-        self.body_norm.setValue(0.3)
-        self.body_norm.setSingleStep(0.025)
-        self.body_norm.valueChanged.connect(self.update_tracker) 
+        self.body_brightness = LabeledDoubleSpinBox(self)
+        self.body_brightness.setText('body norm')
+        self.body_brightness.setRange(0,1)
+        self.body_brightness.setValue(0.3)
+        self.body_brightness.setSingleStep(0.025)
+        self.body_brightness.valueChanged.connect(self.update_tracker) 
 
         # body size
         self.min_body_size_mm = LabeledDoubleSpinBox(self)
@@ -145,7 +145,7 @@ class BodyTrackerWidget(QWidget):
         parameters.addWidget(self.body_intensity)
         parameters.addWidget(self.body_gamma)
         parameters.addWidget(self.body_contrast)
-        parameters.addWidget(self.body_norm)
+        parameters.addWidget(self.body_brightness)
         parameters.addWidget(self.min_body_size_mm)
         parameters.addWidget(self.max_body_size_mm)
         parameters.addWidget(self.min_body_length_mm)
@@ -179,7 +179,7 @@ class BodyTrackerWidget(QWidget):
             body_intensity = self.body_intensity.value(),
             body_gamma = self.body_gamma.value(),
             body_contrast = self.body_contrast.value(),
-            body_norm = self.body_norm.value(),
+            body_brightness = self.body_brightness.value(),
             min_body_size_mm = self.min_body_size_mm.value(),
             max_body_size_mm = self.max_body_size_mm.value(),
             min_body_length_mm = self.min_body_length_mm.value(),

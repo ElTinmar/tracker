@@ -5,7 +5,7 @@ from .animal import AnimalTracker
 import numpy as np
 import cv2
 from typing import Protocol, Optional
-from image_tools import imcontrast, imrotate, rotation_matrix
+from image_tools import enhance, imrotate, rotation_matrix
 
 class Accumulator(Protocol):
     def update(self):
@@ -41,7 +41,7 @@ class Tracker:
             return None
         
         # restrain image between 0 and 1
-        image = imcontrast(image)
+        image = enhance(image)
 
         # get animal centroids (only crude location is necessary)
         animals = self.animal_tracker.track(image)

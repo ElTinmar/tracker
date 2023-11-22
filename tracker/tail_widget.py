@@ -49,12 +49,12 @@ class TailTrackerWidget(QWidget):
         self.tail_gamma.valueChanged.connect(self.update_tracker) 
         
         # tail norm 
-        self.tail_norm = LabeledDoubleSpinBox(self)
-        self.tail_norm.setText('tail norm')
-        self.tail_norm.setRange(0,1)
-        self.tail_norm.setValue(0.2)
-        self.tail_norm.setSingleStep(0.025)
-        self.tail_norm.valueChanged.connect(self.update_tracker) 
+        self.tail_brightness = LabeledDoubleSpinBox(self)
+        self.tail_brightness.setText('tail norm')
+        self.tail_brightness.setRange(0,1)
+        self.tail_brightness.setValue(0.2)
+        self.tail_brightness.setSingleStep(0.025)
+        self.tail_brightness.valueChanged.connect(self.update_tracker) 
         
         # arc angle deg
         self.arc_angle_deg = LabeledDoubleSpinBox(self)
@@ -156,7 +156,7 @@ class TailTrackerWidget(QWidget):
         parameters.addWidget(self.target_pix_per_mm)
         parameters.addWidget(self.tail_contrast)
         parameters.addWidget(self.tail_gamma)
-        parameters.addWidget(self.tail_norm)
+        parameters.addWidget(self.tail_brightness)
         parameters.addWidget(self.arc_angle_deg)
         parameters.addWidget(self.n_tail_points)
         parameters.addWidget(self.n_pts_arc)
@@ -193,7 +193,7 @@ class TailTrackerWidget(QWidget):
             target_pix_per_mm = self.target_pix_per_mm.value(),
             tail_contrast = self.tail_contrast.value(),
             tail_gamma = self.tail_gamma.value(),
-            tail_norm = self.tail_norm.value(),
+            tail_brightness = self.tail_brightness.value(),
             arc_angle_deg = self.arc_angle_deg.value(),
             n_tail_points = self.n_tail_points.value(),
             n_pts_arc = self.n_pts_arc.value(),

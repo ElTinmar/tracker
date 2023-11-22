@@ -59,12 +59,12 @@ class AnimalTrackerWidget(QWidget):
         self.animal_contrast.valueChanged.connect(self.update_tracker) 
 
         # norm
-        self.animal_norm = LabeledDoubleSpinBox(self)
-        self.animal_norm.setText('animal norm')
-        self.animal_norm.setRange(0,1)
-        self.animal_norm.setValue(1.0)
-        self.animal_norm.setSingleStep(0.025)
-        self.animal_norm.valueChanged.connect(self.update_tracker) 
+        self.animal_brightness = LabeledDoubleSpinBox(self)
+        self.animal_brightness.setText('animal norm')
+        self.animal_brightness.setRange(0,1)
+        self.animal_brightness.setValue(1.0)
+        self.animal_brightness.setSingleStep(0.025)
+        self.animal_brightness.valueChanged.connect(self.update_tracker) 
 
         # animal size
         self.min_animal_size_mm = LabeledDoubleSpinBox(self)
@@ -153,7 +153,7 @@ class AnimalTrackerWidget(QWidget):
         parameters.addWidget(self.animal_intensity)
         parameters.addWidget(self.animal_gamma)
         parameters.addWidget(self.animal_contrast)
-        parameters.addWidget(self.animal_norm)
+        parameters.addWidget(self.animal_brightness)
         parameters.addWidget(self.min_animal_size_mm)
         parameters.addWidget(self.max_animal_size_mm)
         parameters.addWidget(self.min_animal_length_mm)
@@ -191,7 +191,7 @@ class AnimalTrackerWidget(QWidget):
             animal_intensity = self.animal_intensity.value(),
             animal_gamma = self.animal_gamma.value(),
             animal_contrast = self.animal_contrast.value(),
-            animal_norm = self.animal_norm.value(),
+            animal_brightness = self.animal_brightness.value(),
             min_animal_size_mm = self.min_animal_size_mm.value(),
             max_animal_size_mm = self.max_animal_size_mm.value(),
             min_animal_length_mm = self.min_animal_length_mm.value(),
