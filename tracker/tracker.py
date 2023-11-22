@@ -8,7 +8,7 @@ class Tracker(ABC):
     def track(
         self, 
         image: NDArray,
-        centroid: Optional[None]
+        centroid: Optional[NDArray]
         ) -> Optional[Any]:
         '''
         image: image to track, preferably background subtracted

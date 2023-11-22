@@ -110,7 +110,7 @@ class AnimalTracker(Tracker):
         self.tracking_param = tracking_param
         self.overlay_param = overlay_param
 
-    def track(self, image: NDArray, centroid: NDArray = None) -> Optional[AnimalTracking]:
+    def track(self, image: NDArray, centroid: Optional[NDArray] = None) -> Optional[AnimalTracking]:
 
         if (image is None) or (image.size == 0):
             return None
