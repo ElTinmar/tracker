@@ -163,3 +163,9 @@ def track(
 
     return res
     
+def track_GPU(
+        image: NDArray, 
+        param: TailTrackerParamTracking, 
+        centroid: NDArray
+    ) -> TailTracking:
+    '''TODO'''

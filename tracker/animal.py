@@ -137,3 +137,5 @@ def track(image: NDArray, param: AnimalTrackerParamTracking) -> AnimalTracking:
 
     return res
 
+def track_GPU(image: NDArray, param: AnimalTrackerParamTracking) -> AnimalTracking:
+    '''TODO'''

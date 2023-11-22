@@ -170,3 +170,10 @@ def track(
             image = im2uint8(image)
         )
         return res
+
+def track_GPU(
+        image: NDArray, 
+        param: BodyTrackerParamTracking, 
+        coord_centroid: Optional[NDArray] = None
+    ) -> BodyTracking:
+    '''TODO'''

@@ -209,3 +209,10 @@ def track(
     )
 
     return res
+
+def track_GPU(
+        image: NDArray, 
+        centroid: NDArray,
+        param: EyesTrackerParamTracking
+    ) -> EyesTracking:
+    '''TODO'''
