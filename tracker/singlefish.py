@@ -11,13 +11,6 @@ class Accumulator(Protocol):
     def update(self):
         ...
 
-class Assignment(Protocol):
-    def update(self):
-        ...
-    
-    def get_ID(self):
-        ...
-
 class SingleFish:
     def __init__(
             self, 
@@ -134,8 +127,6 @@ class SingleFish:
             cv2.putText(image, str(id), bbox_bottomleft.astype(int), cv2.FONT_HERSHEY_SIMPLEX, 1.5, (0,0,255), 2, cv2.LINE_AA)
         
         return image
-
-
 
     def overlay(self, image, tracking):
         if tracking is None:

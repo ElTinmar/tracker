@@ -109,7 +109,7 @@ class MultiFish(Tracker):
         }
         return res 
 
-    def overlay_local(image: NDArray, tracking: Optional[Dict]) -> NDArray:
+    def overlay_local(self, image: NDArray, tracking: Optional[Dict]) -> NDArray:
 
         if tracking is None:
             return None
