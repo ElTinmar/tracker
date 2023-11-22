@@ -8,7 +8,6 @@ from typing import Tuple
 from image_tools import enhance, im2uint8
 from .roi_coords import get_roi_coords
 
-
 @dataclass
 class TailTrackerParamTracking:
     pix_per_mm: float = 40.0
