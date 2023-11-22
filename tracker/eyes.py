@@ -3,10 +3,11 @@ import cv2
 from scipy.spatial.distance import pdist
 import numpy as np
 from numpy.typing import NDArray, ArrayLike
-from typing import Tuple, Dict
-from image_tools import bwareafilter_props, bwareafilter, enhance, im2uint8
-from geometry import ellipse_direction, angle_between_vectors
+from typing import Tuple, Dict, Optional
+from image_tools import bwareafilter_props, bwareafilter, enhance, im2uint8, im2rgb
+from geometry import ellipse_direction, angle_between_vectors, to_homogeneous, from_homogeneous
 from .roi_coords import get_roi_coords
+from tracker import Tracker
 
 @dataclass
 class EyesTrackerParamTracking:
@@ -56,7 +57,23 @@ class EyesTrackerParamTracking:
     @property
     def crop_offset_px(self):
         return self.mm2px(self.crop_offset_mm)
+
+@dataclass
+class EyesTrackerParamOverlay:
+    pix_per_mm: float = 40.0
+    eye_len_mm: float = 0.2
+    color_eye_left: tuple = (255, 255, 128)
+    color_eye_right: tuple = (128, 255, 255)
+    thickness: int = 2
+
+    def mm2px(self, val_mm):
+        val_px = int(val_mm * self.pix_per_mm) 
+        return val_px
     
+    @property
+    def eye_len_px(self):
+        return self.mm2px(self.eye_len_mm)
+        
 @dataclass
 class EyesTracking:
     centroid: NDArray
@@ -68,7 +85,6 @@ class EyesTracking:
     def to_csv(self):
         '''export data as csv'''
         pass
-
 
 def get_eye_prop(blob, resize: float) -> Dict:
 
@@ -135,84 +151,185 @@ def find_eyes_and_swimbladder(
 
     return (found_eyes_and_sb, props, mask)
 
-def track(
+def disp_eye(
         image: NDArray, 
-        centroid: NDArray,
-        param: EyesTrackerParamTracking
-    ) -> EyesTracking:
+        eye_centroid: NDArray,
+        eye_direction: NDArray,
+        color: tuple, 
+        eye_len_px: float, 
+        thickness: int
+    ) -> NDArray:
 
-    if (image is None) or (image.size == 0):
-        return None
+    overlay = image.copy()
 
-    if param.resize != 1:
-        image = cv2.resize(
-            image, 
-            None, 
-            None,
-            param.resize,
-            param.resize,
-            cv2.INTER_NEAREST
+    # draw two lines from eye centroid 
+    pt1 = eye_centroid
+    pt2 = pt1 + eye_len_px * eye_direction
+    overlay = cv2.line(
+        overlay,
+        pt1.astype(np.int32),
+        pt2.astype(np.int32),
+        color,
+        thickness
+    )
+    pt2 = pt1 - eye_len_px * eye_direction
+    overlay = cv2.line(
+        overlay,
+        pt1.astype(np.int32),
+        pt2.astype(np.int32),
+        color,
+        thickness
+    )
+
+    # indicate eye direction with a circle (easier than arrowhead)
+    overlay = cv2.circle(
+        overlay,
+        pt2.astype(np.int32),
+        2,
+        color,
+        thickness
+    )
+
+    return overlay
+
+class EyesTracker(Tracker):
+
+    def __init__(
+            self, 
+            tracking_param: EyesTrackerParamTracking, 
+            overlay_param: EyesTrackerParamOverlay
+        ) -> None:
+
+        self.tracking_param = tracking_param
+        self.overlay_param = overlay_param
+
+    def track(
+            self,
+            image: NDArray, 
+            centroid: Optional[NDArray],
+        ) -> Optional[EyesTracking]:
+
+        if (image is None) or (image.size == 0) or (centroid is None):
+            return None
+
+        if self.tracking_param.resize != 1:
+            image = cv2.resize(
+                image, 
+                None, 
+                None,
+                self.tracking_param.resize,
+                self.tracking_param.resize,
+                cv2.INTER_NEAREST
+            )
+
+        left_eye = None
+        right_eye = None
+        new_heading = None
+
+        # crop image
+        left, bottom, w, h = get_roi_coords(
+            centroid, 
+            self.tracking_param.crop_dimension_px, 
+            self.tracking_param.crop_offset_px, 
+            self.tracking_param.resize
+        )
+        right = left + w
+        top = bottom + h
+        image_crop = image[bottom:top, left:right]
+        if image_crop.size == 0:
+            return None
+
+        # tune image contrast and gamma
+        image_crop = enhance(
+            image_crop,
+            self.tracking_param.eye_contrast,
+            self.tracking_param.eye_gamma,
+            self.tracking_param.eye_brightness,
+            self.tracking_param.blur_sz_px,
+            self.tracking_param.median_filter_sz_px
         )
 
-    left_eye = None
-    right_eye = None
-    new_heading = None
+        # sweep threshold to obtain 3 connected component within size range (include SB)
+        found_eyes_and_sb, props, mask = find_eyes_and_swimbladder(
+            image_crop, 
+            self.tracking_param.eye_dyntresh_res, 
+            self.tracking_param.eye_size_lo_px, 
+            self.tracking_param.eye_size_hi_px
+        )
+        
+        if found_eyes_and_sb: 
+            # identify left eye, right eye and swimbladder
+            blob_centroids = np.array([blob.centroid for blob in props])
+            sb_idx, left_idx, right_idx = assign_features(blob_centroids)
 
-    # crop image
-    left, bottom, w, h = get_roi_coords(
-        centroid, 
-        param.crop_dimension_px, 
-        param.crop_offset_px, 
-        param.resize
-    )
-    right = left + w
-    top = bottom + h
-    image_crop = image[bottom:top, left:right]
-    if image_crop.size == 0:
-        return None
+            # compute eye orientation
+            left_eye = get_eye_prop(props[left_idx], self.tracking_param.resize)
+            right_eye = get_eye_prop(props[right_idx], self.tracking_param.resize)
+            #new_heading = (props[left_idx].centroid + props[right_idx].centroid)/2 - props[sb_idx].centroid
+            #new_heading = new_heading / np.linalg.norm(new_heading)
 
-    # tune image contrast and gamma
-    image_crop = enhance(
-        image_crop,
-        param.eye_contrast,
-        param.eye_gamma,
-        param.eye_brightness,
-        param.blur_sz_px,
-        param.median_filter_sz_px
-    )
+        res = EyesTracking(
+            centroid = centroid,
+            left_eye = left_eye,
+            right_eye = right_eye,
+            mask = im2uint8(mask),
+            image = im2uint8(image_crop)
+        )
 
-    # sweep threshold to obtain 3 connected component within size range (include SB)
-    found_eyes_and_sb, props, mask = find_eyes_and_swimbladder(
-        image_crop, 
-        param.eye_dyntresh_res, 
-        param.eye_size_lo_px, 
-        param.eye_size_hi_px
-    )
-    
-    if found_eyes_and_sb: 
-        # identify left eye, right eye and swimbladder
-        blob_centroids = np.array([blob.centroid for blob in props])
-        sb_idx, left_idx, right_idx = assign_features(blob_centroids)
+        return res
 
-        # compute eye orientation
-        left_eye = get_eye_prop(props[left_idx], param.resize)
-        right_eye = get_eye_prop(props[right_idx], param.resize)
-        #new_heading = (props[left_idx].centroid + props[right_idx].centroid)/2 - props[sb_idx].centroid
-        #new_heading = new_heading / np.linalg.norm(new_heading)
+    def overlay(
+            self,
+            image: NDArray, 
+            tracking: Optional[EyesTracking], 
+            transformation_matrix: NDArray,
+        ) -> Optional[NDArray]:
 
-    res = EyesTracking(
-        centroid = centroid,
-        left_eye = left_eye,
-        right_eye = right_eye,
-        mask = im2uint8(mask),
-        image = im2uint8(image_crop)
-    )
+        if tracking is not None:
 
-    return res
+            overlay = im2rgb(image)
 
-def track_GPU(
-        image: NDArray, 
-        centroid: NDArray,
-        param: EyesTrackerParamTracking
-    ) -> EyesTracking:
-    '''TODO'''
+            left_eye_centroid = from_homogeneous(
+                transformation_matrix @ to_homogeneous(tracking.left_eye['centroid'])
+            )
+            left_eye_direction = from_homogeneous(
+                transformation_matrix @ to_homogeneous(tracking.left_eye['direction'])
+            )
+            right_eye_centroid = from_homogeneous(
+                transformation_matrix @ to_homogeneous(tracking.right_eye['centroid'])
+            )
+            right_eye_direction = from_homogeneous(
+                transformation_matrix @ to_homogeneous(tracking.right_eye['direction'])
+            )
+            
+            # left eye
+            if tracking.left_eye is not None:
+                overlay = disp_eye(
+                    overlay, 
+                    left_eye_centroid,
+                    left_eye_direction,
+                    self.overlay_param.color_eye_left, 
+                    self.overlay_param.eye_len_px, 
+                    self.overlay_param.thickness
+                )
+
+            # right eye
+            if tracking.right_eye is not None:   
+                overlay = disp_eye(
+                    overlay, 
+                    right_eye_centroid,
+                    right_eye_direction,
+                    self.overlay_param.color_eye_right, 
+                    self.overlay_param.eye_len_px, 
+                    self.overlay_param.thickness
+                )
+        
+            return overlay
+
+class EyesTrackerGPU(Tracker):
+
+    def track(
+            image: NDArray, 
+            centroid: Optional[NDArray],
+        ) -> Optional[EyesTracking]:
+        '''TODO'''

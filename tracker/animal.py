@@ -1,8 +1,11 @@
-from image_tools import bwareafilter_centroids, enhance, im2uint8
+from image_tools import bwareafilter_centroids, enhance, im2uint8, im2rgb
+from geometry import to_homogeneous, Affine2DTransform
 import numpy as np
 from numpy.typing import NDArray
 from dataclasses import dataclass
 import cv2
+from typing import Optional, Any
+from .tracker import Tracker
 
 @dataclass
 class AnimalTrackerParamTracking:
@@ -67,6 +70,22 @@ class AnimalTrackerParamTracking:
         return self.mm2px(self.median_filter_sz_mm)
 
 @dataclass
+class AnimalTrackerParamOverlay:
+    pix_per_mm: float = 40.0
+    radius_mm: float = 0.1
+    centroid_color: tuple = (255, 128, 128)
+    bbox_color:tuple = (255, 255, 255) 
+    centroid_thickness: int = -1
+    bbox_thickness: int = 2
+
+    def mm2px(self, val_mm):
+        return int(val_mm * self.pix_per_mm) 
+
+    @property
+    def radius_px(self):
+        return self.mm2px(self.radius_mm)
+    
+@dataclass
 class AnimalTracking:
     centroids: NDArray # nx2 vector. (x,y) coordinates of the n fish centroid ~ swim bladder location
     bounding_boxes: NDArray
@@ -80,62 +99,120 @@ class AnimalTracking:
         '''
         pass    
 
-def track(image: NDArray, param: AnimalTrackerParamTracking) -> AnimalTracking:
+class AnimalTracker(Tracker):
 
-    if (image is None) or (image.size == 0):
-        return None
-    
-    if param.resize != 1:
-        image = cv2.resize(
-            image, 
-            None, 
-            None,
-            param.resize,
-            param.resize,
-            cv2.INTER_NEAREST
+    def __init__(
+            self, 
+            tracking_param: AnimalTrackerParamTracking, 
+            overlay_param: AnimalTrackerParamOverlay
+        ):
+
+        self.tracking_param = tracking_param
+        self.overlay_param = overlay_param
+
+    def track(self, image: NDArray, centroid: NDArray = None) -> Optional[AnimalTracking]:
+
+        if (image is None) or (image.size == 0):
+            return None
+        
+        if self.tracking_param.resize != 1:
+            image = cv2.resize(
+                image, 
+                None, 
+                None,
+                self.tracking_param.resize,
+                self.tracking_param.resize,
+                cv2.INTER_NEAREST
+            )
+
+        # tune image contrast and gamma
+        image = enhance(
+            image,
+            self.tracking_param.animal_contrast,
+            self.tracking_param.animal_gamma,
+            self.tracking_param.animal_brightness,
+            self.tracking_param.blur_sz_px,
+            self.tracking_param.median_filter_sz_px
         )
 
-    # tune image contrast and gamma
-    image = enhance(
-        image,
-        param.animal_contrast,
-        param.animal_gamma,
-        param.animal_brightness,
-        param.blur_sz_px,
-        param.median_filter_sz_px
-    )
+        height, width = image.shape
+        mask = (image >= self.tracking_param.animal_intensity)
+        centroids = bwareafilter_centroids(
+            mask, 
+            min_size = self.tracking_param.min_animal_size_px,
+            max_size = self.tracking_param.max_animal_size_px, 
+            min_length = self.tracking_param.min_animal_length_px,
+            max_length = self.tracking_param.max_animal_length_px,
+            min_width = self.tracking_param.min_animal_width_px,
+            max_width = self.tracking_param.max_animal_width_px
+        )
 
-    height, width = image.shape
-    mask = (image >= param.animal_intensity)
-    centroids = bwareafilter_centroids(
-        mask, 
-        min_size = param.min_animal_size_px,
-        max_size = param.max_animal_size_px, 
-        min_length = param.min_animal_length_px,
-        max_length = param.max_animal_length_px,
-        min_width = param.min_animal_width_px,
-        max_width = param.max_animal_width_px
-    )
+        bboxes = np.zeros((centroids.shape[0],4), dtype=int)
+        bb_centroids = np.zeros((centroids.shape[0],2), dtype=float)
+        for idx, (x,y) in enumerate(centroids):
+            left = max(int(x - self.tracking_param.pad_value_px), 0) 
+            bottom = max(int(y - self.tracking_param.pad_value_px), 0) 
+            right = min(int(x + self.tracking_param.pad_value_px), width)
+            top = min(int(y + self.tracking_param.pad_value_px), height)
+            bboxes[idx,:] = [left,bottom,right,top]
+            bb_centroids[idx,:] = [x-left, y-bottom] 
 
-    bboxes = np.zeros((centroids.shape[0],4), dtype=int)
-    bb_centroids = np.zeros((centroids.shape[0],2), dtype=float)
-    for idx, (x,y) in enumerate(centroids):
-        left = max(int(x - param.pad_value_px), 0) 
-        bottom = max(int(y - param.pad_value_px), 0) 
-        right = min(int(x + param.pad_value_px), width)
-        top = min(int(y + param.pad_value_px), height)
-        bboxes[idx,:] = [left,bottom,right,top]
-        bb_centroids[idx,:] = [x-left, y-bottom] 
+        res = AnimalTracking(
+            centroids = centroids/self.tracking_param.resize,
+            bounding_boxes = bboxes/self.tracking_param.resize,
+            bb_centroids = bb_centroids/self.tracking_param.resize,
+            mask = im2uint8(mask),
+            image = im2uint8(image)
+        )
 
-    res = AnimalTracking(
-        centroids = centroids/param.resize,
-        bounding_boxes = bboxes/param.resize,
-        bb_centroids = bb_centroids/param.resize,
-        mask = im2uint8(mask),
-        image = im2uint8(image)
-    )
+        return res
+    
+    def overlay(
+            self,
+            image: NDArray, 
+            tracking: Optional[AnimalTracking], 
+            transformation_matrix: NDArray = Affine2DTransform.identity()
+        ) -> Optional[NDArray]:
 
-    return res
+        if tracking is not None:
 
-def track_GPU(image: NDArray, param: AnimalTrackerParamTracking) -> AnimalTracking:
-    '''TODO'''
+            overlay = im2rgb(image)
+
+            # draw centroid
+            for x,y,_ in transformation_matrix @ to_homogeneous(tracking.centroids):
+                overlay = cv2.circle(
+                    overlay,
+                    (int(x),int(y)), 
+                    self.overlay_param.radius_px, 
+                    self.overlay_param.centroid_color, 
+                    self.overlay_param.centroid_thickness
+                )
+
+            # draw bounding boxes
+            for (left, bottom, right, top) in tracking.bounding_boxes:
+                rect = np.array([[left, top],[right, bottom]])
+                bbox = transformation_matrix @ to_homogeneous(rect)
+                topleft = bbox[0,:-1].astype(int)
+                bottomright = bbox[1,:-1].astype(int)
+                overlay = cv2.rectangle(
+                    overlay, 
+                    topleft,
+                    bottomright, 
+                    self.overlay_param.bbox_color, 
+                    self.overlay_param.bbox_thickness
+                )
+
+            return overlay
+        
+class AnimalTrackerGPU(Tracker):
+    
+    def track(self, image: NDArray) -> Optional[AnimalTracking]:
+        '''TODO'''
+
+    def overlay(
+        self, 
+        image: NDArray, 
+        tracking: Optional[Any], 
+        transformation_matrix: NDArray 
+        ) -> Optional[NDArray]:
+        '''TODO'''
