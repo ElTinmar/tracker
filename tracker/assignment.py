@@ -33,15 +33,15 @@ class GridAssignment:
 
         self.ID = np.array(unique_ids)
         self.centroids = centroids[idx_to_keep,:]
-        self.idx_to_keep = idx_to_keep
+        self.idx_to_keep = np.asarray(idx_to_keep)
 
-    def get_ID(self):
+    def get_ID(self) -> NDArray:
         return self.ID
     
-    def get_kept_centroids(self):
+    def get_kept_centroids(self) -> NDArray:
         return self.idx_to_keep
     
-    def get_centroids(self):
+    def get_centroids(self) -> NDArray:
         return self.centroids
     
 class LinearSumAssignment:
@@ -93,13 +93,13 @@ class LinearSumAssignment:
         self.previous_centroids = centroids
         self.idx_to_keep = np.arange(centroids.shape[0])
             
-    def get_ID(self):
+    def get_ID(self) -> NDArray:
         return self.ID
     
-    def get_kept_centroids(self):
+    def get_kept_centroids(self) -> NDArray:
         '''for compatibility with grid assignment'''
         return self.idx_to_keep
     
-    def get_centroids(self):
+    def get_centroids(self) -> NDArray:
         return self.previous_centroids
  

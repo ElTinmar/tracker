@@ -1,10 +1,15 @@
 import numpy as np
 import cv2
-from typing import Protocol, Optional, Dict
+from typing import Protocol, Optional, List
 from numpy.typing import NDArray
 from image_tools import enhance, imrotate, im2rgb
 from geometry import Affine2DTransformation
 from .core import Tracker, TrackingOverlay
+from .animal import AnimalTracking
+from .body import BodyTracking
+from .eyes import EyesTracking
+from .tail import TailTracking 
+from dataclasses import dataclass
 
 class Accumulator(Protocol):
     def update(self):
@@ -17,7 +22,23 @@ class Assignment(Protocol):
     def get_ID(self):
         ...
 
-class MultiFish(Tracker):
+@dataclass
+class MultiFishTracking:
+    identities: NDArray
+    indices: NDArray
+    animals: AnimalTracking
+    body: Optional[List[BodyTracking]]
+    eyes: Optional[List[EyesTracking]]
+    tail: Optional[List[TailTracking]]
+    image: NDArray
+
+    
+    def to_csv(self):
+        '''export data as csv'''
+        pass
+
+
+class MultiFishTracker(Tracker):
 
     def __init__(
             self, 
@@ -35,7 +56,7 @@ class MultiFish(Tracker):
         self.eyes = eyes
         self.tail = tail
         
-    def track(self, image: NDArray, centroid: Optional[NDArray] = None):
+    def track(self, image: NDArray, centroid: Optional[NDArray] = None) -> Optional[MultiFishTracking]:
 
         if (image is None) or (image.size == 0):
             return None
@@ -100,15 +121,16 @@ class MultiFish(Tracker):
                     self.accumulator.update(id,body[id],eyes[id],tail[id])
 
         # save tracking results in a dict and return
-        res = {
-            'identities': identities, 
-            'indices': to_keep,
-            'animals': animals,
-            'body': body,
-            'eyes': eyes,
-            'tail': tail,
-            'image': (255*image).astype(np.uint8)
-        }
+        res = MultiFishTracking(
+            identities =  identities, 
+            indices = to_keep,
+            animals = animals,
+            body = body,
+            eyes = eyes,
+            tail =  tail,
+            image = (255*image).astype(np.uint8)
+        )
+        
         return res 
 
 class MultiFishOverlay(TrackingOverlay):
@@ -130,7 +152,7 @@ class MultiFishOverlay(TrackingOverlay):
     def overlay(
             self, 
             image: NDArray, 
-            tracking: Optional[Dict], 
+            tracking: Optional[MultiFishTracking], 
             transformation_matrix: NDArray
         ) -> NDArray:
         '''
@@ -145,46 +167,46 @@ class MultiFishOverlay(TrackingOverlay):
             overlay = im2rgb(image)
 
             # loop over animals
-            for idx, id in zip(tracking['indices'], tracking['identities']):
+            for idx, id in zip(tracking.indices, tracking.identities):
 
-                if tracking['animals'] is not None:
+                if tracking.animals is not None:
 
                     # overlay animal bounding boxes, coord system 1.
-                    overlay = self.animal.overlay(overlay, tracking['animals'])
+                    overlay = self.animal.overlay(overlay, tracking.animals)
                     
                     # transformation matrix from coord system 1. to coord system 2., just a translation  
-                    tx_bbox = tracking['animals'].bounding_boxes[idx,0],
-                    ty_bbox = tracking['animals'].bounding_boxes[idx,1],
+                    tx_bbox = tracking.animals.bounding_boxes[idx,0],
+                    ty_bbox = tracking.animals.bounding_boxes[idx,1],
                     translation_bbox = Affine2DTransformation.translation(tx_bbox,ty_bbox)
 
-                    if (self.body is not None)  and (tracking['body'][id] is not None):
+                    if (self.body is not None)  and (tracking.body[id] is not None):
 
                         # overlay body, coord. system 2.
                         overlay = self.body.overlay(
                             overlay, 
-                            tracking['body'][id], 
+                            tracking.body[id], 
                             Affine2DTransformation.inverse(translation_bbox)
                         )
 
                         # transformation matrix from coord system 1. to coord system 3., rotation + translation
-                        angle = tracking['body'][id].angle_rad
+                        angle = tracking.body[id].angle_rad
                         rotation = Affine2DTransformation.rotation(np.rad2deg(angle))
-                        tx, ty = tracking['body'][id].centroid 
+                        tx, ty = tracking.body[id].centroid 
                         transformation = rotation @ Affine2DTransformation.translation(tx, ty) @ translation_bbox
                         
                         # overlay eyes, coord system 3.
-                        if (self.eyes is not None)  and (tracking['eyes'][id]is not None):
+                        if (self.eyes is not None)  and (tracking.eyes[id]is not None):
                             overlay = self.eyes.overlay(
                                 overlay, 
-                                tracking['eyes'][id], 
+                                tracking.eyes[id], 
                                 Affine2DTransformation.inverse(transformation)
                             )
                         
                         # overlay tail, coord system 3.
-                        if (self.tail is not None)  and (tracking['tail'][id] is not None):
+                        if (self.tail is not None)  and (tracking.tail[id] is not None):
                             overlay = self.tail.overlay(
                                 overlay, 
-                                tracking['tail'][id], 
+                                tracking.tail[id], 
                                 Affine2DTransformation.inverse(transformation)
                             )
 
