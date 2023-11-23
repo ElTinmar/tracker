@@ -3,7 +3,7 @@ import cv2
 from typing import Protocol, Optional, List
 from numpy.typing import NDArray
 from image_tools import enhance, imrotate, im2rgb
-from geometry import Affine2DTransformation
+from geometry import Affine2DTransform
 from .core import Tracker, TrackingOverlay
 from .animal import AnimalTracking
 from .body import BodyTracking
@@ -153,7 +153,7 @@ class MultiFishOverlay(TrackingOverlay):
             self, 
             image: NDArray, 
             tracking: Optional[MultiFishTracking], 
-            transformation_matrix: NDArray = Affine2DTransformation.identity()
+            transformation_matrix: NDArray = Affine2DTransform.identity()
         ) -> NDArray:
         '''
         There are 3 different coordinate systems:
@@ -177,7 +177,7 @@ class MultiFishOverlay(TrackingOverlay):
                     # transformation matrix from coord system 1. to coord system 2., just a translation  
                     tx_bbox = tracking.animals.bounding_boxes[idx,0],
                     ty_bbox = tracking.animals.bounding_boxes[idx,1],
-                    translation_bbox = Affine2DTransformation.translation(tx_bbox,ty_bbox)
+                    translation_bbox = Affine2DTransform.translation(tx_bbox,ty_bbox)
 
                     if (self.body is not None)  and (tracking.body[id] is not None):
 
@@ -185,21 +185,21 @@ class MultiFishOverlay(TrackingOverlay):
                         overlay = self.body.overlay(
                             overlay, 
                             tracking.body[id], 
-                            Affine2DTransformation.inverse(translation_bbox)
+                            Affine2DTransform.inverse(translation_bbox)
                         )
 
                         # transformation matrix from coord system 1. to coord system 3., rotation + translation
                         angle = tracking.body[id].angle_rad
-                        rotation = Affine2DTransformation.rotation(np.rad2deg(angle))
+                        rotation = Affine2DTransform.rotation(np.rad2deg(angle))
                         tx, ty = tracking.body[id].centroid 
-                        transformation = rotation @ Affine2DTransformation.translation(tx, ty) @ translation_bbox
+                        transformation = rotation @ Affine2DTransform.translation(tx, ty) @ translation_bbox
                         
                         # overlay eyes, coord system 3.
                         if (self.eyes is not None)  and (tracking.eyes[id]is not None):
                             overlay = self.eyes.overlay(
                                 overlay, 
                                 tracking.eyes[id], 
-                                Affine2DTransformation.inverse(transformation)
+                                Affine2DTransform.inverse(transformation)
                             )
                         
                         # overlay tail, coord system 3.
@@ -207,7 +207,7 @@ class MultiFishOverlay(TrackingOverlay):
                             overlay = self.tail.overlay(
                                 overlay, 
                                 tracking.tail[id], 
-                                Affine2DTransformation.inverse(transformation)
+                                Affine2DTransform.inverse(transformation)
                             )
 
                 # show ID, coord. system 1.

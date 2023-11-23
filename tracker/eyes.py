@@ -280,7 +280,6 @@ class EyesOverlay(TrackingOverlay):
 
     def __init__(
             self, 
-            tracking_param: EyesTrackerParamTracking, 
             overlay_param: EyesTrackerParamOverlay
         ) -> None:
 
