@@ -1,6 +1,7 @@
-__all__ = ["animal", "assignment", "body", "eyes", "tail", "multifish",
+__all__ = ["core", "animal", "assignment", "body", "eyes", "tail", "multifish",
            "animal_widget", "assignment_widget", "body_widget", "eyes_widget", "tail_widget", "multifish_widget"]
 
+from .core import *
 from .animal import *
 from .assignment import *
 from .body import *

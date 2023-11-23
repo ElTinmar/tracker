@@ -4,7 +4,7 @@ from typing import Protocol, Optional, Dict
 from numpy.typing import NDArray
 from image_tools import enhance, imrotate, im2rgb
 from geometry import Affine2DTransformation
-from .tracker import Tracker, TrackingOverlay
+from .core import Tracker, TrackingOverlay
 
 class Accumulator(Protocol):
     def update(self):

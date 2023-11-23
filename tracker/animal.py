@@ -5,7 +5,7 @@ from numpy.typing import NDArray
 from dataclasses import dataclass
 import cv2
 from typing import Optional, Any
-from .tracker import Tracker, TrackingOverlay
+from .core import Tracker, TrackingOverlay
 
 @dataclass
 class AnimalTrackerParamTracking:
