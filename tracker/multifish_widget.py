@@ -3,7 +3,7 @@ from .body_widget import BodyTrackerWidget
 from .eyes_widget import EyesTrackerWidget
 from .tail_widget import TailTrackerWidget 
 from .assignment_widget import AssignmentWidget
-from .multifish import Tracker
+from .multifish import MultiFishTracker, MultiFishOverlay
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QMainWindow, QTabWidget, QDockWidget, QLabel, QVBoxLayout, QHBoxLayout, QWidget
 from typing import Protocol, Optional
@@ -12,7 +12,6 @@ import numpy as np
 from qt_widgets import NDarray_to_QPixmap, LabeledSpinBox
 import cv2
 
-# TODO add widget to chose assignment method
 # TODO add widget to chose accumulator method (useful when you want to actually do the tracking)
 # TODO add widget to show background subtracted image histogram 
 
@@ -42,7 +41,8 @@ class TrackerWidget(QMainWindow):
         self.declare_components()
         self.layout_components()
 
-    def declare_components(self):
+    def declare_components(self) -> None:
+
         self.image_overlay = QLabel(self)
         self.image_overlay.mousePressEvent = self.on_mouse_click
 
@@ -52,7 +52,7 @@ class TrackerWidget(QMainWindow):
         self.zoom.setValue(66)
         self.zoom.setSingleStep(25)
 
-    def layout_components(self):
+    def layout_components(self) -> None:
 
         main_widget = QWidget()
 
@@ -82,7 +82,8 @@ class TrackerWidget(QMainWindow):
 
         self.setCentralWidget(main_widget)
 
-    def on_tab_close(self, index):
+    def on_tab_close(self, index) -> None:
+
         text = self.tabs.tabText(index)
         if text == 'eyes':
             self.body_tracker_widget = None
@@ -91,25 +92,36 @@ class TrackerWidget(QMainWindow):
             self.body_tracker_widget = None
             self.tabs.removeTab(index)
 
-    def update_tracker(self):
+    def update_tracker(self) -> None:
+        
+        self.animal_tracker_widget.update_tracker()
+        animal_tracker = self.animal_tracker_widget.tracker
+        animal_overlay = self.animal_tracker_widget.overlay
+
         body_tracker = None
         eyes_tracker = None
         tail_tracker = None
-        self.animal_tracker_widget.update_tracker()
-        assignment = self.assignment_widget.get_assignment()
-        animal_tracker = self.animal_tracker_widget.tracker
+        
         if self.body_tracker_widget is not None:
             self.body_tracker_widget.update_tracker()
             body_tracker = self.body_tracker_widget.tracker
+            body_overlay = self.body_tracker_widget.overlay
+        
         if self.eyes_tracker_widget is not None:
             self.eyes_tracker_widget.update_tracker()
             eyes_tracker = self.eyes_tracker_widget.tracker
+            eyes_overlay = self.eyes_tracker_widget.overlay
+        
         if self.tail_tracker_widget is not None:
             self.tail_tracker_widget.update_tracker()
             tail_tracker = self.tail_tracker_widget.tracker
+            tail_overlay = self.tail_tracker_widget.overlay
+
+        assignment = self.assignment_widget.get_assignment()
 
         if assignment is not None:
-            self.tracker = Tracker(
+
+            self.tracker = MultiFishTracker(
                 assignment,
                 None,
                 animal_tracker,
@@ -118,9 +130,19 @@ class TrackerWidget(QMainWindow):
                 tail_tracker
             )
 
-    def display(self, tracking):
+            self.overlay = MultiFishOverlay(
+                animal_overlay,
+                body_overlay,
+                eyes_overlay,
+                tail_overlay
+            )
+
+    def display(self, tracking: Dict) -> None:
+
         if tracking is not None:
-            overlay = self.tracker.overlay_local(tracking)
+
+            overlay = self.overlay.overlay(tracking)
+            
             zoom = self.zoom.value()/100.0
             overlay = cv2.resize(overlay,None,None,zoom,zoom,cv2.INTER_NEAREST)
             self.image_overlay.setPixmap(NDarray_to_QPixmap(overlay))
@@ -136,7 +158,8 @@ class TrackerWidget(QMainWindow):
             except KeyError:
                 pass
 
-    def on_mouse_click(self, event):
+    def on_mouse_click(self, event) -> None:
+
         x = event.pos().x()
         y = event.pos().y() 
 

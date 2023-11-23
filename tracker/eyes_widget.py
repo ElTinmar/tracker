@@ -1,18 +1,22 @@
 from PyQt5.QtWidgets import QWidget, QLabel, QHBoxLayout, QVBoxLayout
-from .eyes import EyesTracker, EyesTrackerParamOverlay, EyesTrackerParamTracking
+from .eyes import *
 from qt_widgets import NDarray_to_QPixmap, LabeledDoubleSpinBox, LabeledSpinBox
 import cv2
+from geometry import Affine2DTransform
+
 
 # TODO maybe group settings into collapsable blocks
 
 class EyesTrackerWidget(QWidget):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
+
         super().__init__(*args, **kwargs)
         self.tracker = None
         self.declare_components()
         self.layout_components()
 
-    def declare_components(self):
+    def declare_components(self) -> None:
+
         self.image = QLabel(self)
         self.mask = QLabel(self)
         self.image_overlay = QLabel(self)
@@ -126,7 +130,8 @@ class EyesTrackerWidget(QWidget):
         self.zoom.setSingleStep(25)
         self.zoom.valueChanged.connect(self.update_tracker)
 
-    def layout_components(self):
+    def layout_components(self) -> None:
+
         parameters = QVBoxLayout()
         parameters.addWidget(self.pix_per_mm)
         parameters.addWidget(self.target_pix_per_mm)
@@ -156,10 +161,8 @@ class EyesTrackerWidget(QWidget):
 
         self.setLayout(mainlayout)
 
-    def update_tracker(self):
-        overlay_param = EyesTrackerParamOverlay(
-            pix_per_mm = self.target_pix_per_mm.value(),
-        )
+    def update_tracker(self) -> None:
+
         tracker_param = EyesTrackerParamTracking(
             pix_per_mm = self.pix_per_mm.value(),
             target_pix_per_mm = self.target_pix_per_mm.value(),
@@ -174,11 +177,19 @@ class EyesTrackerWidget(QWidget):
             blur_sz_mm = self.blur_sz_mm.value(),
             median_filter_sz_mm = self.median_filter_sz_mm.value(),
         )
-        self.tracker = EyesTracker(tracker_param, overlay_param)
+        self.tracker = EyesTracker(tracker_param)
 
-    def display(self, tracking):
+        overlay_param = EyesTrackerParamOverlay(
+            pix_per_mm = self.target_pix_per_mm.value(),
+        )
+        self.overlay = EyesOverlay(overlay_param)
+
+    def display(self, tracking: EyesTracking) -> None:
+
         if tracking is not None:
-            overlay = self.tracker.overlay_local(tracking)
+
+            T = Affine2DTransform.scale(self.tracker.tracking_param.resize, self.tracker.tracking_param.resize)
+            overlay = self.overlay.overlay(tracking.image, tracking, T)
 
             zoom = self.zoom.value()/100.0
             image = cv2.resize(tracking.image,None,None,zoom,zoom,cv2.INTER_NEAREST)

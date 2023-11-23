@@ -1,18 +1,22 @@
 from PyQt5.QtWidgets import QWidget, QLabel, QHBoxLayout, QVBoxLayout
-from .tail import TailTracker, TailTrackerParamOverlay, TailTrackerParamTracking
+from .tail import *
 from qt_widgets import NDarray_to_QPixmap, LabeledDoubleSpinBox, LabeledSpinBox
 import cv2
+from geometry import Affine2DTransform
+
 
 # TODO maybe group settings into collapsable blocks
 
 class TailTrackerWidget(QWidget):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
+
         super().__init__(*args, **kwargs)
         self.tracker = None
         self.declare_components()
         self.layout_components()
 
-    def declare_components(self):
+    def declare_components(self) -> None:
+
         self.image = QLabel(self)
         self.image_overlay = QLabel(self)
 
@@ -150,7 +154,8 @@ class TailTrackerWidget(QWidget):
         self.zoom.setSingleStep(25)
         self.zoom.valueChanged.connect(self.update_tracker)
 
-    def layout_components(self):
+    def layout_components(self) -> None:
+
         parameters = QVBoxLayout()
         parameters.addWidget(self.pix_per_mm)
         parameters.addWidget(self.target_pix_per_mm)
@@ -182,12 +187,8 @@ class TailTrackerWidget(QWidget):
 
         self.setLayout(mainlayout)
 
-    def update_tracker(self):
-        overlay_param = TailTrackerParamOverlay(
-            pix_per_mm = self.target_pix_per_mm.value(),
-            color_tail = (255, 128, 128),
-            thickness = 2
-        )
+    def update_tracker(self) -> None:
+
         tracker_param = TailTrackerParamTracking(
             pix_per_mm = self.pix_per_mm.value(),
             target_pix_per_mm = self.target_pix_per_mm.value(),
@@ -205,11 +206,21 @@ class TailTrackerWidget(QWidget):
             blur_sz_mm = self.blur_sz_mm.value(),
             median_filter_sz_mm = self.median_filter_sz_mm.value(),
         )
-        self.tracker = TailTracker(tracker_param, overlay_param)
+        self.tracker = TailTracker(tracker_param)
 
-    def display(self, tracking):
+        overlay_param = TailTrackerParamOverlay(
+            pix_per_mm = self.target_pix_per_mm.value(),
+            color_tail = (255, 128, 128),
+            thickness = 2
+        )
+        self.overlay = TailOverlay(overlay_param)
+
+    def display(self, tracking: TailTracking) -> None:
+
         if tracking is not None:
-            overlay = self.tracker.overlay_local(tracking)
+
+            T = Affine2DTransform.scale(self.tracker.tracking_param.resize, self.tracker.tracking_param.resize)
+            overlay = self.overlay.overlay(tracking.image, tracking, T)
 
             zoom = self.zoom.value()/100.0
             image = cv2.resize(tracking.image,None,None,zoom,zoom,cv2.INTER_NEAREST)
