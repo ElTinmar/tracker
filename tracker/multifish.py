@@ -153,7 +153,7 @@ class MultiFishOverlay(TrackingOverlay):
             self, 
             image: NDArray, 
             tracking: Optional[MultiFishTracking], 
-            transformation_matrix: NDArray
+            transformation_matrix: NDArray = Affine2DTransformation.identity()
         ) -> NDArray:
         '''
         There are 3 different coordinate systems:
