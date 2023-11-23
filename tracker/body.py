@@ -6,7 +6,7 @@ from numpy.typing import NDArray
 from dataclasses import dataclass
 import cv2
 from typing import Optional
-from .tracker import Tracker
+from .tracker import Tracker, TrackingOverlay
         
 @dataclass
 class BodyTrackerParamTracking:
@@ -119,11 +119,9 @@ class BodyTracker(Tracker):
     def __init__(
             self, 
             tracking_param: BodyTrackerParamTracking, 
-            overlay_param: BodyTrackerParamOverlay
         ) -> None:
 
         self.tracking_param = tracking_param
-        self.overlay_param = overlay_param
         
     def track(
             self,
@@ -198,13 +196,26 @@ class BodyTracker(Tracker):
                 image = im2uint8(image)
             )
             return res
-        
+
+class BodyOverlay(TrackingOverlay):
+
+    def __init__(
+            self, 
+            overlay_param: BodyTrackerParamOverlay
+        ) -> None:
+
+        self.overlay_param = overlay_param
+
     def overlay(
             self,
             image: NDArray, 
             tracking: BodyTracking, 
             transformation_matrix: NDArray 
         ) -> Optional[NDArray]:
+
+        '''
+        Coordinate system: origin = fish bounding box top left coordinates
+        '''
 
         if tracking is not None:
 

@@ -5,7 +5,7 @@ from numpy.typing import NDArray
 from dataclasses import dataclass
 import cv2
 from typing import Optional, Any
-from .tracker import Tracker
+from .tracker import Tracker, TrackingOverlay
 
 @dataclass
 class AnimalTrackerParamTracking:
@@ -104,11 +104,9 @@ class AnimalTracker(Tracker):
     def __init__(
             self, 
             tracking_param: AnimalTrackerParamTracking, 
-            overlay_param: AnimalTrackerParamOverlay
         ):
 
         self.tracking_param = tracking_param
-        self.overlay_param = overlay_param
 
     def track(self, image: NDArray, centroid: Optional[NDArray] = None) -> Optional[AnimalTracking]:
 
@@ -166,7 +164,21 @@ class AnimalTracker(Tracker):
         )
 
         return res
+
+class AnimalTrackerGPU(Tracker):
     
+    def track(self, image: NDArray, centroid: Optional[NDArray] = None) -> Optional[AnimalTracking]:
+        '''TODO'''
+
+class AnimalOverlay(TrackingOverlay):
+
+    def __init__(
+            self, 
+            overlay_param: AnimalTrackerParamOverlay
+        ):
+
+        self.overlay_param = overlay_param
+
     def overlay(
             self,
             image: NDArray, 
@@ -204,15 +216,3 @@ class AnimalTracker(Tracker):
 
             return overlay
         
-class AnimalTrackerGPU(Tracker):
-    
-    def track(self, image: NDArray) -> Optional[AnimalTracking]:
-        '''TODO'''
-
-    def overlay(
-        self, 
-        image: NDArray, 
-        tracking: Optional[Any], 
-        transformation_matrix: NDArray 
-        ) -> Optional[NDArray]:
-        '''TODO'''

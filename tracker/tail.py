@@ -8,7 +8,7 @@ from typing import Tuple, Optional
 from image_tools import enhance, im2rgb, im2uint8
 from geometry import to_homogeneous, from_homogeneous
 from .roi_coords import get_roi_coords
-from tracker import Tracker
+from tracker import Tracker, TrackingOverlay
 
 # TODO check if using polyline is faster
 
@@ -86,11 +86,9 @@ class TailTracker(Tracker):
     def __init__(
             self, 
             tracking_param: TailTrackerParamTracking, 
-            overlay_param: TailTrackerParamOverlay
         ) -> None:
 
         self.tracking_param = tracking_param
-        self.overlay_param = overlay_param
 
     def track(
             self,
@@ -181,7 +179,16 @@ class TailTracker(Tracker):
         )    
 
         return res
-    
+
+class TailOverlay(TrackingOverlay):
+
+    def __init__(
+            self, 
+            overlay_param: TailTrackerParamOverlay
+        ) -> None:
+
+        self.overlay_param = overlay_param
+
     def overlay(
             self,
             image: NDArray, 
@@ -189,6 +196,10 @@ class TailTracker(Tracker):
             transformation_matrix: NDArray
         ) -> Optional[NDArray]:
 
+        '''
+        Coordinate system: origin = fish centroid, rotation = fish heading
+        '''
+                
         if tracking is not None:         
 
             overlay = im2rgb(image)       

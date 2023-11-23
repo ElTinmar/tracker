@@ -7,7 +7,7 @@ from typing import Tuple, Dict, Optional
 from image_tools import bwareafilter_props, bwareafilter, enhance, im2uint8, im2rgb
 from geometry import ellipse_direction, angle_between_vectors, to_homogeneous, from_homogeneous
 from .roi_coords import get_roi_coords
-from tracker import Tracker
+from tracker import Tracker, TrackingOverlay
 
 @dataclass
 class EyesTrackerParamTracking:
@@ -197,11 +197,9 @@ class EyesTracker(Tracker):
     def __init__(
             self, 
             tracking_param: EyesTrackerParamTracking, 
-            overlay_param: EyesTrackerParamOverlay
         ) -> None:
 
         self.tracking_param = tracking_param
-        self.overlay_param = overlay_param
 
     def track(
             self,
@@ -277,6 +275,16 @@ class EyesTracker(Tracker):
         )
 
         return res
+    
+class EyesOverlay(TrackingOverlay):
+
+    def __init__(
+            self, 
+            tracking_param: EyesTrackerParamTracking, 
+            overlay_param: EyesTrackerParamOverlay
+        ) -> None:
+
+        self.overlay_param = overlay_param
 
     def overlay(
             self,
@@ -284,6 +292,10 @@ class EyesTracker(Tracker):
             tracking: Optional[EyesTracking], 
             transformation_matrix: NDArray,
         ) -> Optional[NDArray]:
+
+        '''
+        Coordinate system: origin = fish centroid, rotation = fish heading
+        '''
 
         if tracking is not None:
 
