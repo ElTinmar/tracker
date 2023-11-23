@@ -3,7 +3,7 @@ from .body_widget import BodyTrackerWidget
 from .eyes_widget import EyesTrackerWidget
 from .tail_widget import TailTrackerWidget 
 from .assignment_widget import AssignmentWidget
-from .multifish import MultiFishTracker, MultiFishOverlay
+from .multifish import *
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QMainWindow, QTabWidget, QDockWidget, QLabel, QVBoxLayout, QHBoxLayout, QWidget
 from typing import Protocol, Optional
@@ -137,7 +137,7 @@ class TrackerWidget(QMainWindow):
                 tail_overlay
             )
 
-    def display(self, tracking: Dict) -> None:
+    def display(self, tracking: MultiFishTracking) -> None:
 
         if tracking is not None:
 
