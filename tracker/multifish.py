@@ -98,7 +98,7 @@ class MultiFishTracker(Tracker):
 
                 # get more precise centroid and orientation of the animals
                 
-                body[id] = self.body.track(image_cropped, centroi=offset)
+                body[id] = self.body.track(image_cropped, centroid=offset)
                 if body[id] is not None:
                     
                     # rotate the animal so that it's vertical head up
