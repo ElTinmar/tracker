@@ -168,7 +168,16 @@ class BodyTracker(Tracker):
         )
         
         if props == []:
-            return None
+
+            res = BodyTracking(
+                heading = None,
+                centroid = None,
+                angle_rad = None,
+                mask = im2uint8(mask),
+                image = im2uint8(image)
+            )
+            return res
+        
         else:
             if centroid is not None:
             # in case of multiple tracking, there may be other blobs
@@ -217,19 +226,20 @@ class BodyOverlay(TrackingOverlay):
         Coordinate system: origin = fish bounding box top left coordinates
         '''
 
-        if tracking is not None:
+        if (tracking is not None) and (tracking.centroid is not None):
 
             overlay = im2rgb(image)
-
-            src = from_homogeneous((transformation_matrix @ to_homogeneous(tracking.centroid).T).T) 
+            
+            centroid = col_to_row(tracking.centroid)
+            src = from_homogeneous((transformation_matrix @ to_homogeneous(centroid).T).T) 
             heading = self.overlay_param.heading_len_px * col_to_row(tracking.heading[:,0])
             dest = src + from_homogeneous((transformation_matrix @ to_homogeneous(heading).T).T)
 
             # heading
             overlay = cv2.line(
                 overlay,
-                src.astype(np.int32),
-                dest.astype(np.int32),
+                ( int(src[0,0]), int(src[0,1]) ),
+                ( int(dest[0,0]), int(dest[0,1]) ),
                 self.overlay_param.heading_color,
                 self.overlay_param.thickness
             )
@@ -237,7 +247,7 @@ class BodyOverlay(TrackingOverlay):
             # show heading direction with a circle (easier than arrowhead)
             overlay = cv2.circle(
                 overlay,
-                dest.astype(np.int32),
+                ( int(dest[0,0]), int(dest[0,1]) ),
                 2,
                 self.overlay_param.heading_color,
                 self.overlay_param.thickness

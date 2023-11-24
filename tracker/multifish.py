@@ -99,7 +99,7 @@ class MultiFishTracker(Tracker):
                 # get more precise centroid and orientation of the animals
                 
                 body[id] = self.body.track(image_cropped, centroid=offset)
-                if body[id] is not None:
+                if (body[id] is not None) and (body[id].centroid is not None):
                     
                     # rotate the animal so that it's vertical head up
                     image_rot, centroid_rot = imrotate(
@@ -179,7 +179,7 @@ class MultiFishOverlay(TrackingOverlay):
                     ty_bbox = tracking.animals.bounding_boxes[idx,1]
                     translation_bbox = Affine2DTransform.translation(tx_bbox,ty_bbox)
 
-                    if (self.body is not None)  and (tracking.body[id] is not None):
+                    if (self.body is not None) and (tracking.body[id] is not None) and (tracking.body[id].centroid is not None):
 
                         # overlay body, coord. system 2.
                         overlay = self.body.overlay(

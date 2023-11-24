@@ -5,7 +5,7 @@ import numpy as np
 from numpy.typing import NDArray, ArrayLike
 from typing import Tuple, Dict, Optional
 from image_tools import bwareafilter_props, bwareafilter, enhance, im2uint8, im2rgb
-from geometry import ellipse_direction, angle_between_vectors, to_homogeneous, from_homogeneous
+from geometry import ellipse_direction, angle_between_vectors, col_to_row, to_homogeneous, from_homogeneous
 from .roi_coords import get_roi_coords
 from tracker import Tracker, TrackingOverlay
 
@@ -167,16 +167,16 @@ def disp_eye(
     pt2 = pt1 + eye_len_px * eye_direction
     overlay = cv2.line(
         overlay,
-        pt1.astype(np.int32),
-        pt2.astype(np.int32),
+        ( int(pt1[0,0]), int(pt1[0,1]) ),
+        ( int(pt2[0,0]), int(pt2[0,1]) ),
         color,
         thickness
     )
     pt2 = pt1 - eye_len_px * eye_direction
     overlay = cv2.line(
         overlay,
-        pt1.astype(np.int32),
-        pt2.astype(np.int32),
+        ( int(pt1[0,0]), int(pt1[0,1]) ),
+        ( int(pt2[0,0]), int(pt2[0,1]) ),
         color,
         thickness
     )
@@ -184,7 +184,7 @@ def disp_eye(
     # indicate eye direction with a circle (easier than arrowhead)
     overlay = cv2.circle(
         overlay,
-        pt2.astype(np.int32),
+        ( int(pt2[0,0]), int(pt2[0,1]) ),
         2,
         color,
         thickness
@@ -300,17 +300,22 @@ class EyesOverlay(TrackingOverlay):
 
             overlay = im2rgb(image)
 
+            centroid_left = col_to_row(tracking.left_eye['centroid'])
+            direction_left = col_to_row(tracking.left_eye['direction'])
+            centroid_right = col_to_row(tracking.right_eye['centroid'])
+            direction_right = col_to_row(tracking.right_eye['direction'])
+
             left_eye_centroid = from_homogeneous(
-                (transformation_matrix @ to_homogeneous(tracking.left_eye['centroid'].T).T)
+                (transformation_matrix @ to_homogeneous(centroid_left).T).T
             )
             left_eye_direction = from_homogeneous(
-                (transformation_matrix @ to_homogeneous(tracking.left_eye['direction'].T).T)
+                (transformation_matrix @ to_homogeneous(direction_left).T).T
             )
             right_eye_centroid = from_homogeneous(
-                (transformation_matrix @ to_homogeneous(tracking.right_eye['centroid'].T).T)
+                (transformation_matrix @ to_homogeneous(centroid_right).T).T
             )
             right_eye_direction = from_homogeneous(
-                (transformation_matrix @ to_homogeneous(tracking.right_eye['direction'].T).T)
+                (transformation_matrix @ to_homogeneous(direction_right).T).T
             )
             
             # left eye
