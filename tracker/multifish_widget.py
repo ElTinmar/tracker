@@ -144,7 +144,7 @@ class TrackerWidget(QMainWindow):
 
         if tracking is not None:
 
-            overlay = self.overlay.overlay(tracking)
+            overlay = self.overlay.overlay(tracking.image, tracking)
             
             zoom = self.zoom.value()/100.0
             overlay = cv2.resize(overlay,None,None,zoom,zoom,cv2.INTER_NEAREST)
