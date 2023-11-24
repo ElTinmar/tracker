@@ -2,7 +2,7 @@ import numpy as np
 import cv2
 from typing import Protocol, Optional, List
 from numpy.typing import NDArray
-from image_tools import enhance, imrotate, im2rgb
+from image_tools import enhance, imrotate, im2rgb, im2uint8
 from geometry import Affine2DTransform
 from .core import Tracker, TrackingOverlay
 from .animal import AnimalTracking
@@ -128,7 +128,7 @@ class MultiFishTracker(Tracker):
             body = body,
             eyes = eyes,
             tail =  tail,
-            image = (255*image).astype(np.uint8)
+            image = im2uint8(image)
         )
         
         return res 
