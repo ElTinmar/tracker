@@ -201,8 +201,9 @@ class BodyTrackerWidget(QWidget):
     def display(self, tracking: BodyTracking):
         
         if tracking is not None:
-
-            T = Affine2DTransform.scale(self.tracker.tracking_param.resize, self.tracker.tracking_param.resize)
+            
+            s = self.tracker.tracking_param.resize
+            T = Affine2DTransform.scale(s, s)
             overlay = self.overlay.overlay(tracking.image, tracking, T)
 
             zoom = self.zoom.value()/100.0
