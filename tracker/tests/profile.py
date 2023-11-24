@@ -128,10 +128,21 @@ with cProfile.Profile() as pr:
     video_reader.exit()
     video_reader.join()
     
-    sortby = SortKey.CUMULATIVE
-    ps = pstats.Stats(pr).sort_stats(sortby)
-    ps.print_stats(50)
-        
-    sortby = SortKey.TIME
-    ps = pstats.Stats(pr).sort_stats(sortby)
-    ps.print_stats(50)
+sortby = SortKey.CUMULATIVE
+ps = pstats.Stats(pr).sort_stats(sortby)
+ps.print_stats(50)
+    
+sortby = SortKey.TIME
+ps = pstats.Stats(pr).sort_stats(sortby)
+ps.print_stats(50)
+
+'''
+# plot cumtime vs tottime
+import pandas as pd
+import seaborn as sns
+
+df = pd.DataFrame(
+    pr.getstats(),
+    columns=['func', 'ncalls', 'ccalls', 'tottime', 'cumtime', 'callers']
+)
+'''
