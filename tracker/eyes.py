@@ -94,7 +94,7 @@ def get_eye_prop(blob, offset: NDArray, resize: float) -> Dict:
     eye_angle = angle_between_vectors(eye_dir, heading)
     # (row,col) to (x,y) coordinates 
     y, x = blob.centroid 
-    eye_centroid = np.array([x, y], dtype = np.float32) - offset
+    eye_centroid = np.array([x, y], dtype = np.float32) + offset
     return {'direction': eye_dir, 'angle': eye_angle, 'centroid': eye_centroid/resize}
 
 

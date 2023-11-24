@@ -156,7 +156,7 @@ class TailTracker(Tracker):
                 points.append(points[-1])
 
         # interpolate
-        skeleton = np.array(points).astype('float')
+        skeleton = np.array(points).astype('float') + offset
         skeleton = skeleton / self.tracking_param.resize
         
         try:
