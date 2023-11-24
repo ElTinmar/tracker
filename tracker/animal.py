@@ -122,7 +122,7 @@ class AnimalTracker(Tracker):
                 self.tracking_param.resize,
                 cv2.INTER_NEAREST
             )
-
+        
         # tune image contrast and gamma
         image = enhance(
             image,
