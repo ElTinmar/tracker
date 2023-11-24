@@ -218,7 +218,7 @@ class BodyOverlay(TrackingOverlay):
     def overlay(
             self,
             image: NDArray, 
-            tracking: BodyTracking, 
+            tracking: Optional[BodyTracking], 
             transformation_matrix: NDArray 
         ) -> Optional[NDArray]:
 
