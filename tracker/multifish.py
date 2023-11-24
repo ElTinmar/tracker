@@ -164,7 +164,7 @@ class MultiFishOverlay(TrackingOverlay):
 
         if tracking is not None:
 
-            overlay = im2rgb(image)
+            overlay = im2rgb(im2uint8(image))
 
             # loop over animals
             for idx, id in zip(tracking.indices, tracking.identities):
@@ -184,7 +184,7 @@ class MultiFishOverlay(TrackingOverlay):
                         # overlay body, coord. system 2.
                         overlay = self.body.overlay(
                             overlay, 
-                            tracking.body[id], 
+                            tracking.body[id], # body coordinates in bbox
                             T_bbox_to_image
                         )
 
@@ -199,7 +199,7 @@ class MultiFishOverlay(TrackingOverlay):
                         if (self.eyes is not None) and (tracking.eyes[id] is not None):
                             overlay = self.eyes.overlay(
                                 overlay, 
-                                tracking.eyes[id], 
+                                tracking.eyes[id], # egocentric eye coordinates
                                 T_egocentric_to_image
                             )
                         
@@ -207,7 +207,7 @@ class MultiFishOverlay(TrackingOverlay):
                         if (self.tail is not None) and (tracking.tail[id] is not None):
                             overlay = self.tail.overlay(
                                 overlay, 
-                                tracking.tail[id], 
+                                tracking.tail[id], # egocentric tail coordinates 
                                 T_egocentric_to_image
                             )
 

@@ -1,5 +1,5 @@
 from video_tools import Buffered_OpenCV_VideoReader, VideoDisplay
-from image_tools import im2single, im2gray
+from image_tools import im2single, im2gray, im2rgb
 from tracker import (
     GridAssignment, MultiFishTracker, MultiFishOverlay,
     AnimalTracker, AnimalOverlay, AnimalTrackerParamTracking, AnimalTrackerParamOverlay,
@@ -167,7 +167,7 @@ try:
             T = Affine2DTransform.translation(tx, ty)
             display_tail.queue_image(
                 tail_overlay.overlay(tracking.tail[0].image, tracking.tail[0], T @ S)
-                )
+            )
 
 finally:
     video_reader.exit()

@@ -303,7 +303,7 @@ class EyesOverlay(TrackingOverlay):
 
         if tracking is not None:
 
-            overlay = im2rgb(image)
+            overlay = im2rgb(im2uint8(image))
             
             # left eye
             if tracking.left_eye is not None:

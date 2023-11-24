@@ -228,7 +228,7 @@ class BodyOverlay(TrackingOverlay):
 
         if (tracking is not None) and (tracking.centroid is not None):
 
-            overlay = im2rgb(image)
+            overlay = im2rgb(im2uint8(image))
             
             src = tracking.centroid
             heading = self.overlay_param.heading_len_px * tracking.heading[:,0]

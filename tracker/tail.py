@@ -200,7 +200,7 @@ class TailOverlay(TrackingOverlay):
                 
         if tracking is not None:         
 
-            overlay = im2rgb(image)       
+            overlay = im2rgb(im2uint8(image))       
             
             if tracking.skeleton_interp is not None:
                 
