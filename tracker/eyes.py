@@ -192,7 +192,7 @@ def disp_eye(
     overlay = cv2.circle(
         overlay,
         pts_[2].astype(np.int32),
-        2,
+        2, # TODO this is hardcoded, make it a param ?
         color,
         thickness
     )
