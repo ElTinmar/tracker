@@ -10,6 +10,7 @@ from tracker import (
 from tqdm import tqdm
 import numpy as np
 from geometry import Affine2DTransform
+from multiprocessing import Queue
 
 # background subtracted video
 INPUT_VIDEO = 'toy_data/19-40-44_nobckg_static.avi'
@@ -27,9 +28,12 @@ LUT = np.zeros((width, height))
 assignment = GridAssignment(LUT)
 accumulator = None
 
-display = VideoDisplay(fps=10, winname='tracking')
-display_eyes = VideoDisplay(fps=10, winname='eyes')
-display_tail = VideoDisplay(fps=10, winname='tail')
+q = Queue()
+q_eyes = Queue()
+q_tail = Queue()
+display = VideoDisplay(q, fps=10, winname='tracking')
+display_eyes = VideoDisplay(q_eyes, fps=10, winname='eyes')
+display_tail = VideoDisplay(q_tail, fps=10, winname='tail')
 display.start()
 display_eyes.start()
 display_tail.start()
@@ -163,7 +167,8 @@ try:
             T = Affine2DTransform.translation(tx, ty)
             display_tail.queue_image(
                 tail_overlay.overlay(tracking.tail[0].image, tracking.tail[0], T @ S)
-            )
+                )
+
 finally:
     video_reader.exit()
     video_reader.join()
