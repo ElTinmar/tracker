@@ -1,5 +1,5 @@
 from video_tools import Buffered_OpenCV_VideoReader, VideoDisplay
-from image_tools import im2single, im2gray, im2rgb
+from image_tools import im2single, im2gray
 from tracker import (
     GridAssignment, MultiFishTracker, MultiFishOverlay,
     AnimalTracker, AnimalOverlay, AnimalTrackerParamTracking, AnimalTrackerParamOverlay,
