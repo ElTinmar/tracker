@@ -6,7 +6,6 @@ from numpy.typing import NDArray, ArrayLike
 from typing import Tuple, Dict, Optional
 from image_tools import bwareafilter_props, bwareafilter, enhance, im2uint8, im2rgb
 from geometry import ellipse_direction, angle_between_vectors, col_to_row, to_homogeneous, from_homogeneous
-from .roi_coords import get_roi_coords
 from tracker import Tracker, TrackingOverlay
 
 @dataclass
@@ -86,7 +85,7 @@ class EyesTracking:
         '''export data as csv'''
         pass
 
-def get_eye_prop(blob, resize: float) -> Dict:
+def get_eye_prop(blob, offset: NDArray, resize: float) -> Dict:
 
     # fish must be vertical head up
     heading = np.array([0, 1], dtype=np.float32)
@@ -94,8 +93,8 @@ def get_eye_prop(blob, resize: float) -> Dict:
     eye_dir = ellipse_direction(blob.inertia_tensor, heading)
     eye_angle = angle_between_vectors(eye_dir, heading)
     # (row,col) to (x,y) coordinates 
-    y, x = blob.centroid
-    eye_centroid = np.array([x, y],dtype = np.float32)
+    y, x = blob.centroid 
+    eye_centroid = np.array([x, y], dtype = np.float32) - offset
     return {'direction': eye_dir, 'angle': eye_angle, 'centroid': eye_centroid/resize}
 
 
@@ -155,6 +154,7 @@ def disp_eye(
         image: NDArray, 
         eye_centroid: NDArray,
         eye_direction: NDArray,
+        transformation_matrix: NDArray,
         color: tuple, 
         eye_len_px: float, 
         thickness: int
@@ -165,18 +165,24 @@ def disp_eye(
     # draw two lines from eye centroid 
     pt1 = eye_centroid
     pt2 = pt1 + eye_len_px * eye_direction
+    pt3 = pt1 - eye_len_px * eye_direction
+
+    # compute transformation
+    pts = np.vstack((pt1, pt2, pt3))
+    pts_ = from_homogeneous((transformation_matrix @ to_homogeneous(pts).T).T)
+
     overlay = cv2.line(
         overlay,
-        ( int(pt1[0,0]), int(pt1[0,1]) ),
-        ( int(pt2[0,0]), int(pt2[0,1]) ),
+        pts_[0].astype(np.int32),
+        pts_[1].astype(np.int32),
         color,
         thickness
     )
-    pt2 = pt1 - eye_len_px * eye_direction
+    
     overlay = cv2.line(
         overlay,
-        ( int(pt1[0,0]), int(pt1[0,1]) ),
-        ( int(pt2[0,0]), int(pt2[0,1]) ),
+        pts_[0].astype(np.int32),
+        pts_[2].astype(np.int32),
         color,
         thickness
     )
@@ -184,7 +190,7 @@ def disp_eye(
     # indicate eye direction with a circle (easier than arrowhead)
     overlay = cv2.circle(
         overlay,
-        ( int(pt2[0,0]), int(pt2[0,1]) ),
+        pts_[2].astype(np.int32),
         2,
         color,
         thickness
@@ -225,14 +231,11 @@ class EyesTracker(Tracker):
         new_heading = None
 
         # crop image
-        left, bottom, w, h = get_roi_coords(
-            centroid, 
-            self.tracking_param.crop_dimension_px, 
-            self.tracking_param.crop_offset_px, 
-            self.tracking_param.resize
-        )
-        right = left + w
-        top = bottom + h
+        w, h = self.tracking_param.crop_dimension_px
+        offset = np.array((-w//2, -h//2+self.tracking_param.crop_offset_px), dtype=np.int32)
+        left, bottom = (centroid * self.tracking_param.resize).astype(np.int32) + offset 
+        right, top = left+w, bottom+h 
+
         image_crop = image[bottom:top, left:right]
         if image_crop.size == 0:
             return None
@@ -261,8 +264,8 @@ class EyesTracker(Tracker):
             sb_idx, left_idx, right_idx = assign_features(blob_centroids)
 
             # compute eye orientation
-            left_eye = get_eye_prop(props[left_idx], self.tracking_param.resize)
-            right_eye = get_eye_prop(props[right_idx], self.tracking_param.resize)
+            left_eye = get_eye_prop(props[left_idx], offset, self.tracking_param.resize)
+            right_eye = get_eye_prop(props[right_idx], offset, self.tracking_param.resize)
             #new_heading = (props[left_idx].centroid + props[right_idx].centroid)/2 - props[sb_idx].centroid
             #new_heading = new_heading / np.linalg.norm(new_heading)
 
@@ -299,31 +302,15 @@ class EyesOverlay(TrackingOverlay):
         if tracking is not None:
 
             overlay = im2rgb(image)
-
-            centroid_left = col_to_row(tracking.left_eye['centroid'])
-            direction_left = col_to_row(tracking.left_eye['direction'])
-            centroid_right = col_to_row(tracking.right_eye['centroid'])
-            direction_right = col_to_row(tracking.right_eye['direction'])
-
-            left_eye_centroid = from_homogeneous(
-                (transformation_matrix @ to_homogeneous(centroid_left).T).T
-            )
-            left_eye_direction = from_homogeneous(
-                (transformation_matrix @ to_homogeneous(direction_left).T).T
-            )
-            right_eye_centroid = from_homogeneous(
-                (transformation_matrix @ to_homogeneous(centroid_right).T).T
-            )
-            right_eye_direction = from_homogeneous(
-                (transformation_matrix @ to_homogeneous(direction_right).T).T
-            )
             
             # left eye
             if tracking.left_eye is not None:
+
                 overlay = disp_eye(
                     overlay, 
-                    left_eye_centroid,
-                    left_eye_direction,
+                    tracking.left_eye['centroid'],
+                    tracking.left_eye['direction'],
+                    transformation_matrix,
                     self.overlay_param.color_eye_left, 
                     self.overlay_param.eye_len_px, 
                     self.overlay_param.thickness
@@ -331,10 +318,12 @@ class EyesOverlay(TrackingOverlay):
 
             # right eye
             if tracking.right_eye is not None:   
+
                 overlay = disp_eye(
                     overlay, 
-                    right_eye_centroid,
-                    right_eye_direction,
+                    tracking.right_eye['centroid'],
+                    tracking.right_eye['direction'],
+                    transformation_matrix,
                     self.overlay_param.color_eye_right, 
                     self.overlay_param.eye_len_px, 
                     self.overlay_param.thickness

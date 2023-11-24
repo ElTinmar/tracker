@@ -7,7 +7,6 @@ from numpy.typing import NDArray
 from typing import Tuple, Optional
 from image_tools import enhance, im2rgb, im2uint8
 from geometry import to_homogeneous, from_homogeneous
-from .roi_coords import get_roi_coords
 from tracker import Tracker, TrackingOverlay
 
 # TODO check if using polyline is faster
@@ -110,14 +109,11 @@ class TailTracker(Tracker):
             )
 
         # crop image
-        left, bottom, w, h = get_roi_coords(
-            centroid, 
-            self.tracking_param.crop_dimension_px, 
-            self.tracking_param.crop_offset_tail_px, 
-            self.tracking_param.resize
-        )
-        right = left + w
-        top = bottom + h
+        w, h = self.tracking_param.crop_dimension_px
+        offset = np.array((-w//2, -h//2+self.tracking_param.crop_offset_tail_px), dtype=np.int32)
+        left, bottom = (centroid * self.tracking_param.resize).astype(np.int32) + offset 
+        right, top = left+w, bottom+h 
+
         image_crop = image[bottom:top, left:right]
         if image_crop.size == 0:
             return None

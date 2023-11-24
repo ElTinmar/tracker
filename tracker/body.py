@@ -230,16 +230,19 @@ class BodyOverlay(TrackingOverlay):
 
             overlay = im2rgb(image)
             
-            centroid = col_to_row(tracking.centroid)
-            src = from_homogeneous((transformation_matrix @ to_homogeneous(centroid).T).T) 
-            heading = self.overlay_param.heading_len_px * col_to_row(tracking.heading[:,0])
-            dest = src + from_homogeneous((transformation_matrix @ to_homogeneous(heading).T).T)
+            src = tracking.centroid
+            heading = self.overlay_param.heading_len_px * tracking.heading[:,0]
+            dst = src + heading
+
+            # compute transformation
+            pts = np.vstack((src, dst))
+            pts_ = from_homogeneous((transformation_matrix @ to_homogeneous(pts).T).T)
 
             # heading
             overlay = cv2.line(
                 overlay,
-                ( int(src[0,0]), int(src[0,1]) ),
-                ( int(dest[0,0]), int(dest[0,1]) ),
+                pts_[0].astype(np.int32),
+                pts_[1].astype(np.int32),
                 self.overlay_param.heading_color,
                 self.overlay_param.thickness
             )
@@ -247,7 +250,7 @@ class BodyOverlay(TrackingOverlay):
             # show heading direction with a circle (easier than arrowhead)
             overlay = cv2.circle(
                 overlay,
-                ( int(dest[0,0]), int(dest[0,1]) ),
+                pts_[1].astype(np.int32),
                 2,
                 self.overlay_param.heading_color,
                 self.overlay_param.thickness

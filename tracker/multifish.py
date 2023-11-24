@@ -185,7 +185,7 @@ class MultiFishOverlay(TrackingOverlay):
                         overlay = self.body.overlay(
                             overlay, 
                             tracking.body[id], 
-                            Affine2DTransform.inverse(translation_bbox)
+                            translation_bbox
                         )
 
                         # transformation matrix from coord system 1. to coord system 3., rotation + translation
@@ -199,7 +199,7 @@ class MultiFishOverlay(TrackingOverlay):
                             overlay = self.eyes.overlay(
                                 overlay, 
                                 tracking.eyes[id], 
-                                Affine2DTransform.inverse(transformation)
+                                transformation
                             )
                         
                         # overlay tail, coord system 3.
@@ -207,7 +207,7 @@ class MultiFishOverlay(TrackingOverlay):
                             overlay = self.tail.overlay(
                                 overlay, 
                                 tracking.tail[id], 
-                                Affine2DTransform.inverse(transformation)
+                                transformation
                             )
 
                 # show ID, coord. system 1.
