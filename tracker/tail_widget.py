@@ -52,9 +52,9 @@ class TailTrackerWidget(QWidget):
         self.tail_gamma.setSingleStep(0.05)
         self.tail_gamma.valueChanged.connect(self.update_tracker) 
         
-        # tail norm 
+        # tail brightness 
         self.tail_brightness = LabeledDoubleSpinBox(self)
-        self.tail_brightness.setText('tail norm')
+        self.tail_brightness.setText('tail brightness')
         self.tail_brightness.setRange(0,1)
         self.tail_brightness.setValue(0.2)
         self.tail_brightness.setSingleStep(0.025)

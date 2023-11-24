@@ -62,9 +62,9 @@ class BodyTrackerWidget(QWidget):
         self.body_contrast.setSingleStep(0.1)
         self.body_contrast.valueChanged.connect(self.update_tracker) 
 
-        # norm
+        # brightness
         self.body_brightness = LabeledDoubleSpinBox(self)
-        self.body_brightness.setText('body norm')
+        self.body_brightness.setText('body brightness')
         self.body_brightness.setRange(0,1)
         self.body_brightness.setValue(0.3)
         self.body_brightness.setSingleStep(0.025)

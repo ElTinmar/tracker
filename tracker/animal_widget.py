@@ -63,9 +63,9 @@ class AnimalTrackerWidget(QWidget):
         self.animal_contrast.setSingleStep(0.1)
         self.animal_contrast.valueChanged.connect(self.update_tracker) 
 
-        # norm
+        # brightness
         self.animal_brightness = LabeledDoubleSpinBox(self)
-        self.animal_brightness.setText('animal norm')
+        self.animal_brightness.setText('animal brightness')
         self.animal_brightness.setRange(0,1)
         self.animal_brightness.setValue(1.0)
         self.animal_brightness.setSingleStep(0.025)

@@ -53,9 +53,9 @@ class EyesTrackerWidget(QWidget):
         self.eye_contrast.setSingleStep(0.1)
         self.eye_contrast.valueChanged.connect(self.update_tracker) 
 
-        # eye norm
+        # eye brightness
         self.eye_brightness = LabeledDoubleSpinBox(self)
-        self.eye_brightness.setText('eye norm')
+        self.eye_brightness.setText('eye brightness')
         self.eye_brightness.setRange(0,1)
         self.eye_brightness.setValue(0.3)
         self.eye_brightness.setSingleStep(0.025)
