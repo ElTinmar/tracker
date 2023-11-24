@@ -192,7 +192,8 @@ class MultiFishOverlay(TrackingOverlay):
                         angle = tracking.body[id].angle_rad
                         rotation = Affine2DTransform.rotation(angle)
                         tx, ty = tracking.body[id].centroid 
-                        T_egocentric_to_image = T_bbox_to_image @ Affine2DTransform.translation(tx, ty) @ rotation
+                        T_fish_centroid_to_bbox = Affine2DTransform.translation(tx, ty)
+                        T_egocentric_to_image = T_bbox_to_image @ T_fish_centroid_to_bbox @ rotation
                         
                         # overlay eyes, coord system 3.
                         if (self.eyes is not None) and (tracking.eyes[id] is not None):
