@@ -159,7 +159,7 @@ class MultiFishOverlay(TrackingOverlay):
         There are 3 different coordinate systems:
         - 1. image coordinates: the whole image, origin = image topleft
         - 2. bbox coordinates: cropped image of each animal, origin = bounding box top left coordinates 
-        - 3. fish coordinates: fish centric coordinates, rotation = fish heading, origin = fish centroid
+        - 3. fish coordinates: fish egocentric coordinates, rotation = fish heading, origin = fish centroid
         '''
 
         if tracking is not None:
@@ -177,7 +177,7 @@ class MultiFishOverlay(TrackingOverlay):
                     # transformation matrix from coord system 1. to coord system 2., just a translation  
                     tx_bbox = tracking.animals.bounding_boxes[idx,0]
                     ty_bbox = tracking.animals.bounding_boxes[idx,1]
-                    translation_bbox = Affine2DTransform.translation(tx_bbox,ty_bbox)
+                    T_bbox_to_image = Affine2DTransform.translation(tx_bbox,ty_bbox)
 
                     if (self.body is not None) and (tracking.body[id] is not None) and (tracking.body[id].centroid is not None):
 
@@ -185,21 +185,21 @@ class MultiFishOverlay(TrackingOverlay):
                         overlay = self.body.overlay(
                             overlay, 
                             tracking.body[id], 
-                            translation_bbox
+                            T_bbox_to_image
                         )
 
                         # transformation matrix from coord system 1. to coord system 3., rotation + translation
                         angle = tracking.body[id].angle_rad
                         rotation = Affine2DTransform.rotation(angle)
                         tx, ty = tracking.body[id].centroid 
-                        transformation = translation_bbox @ Affine2DTransform.translation(tx, ty) @ rotation
+                        T_egocentric_to_image = T_bbox_to_image @ Affine2DTransform.translation(tx, ty) @ rotation
                         
                         # overlay eyes, coord system 3.
                         if (self.eyes is not None) and (tracking.eyes[id] is not None):
                             overlay = self.eyes.overlay(
                                 overlay, 
                                 tracking.eyes[id], 
-                                transformation
+                                T_egocentric_to_image
                             )
                         
                         # overlay tail, coord system 3.
@@ -207,7 +207,7 @@ class MultiFishOverlay(TrackingOverlay):
                             overlay = self.tail.overlay(
                                 overlay, 
                                 tracking.tail[id], 
-                                transformation
+                                T_egocentric_to_image
                             )
 
                 # show ID, coord. system 1.
