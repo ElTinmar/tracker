@@ -195,7 +195,7 @@ class MultiFishOverlay(TrackingOverlay):
                         transformation = translation_bbox @ Affine2DTransform.translation(tx, ty) @ rotation
                         
                         # overlay eyes, coord system 3.
-                        if (self.eyes is not None)  and (tracking.eyes[id]is not None):
+                        if (self.eyes is not None) and (tracking.eyes[id] is not None):
                             overlay = self.eyes.overlay(
                                 overlay, 
                                 tracking.eyes[id], 
@@ -203,7 +203,7 @@ class MultiFishOverlay(TrackingOverlay):
                             )
                         
                         # overlay tail, coord system 3.
-                        if (self.tail is not None)  and (tracking.tail[id] is not None):
+                        if (self.tail is not None) and (tracking.tail[id] is not None):
                             overlay = self.tail.overlay(
                                 overlay, 
                                 tracking.tail[id], 

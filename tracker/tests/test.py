@@ -9,6 +9,7 @@ from tracker import (
 )
 from tqdm import tqdm
 import numpy as np
+from geometry import Affine2DTransform
 
 # background subtracted video
 INPUT_VIDEO = 'toy_data/19-40-44_nobckg_static.avi'
@@ -26,8 +27,12 @@ LUT = np.zeros((width, height))
 assignment = GridAssignment(LUT)
 accumulator = None
 
-display = VideoDisplay(fps=10)
+display = VideoDisplay(fps=10, winname='tracking')
+display_eyes = VideoDisplay(fps=10, winname='eyes')
+display_tail = VideoDisplay(fps=10, winname='tail')
 display.start()
+display_eyes.start()
+display_tail.start()
 
 # tracking 
 animal_tracker = AnimalTracker(
@@ -130,12 +135,41 @@ try:
         (rval, frame) = video_reader.next_frame()
         if not rval:
             raise RuntimeError('VideoReader was unable to read the whole video')
+        
+        # convert
         frame_gray = im2single(im2gray(frame))
+
+        # track
         tracking = tracker.track(frame_gray)
-        img = overlay.overlay(frame_gray, tracking)
-        display.queue_image(img)
+
+        # display tracking
+        display.queue_image(overlay.overlay(frame_gray, tracking))
+
+        # display eyes 
+        if tracking.eyes[0] is not None:
+            s = eyes_tracker.tracking_param.resize
+            tx, ty = -tracking.eyes[0].offset
+            S = Affine2DTransform.scaling(s,s)
+            T = Affine2DTransform.translation(tx, ty)
+            display_eyes.queue_image(
+                eyes_overlay.overlay(tracking.eyes[0].image, tracking.eyes[0], T @ S)
+            )
+
+        # display tail
+        if tracking.tail[0] is not None:
+            s = tail_tracker.tracking_param.resize
+            tx, ty = -tracking.tail[0].offset
+            S = Affine2DTransform.scaling(s,s)
+            T = Affine2DTransform.translation(tx, ty)
+            display_tail.queue_image(
+                tail_overlay.overlay(tracking.tail[0].image, tracking.tail[0], T @ S)
+            )
 finally:
     video_reader.exit()
     video_reader.join()
     display.exit()
+    display_eyes.exit()
+    display_tail.exit()
     display.join()
+    display_eyes.join()
+    display_tail.join()

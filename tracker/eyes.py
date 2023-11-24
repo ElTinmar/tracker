@@ -5,7 +5,7 @@ import numpy as np
 from numpy.typing import NDArray, ArrayLike
 from typing import Tuple, Dict, Optional
 from image_tools import bwareafilter_props, bwareafilter, enhance, im2uint8, im2rgb
-from geometry import ellipse_direction, angle_between_vectors, col_to_row, to_homogeneous, from_homogeneous
+from geometry import ellipse_direction, angle_between_vectors, to_homogeneous, from_homogeneous
 from tracker import Tracker, TrackingOverlay
 
 @dataclass
@@ -75,7 +75,8 @@ class EyesTrackerParamOverlay:
         
 @dataclass
 class EyesTracking:
-    centroid: NDArray
+    centroid: NDArray 
+    offset: NDArray # position of centroid in cropped image
     left_eye: dict
     right_eye: dict
     mask: NDArray
@@ -271,6 +272,7 @@ class EyesTracker(Tracker):
 
         res = EyesTracking(
             centroid = centroid,
+            offset = offset,
             left_eye = left_eye,
             right_eye = right_eye,
             mask = im2uint8(mask),

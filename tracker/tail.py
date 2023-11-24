@@ -72,6 +72,7 @@ class TailTrackerParamOverlay:
 @dataclass
 class TailTracking:
     centroid: NDArray
+    offset: NDArray # position of centroid in cropped image
     skeleton: NDArray
     skeleton_interp: NDArray
     image: NDArray
@@ -169,6 +170,7 @@ class TailTracker(Tracker):
 
         res = TailTracking(
             centroid = centroid,
+            offset = offset,
             skeleton = skeleton,
             skeleton_interp = skeleton_interp,
             image = im2uint8(image_crop)

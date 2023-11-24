@@ -1,5 +1,5 @@
 from image_tools import bwareafilter_props, enhance, im2rgb, im2uint8
-from geometry import to_homogeneous, from_homogeneous, col_to_row
+from geometry import to_homogeneous, from_homogeneous
 from sklearn.decomposition import PCA
 import numpy as np
 from numpy.typing import NDArray
