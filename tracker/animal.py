@@ -192,8 +192,7 @@ class AnimalOverlay(TrackingOverlay):
 
             # draw centroid
             # TODO problem here ValueError: matmul: Input operand 1 has a mismatch in its core dimension 0, with gufunc signature (n?,k),(k,m?)->(n?,m?) (size 1 is different from 3)
-            print(transformation_matrix @ to_homogeneous(tracking.centroids).T)
-            for x,y,_ in transformation_matrix @ to_homogeneous(tracking.centroids).T:
+            for x,y,_ in (transformation_matrix @ to_homogeneous(tracking.centroids).T).T:
                 overlay = cv2.circle(
                     overlay,
                     (int(x),int(y)), 
@@ -205,7 +204,7 @@ class AnimalOverlay(TrackingOverlay):
             # draw bounding boxes
             for (left, bottom, right, top) in tracking.bounding_boxes:
                 rect = np.array([[left, top],[right, bottom]])
-                bbox = transformation_matrix @ to_homogeneous(rect)
+                bbox = (transformation_matrix @ to_homogeneous(rect).T).T
                 topleft = bbox[0,:-1].astype(int)
                 bottomright = bbox[1,:-1].astype(int)
                 overlay = cv2.rectangle(

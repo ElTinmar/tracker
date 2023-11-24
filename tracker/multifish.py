@@ -175,8 +175,8 @@ class MultiFishOverlay(TrackingOverlay):
                     overlay = self.animal.overlay(overlay, tracking.animals)
                     
                     # transformation matrix from coord system 1. to coord system 2., just a translation  
-                    tx_bbox = tracking.animals.bounding_boxes[idx,0],
-                    ty_bbox = tracking.animals.bounding_boxes[idx,1],
+                    tx_bbox = tracking.animals.bounding_boxes[idx,0]
+                    ty_bbox = tracking.animals.bounding_boxes[idx,1]
                     translation_bbox = Affine2DTransform.translation(tx_bbox,ty_bbox)
 
                     if (self.body is not None)  and (tracking.body[id] is not None):

@@ -221,9 +221,9 @@ class BodyOverlay(TrackingOverlay):
 
             overlay = im2rgb(image)
 
-            src = from_homogeneous(transformation_matrix @ to_homogeneous(tracking.centroid)) 
+            src = from_homogeneous((transformation_matrix @ to_homogeneous(tracking.centroid).T).T) 
             heading = self.overlay_param.heading_len_px * col_to_row(tracking.heading[:,0])
-            dest = src + from_homogeneous(transformation_matrix @ to_homogeneous(heading))
+            dest = src + from_homogeneous((transformation_matrix @ to_homogeneous(heading).T).T)
 
             # heading
             overlay = cv2.line(

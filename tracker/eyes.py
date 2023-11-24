@@ -301,16 +301,16 @@ class EyesOverlay(TrackingOverlay):
             overlay = im2rgb(image)
 
             left_eye_centroid = from_homogeneous(
-                transformation_matrix @ to_homogeneous(tracking.left_eye['centroid'])
+                (transformation_matrix @ to_homogeneous(tracking.left_eye['centroid'].T).T)
             )
             left_eye_direction = from_homogeneous(
-                transformation_matrix @ to_homogeneous(tracking.left_eye['direction'])
+                (transformation_matrix @ to_homogeneous(tracking.left_eye['direction'].T).T)
             )
             right_eye_centroid = from_homogeneous(
-                transformation_matrix @ to_homogeneous(tracking.right_eye['centroid'])
+                (transformation_matrix @ to_homogeneous(tracking.right_eye['centroid'].T).T)
             )
             right_eye_direction = from_homogeneous(
-                transformation_matrix @ to_homogeneous(tracking.right_eye['direction'])
+                (transformation_matrix @ to_homogeneous(tracking.right_eye['direction'].T).T)
             )
             
             # left eye

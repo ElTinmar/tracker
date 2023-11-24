@@ -206,7 +206,7 @@ class TailOverlay(TrackingOverlay):
             
             if tracking.skeleton_interp is not None:
                 
-                transformed_coord = from_homogeneous(transformation_matrix @ to_homogeneous(tracking.skeleton_interp))
+                transformed_coord = from_homogeneous((transformation_matrix @ to_homogeneous(tracking.skeleton_interp).T).T)
                 tail_segments = zip(transformed_coord[:-1,], transformed_coord[1:,])
                 for pt1, pt2 in tail_segments:
                     overlay = cv2.line(
