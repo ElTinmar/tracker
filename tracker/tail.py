@@ -215,7 +215,7 @@ class TailOverlay(TrackingOverlay):
                         self.overlay_param.thickness
                     )
             
-        return overlay
+            return overlay
 
 class TailTrackerGPU(Tracker):
 
