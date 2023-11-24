@@ -83,7 +83,7 @@ class AnimalTrackerParamOverlay:
 
     @property
     def radius_px(self):
-        return int(self.mm2px(self.radius_mm))
+        return self.mm2px(self.radius_mm)
     
 @dataclass
 class AnimalTracking:
