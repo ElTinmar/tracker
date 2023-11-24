@@ -217,7 +217,7 @@ class AnimalTrackerWidget(QWidget):
         if tracking is not None:
             
             s = self.tracker.tracking_param.resize
-            T = Affine2DTransform.scale(s, s)
+            T = Affine2DTransform.scaling(s, s)
             overlay = self.overlay.overlay(tracking.image, tracking, T)
 
             zoom = self.zoom.value()/100.0
