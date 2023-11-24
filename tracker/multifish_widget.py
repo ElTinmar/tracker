@@ -101,6 +101,9 @@ class TrackerWidget(QMainWindow):
         body_tracker = None
         eyes_tracker = None
         tail_tracker = None
+        body_overlay = None
+        eyes_overlay = None
+        tail_overlay = None
         
         if self.body_tracker_widget is not None:
             self.body_tracker_widget.update_tracker()
