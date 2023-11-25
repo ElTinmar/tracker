@@ -140,9 +140,13 @@ ps.print_stats(50)
 # plot cumtime vs tottime
 import pandas as pd
 import seaborn as sns
+import matplotlib.pyplot as plt
 
 df = pd.DataFrame(
     pr.getstats(),
     columns=['func', 'ncalls', 'ccalls', 'tottime', 'cumtime', 'callers']
 )
+
+sns.pointplot(data=df, x='tottime', y='cumtime')
+plt.show()
 '''
