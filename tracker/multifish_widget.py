@@ -145,10 +145,10 @@ class TrackerWidget(QMainWindow):
         if tracking is not None:
 
             overlay = self.overlay.overlay(tracking.image, tracking)
-            
             zoom = self.zoom.value()/100.0
-            overlay = cv2.resize(overlay,None,None,zoom,zoom,cv2.INTER_NEAREST)
-            self.image_overlay.setPixmap(NDarray_to_QPixmap(overlay))
+            if (overlay is not None) and (overlay.size > 0): 
+                overlay = cv2.resize(overlay,None,None,zoom,zoom,cv2.INTER_NEAREST)
+                self.image_overlay.setPixmap(NDarray_to_QPixmap(overlay))
 
             self.animal_tracker_widget.display(tracking.animals)
             try:
