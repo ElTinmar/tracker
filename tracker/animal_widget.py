@@ -222,10 +222,11 @@ class AnimalTrackerWidget(QWidget):
 
             zoom = self.zoom.value()/100.0
             image = cv2.resize(tracking.image,None,None,zoom,zoom,cv2.INTER_NEAREST)
-            mask = cv2.resize(tracking.mask,None,None,zoom,zoom,cv2.INTER_NEAREST)
-            overlay = cv2.resize(overlay,None,None,zoom,zoom,cv2.INTER_NEAREST)
-
             self.image.setPixmap(NDarray_to_QPixmap(image))
+            mask = cv2.resize(tracking.mask,None,None,zoom,zoom,cv2.INTER_NEAREST)
             self.mask.setPixmap(NDarray_to_QPixmap(mask))
-            self.image_overlay.setPixmap(NDarray_to_QPixmap(overlay))
+            if (overlay is not None) and (overlay.size > 0): 
+                overlay = cv2.resize(overlay,None,None,zoom,zoom,cv2.INTER_NEAREST)
+                self.image_overlay.setPixmap(NDarray_to_QPixmap(overlay))
+
             self.update()
