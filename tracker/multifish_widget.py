@@ -54,6 +54,7 @@ class TrackerWidget(QMainWindow):
         self.zoom.setSingleStep(25)
 
         self.save_tracking_param = FileSaveLabeledEditButton()
+        self.save_tracking_param.setText('Save tracking parameters:')
         self.save_tracking_param.textChanged.connect(self.save_tracking)
 
     def layout_components(self) -> None:
