@@ -186,7 +186,7 @@ class AnimalOverlay(TrackingOverlay):
             transformation_matrix: NDArray = Affine2DTransform.identity()
         ) -> Optional[NDArray]:
 
-        if tracking is not None:
+        if (tracking is not None) and (tracking.centroids.size > 0):
 
             overlay = im2rgb(im2uint8(image))
 
