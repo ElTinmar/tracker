@@ -9,8 +9,9 @@ from PyQt5.QtWidgets import QMainWindow, QTabWidget, QDockWidget, QLabel, QVBoxL
 from typing import Protocol, Optional
 from scipy.spatial.distance import cdist
 import numpy as np
-from qt_widgets import NDarray_to_QPixmap, LabeledSpinBox
+from qt_widgets import NDarray_to_QPixmap, LabeledSpinBox, FileSaveLabeledEditButton
 import cv2
+import json
 
 # TODO add widget to chose accumulator method (useful when you want to actually do the tracking)
 # TODO add widget to show background subtracted image histogram 
@@ -52,11 +53,15 @@ class TrackerWidget(QMainWindow):
         self.zoom.setValue(66)
         self.zoom.setSingleStep(25)
 
+        self.save_tracking_param = FileSaveLabeledEditButton()
+        self.save_tracking_param.textChanged.connect(self.save_tracking)
+
     def layout_components(self) -> None:
 
         main_widget = QWidget()
 
         images_and_zoom = QVBoxLayout()
+        images_and_zoom.addWidget(self.save_tracking_param)
         images_and_zoom.addWidget(self.assignment_widget)
         images_and_zoom.addWidget(self.zoom)
         images_and_zoom.addWidget(self.image_overlay)
@@ -91,6 +96,23 @@ class TrackerWidget(QMainWindow):
         elif text == 'tail':
             self.body_tracker_widget = None
             self.tabs.removeTab(index)
+
+    def save_tracking(self, filename):
+
+        param = {}
+        param['animal'] = self.animal_tracker_widget.tracker.tracking_param.to_dict()
+
+        if self.body_tracker_widget is not None:
+            param['body'] = self.body_tracker_widget.tracker.tracking_param.to_dict()
+
+        if self.eyes_tracker_widget is not None:
+            param['eyes'] = self.eyes_tracker_widget.tracker.tracking_param.to_dict()
+
+        if self.tail_tracker_widget is not None:
+            param['tail'] = self.tail_tracker_widget.tracker.tracking_param.to_dict()
+        
+        with open(filename, 'w') as fp:
+            json.dump(param, fp)
 
     def update_tracker(self) -> None:
         

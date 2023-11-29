@@ -3,7 +3,7 @@ from distutils.core import setup
 setup(
     name='tracker',
     author='Martin Privat',
-    version='0.1.15',
+    version='0.1.16',
     packages=['tracker','tracker.tests'],
     license='Creative Commons Attribution-Noncommercial-Share Alike license',
     description='tracking zebrafish larvae',
