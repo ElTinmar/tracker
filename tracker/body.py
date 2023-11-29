@@ -64,6 +64,24 @@ class BodyTrackerParamTracking:
     def median_filter_sz_px(self):
         return self.mm2px(self.median_filter_sz_mm)
 
+    def to_dict(self):
+        res = {}
+        res['pix_per_mm'] = self.pix_per_mm
+        res['target_pix_per_mm'] = self.target_pix_per_mm
+        res['body_intensity'] = self.body_intensity
+        res['body_brightness'] = self.body_brightness
+        res['body_gamma'] = self.body_gamma
+        res['body_contrast'] = self.body_contrast
+        res['blur_sz_mm'] = self.blur_sz_mm
+        res['median_filter_sz_mm'] = self.median_filter_sz_mm
+        res['min_body_size_mm'] = self.min_body_size_mm
+        res['max_body_size_mm'] = self.max_body_size_mm
+        res['min_body_length_mm'] = self.min_body_length_mm
+        res['max_body_length_mm'] = self.max_body_length_mm
+        res['min_body_width_mm'] = self.min_body_width_mm
+        res['max_body_width_mm'] = self.max_body_width_mm
+        return res
+    
 @dataclass
 class BodyTrackerParamOverlay:
     pix_per_mm: float = 40.0

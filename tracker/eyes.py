@@ -57,6 +57,22 @@ class EyesTrackerParamTracking:
     def crop_offset_px(self):
         return self.mm2px(self.crop_offset_mm)
 
+    def to_dict(self):
+        res = {}
+        res['pix_per_mm'] = self.pix_per_mm
+        res['target_pix_per_mm'] = self.target_pix_per_mm
+        res['eye_brightness'] = self.eye_brightness
+        res['eye_gamma'] = self.eye_gamma
+        res['eye_dyntresh_res'] = self.eye_dyntresh_res
+        res['eye_contrast'] = self.eye_contrast
+        res['eye_size_lo_mm'] = self.eye_size_lo_mm
+        res['eye_size_hi_mm'] = self.eye_size_hi_mm
+        res['blur_sz_mm'] = self.blur_sz_mm
+        res['median_filter_sz_mm'] = self.median_filter_sz_mm
+        res['crop_dimension_mm'] = self.crop_dimension_mm
+        res['crop_offset_mm'] = self.crop_offset_mm
+        return res
+    
 @dataclass
 class EyesTrackerParamOverlay:
     pix_per_mm: float = 40.0

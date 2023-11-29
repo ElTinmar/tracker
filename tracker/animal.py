@@ -68,6 +68,25 @@ class AnimalTrackerParamTracking:
     @property
     def median_filter_sz_px(self):
         return self.mm2px(self.median_filter_sz_mm)
+    
+    def to_dict(self):
+        res = {}
+        res['pix_per_mm'] = self.pix_per_mm
+        res['target_pix_per_mm'] = self.target_pix_per_mm
+        res['animal_intensity'] = self.animal_intensity
+        res['animal_brightness'] = self.animal_brightness
+        res['animal_gamma'] = self.animal_gamma
+        res['animal_contrast'] = self.animal_contrast
+        res['blur_sz_mm'] = self.blur_sz_mm
+        res['median_filter_sz_mm'] = self.median_filter_sz_mm
+        res['min_animal_size_mm'] = self.min_animal_size_mm
+        res['max_animal_size_mm'] = self.max_animal_size_mm
+        res['min_animal_length_mm'] = self.min_animal_length_mm
+        res['max_animal_length_mm'] = self.max_animal_length_mm
+        res['min_animal_width_mm'] = self.min_animal_width_mm
+        res['max_animal_width_mm'] = self.max_animal_width_mm
+        res['pad_value_mm'] = self.pad_value_mm
+        return res
 
 @dataclass
 class AnimalTrackerParamOverlay:
