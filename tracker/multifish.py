@@ -171,7 +171,7 @@ class MultiFishOverlay(TrackingOverlay):
         - 3. fish coordinates: fish egocentric coordinates, rotation = fish heading, origin = fish centroid
         '''
 
-        if tracking is not None:
+        if (tracking is not None) and (tracking.identities is not None):
 
             overlay = im2rgb(im2uint8(image))
 
