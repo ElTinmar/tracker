@@ -4,7 +4,13 @@ from scipy.spatial.distance import pdist
 import numpy as np
 from numpy.typing import NDArray, ArrayLike
 from typing import Tuple, Dict, Optional
-from image_tools import bwareafilter_props, bwareafilter, enhance, im2uint8, im2rgb
+from image_tools import (
+    bwareafilter_props, bwareafilter_props_GPU, 
+    bwareafilter, bwareafilter_GPU,
+    enhance, enhance_GPU, 
+    im2uint8, im2rgb, 
+    GpuMat_to_cupy_array, cupy_array_to_GpuMat
+)
 from geometry import ellipse_direction, angle_between_vectors, to_homogeneous, from_homogeneous
 from tracker import Tracker, TrackingOverlay
 
