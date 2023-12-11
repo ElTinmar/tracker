@@ -2,6 +2,7 @@ from distutils.core import setup
 
 setup(
     name='tracker',
+    python_requires='3.8',
     author='Martin Privat',
     version='0.1.18',
     packages=['tracker','tracker.tests'],
