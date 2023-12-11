@@ -10,7 +10,7 @@ import numpy as np
 from numpy.typing import NDArray
 from dataclasses import dataclass
 import cv2
-from typing import Optional
+from typing import Optional, Tuple
 from .core import Tracker, TrackingOverlay
 
 try:
