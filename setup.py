@@ -21,6 +21,6 @@ setup(
         "geometry @ git+https://github.com/ElTinmar/geometry.git@main"
     ],
     extras_require={
-        'gpu': ["image_tools[gpu] @ git+https://github.com/ElTinmar/image_tools.git@main",]
+        'gpu': ["image_tools[gpu] @ git+https://github.com/ElTinmar/image_tools.git@main"]
     }
 )
