@@ -49,7 +49,7 @@ class BodyTrackerWidget(QWidget):
         # gamma
         self.body_gamma = LabeledDoubleSpinBox(self)
         self.body_gamma.setText('body gamma')
-        self.body_gamma.setRange(0,100)
+        self.body_gamma.setRange(0.1,100)
         self.body_gamma.setValue(3.0)
         self.body_gamma.setSingleStep(0.1)
         self.body_gamma.valueChanged.connect(self.update_tracker) 
@@ -57,7 +57,7 @@ class BodyTrackerWidget(QWidget):
         # constrast
         self.body_contrast = LabeledDoubleSpinBox(self)
         self.body_contrast.setText('body contrast')
-        self.body_contrast.setRange(0,100)
+        self.body_contrast.setRange(0.1,100)
         self.body_contrast.setValue(1.5)
         self.body_contrast.setSingleStep(0.1)
         self.body_contrast.valueChanged.connect(self.update_tracker) 
@@ -65,8 +65,8 @@ class BodyTrackerWidget(QWidget):
         # brightness
         self.body_brightness = LabeledDoubleSpinBox(self)
         self.body_brightness.setText('body brightness')
-        self.body_brightness.setRange(0,1)
-        self.body_brightness.setValue(0.3)
+        self.body_brightness.setRange(-1,1)
+        self.body_brightness.setValue(0.0)
         self.body_brightness.setSingleStep(0.025)
         self.body_brightness.valueChanged.connect(self.update_tracker) 
 
@@ -174,6 +174,9 @@ class BodyTrackerWidget(QWidget):
         self.setLayout(mainlayout)
 
     def update_tracker(self) -> None:
+
+        self.median_filter_sz_mm.setRange(1/self.target_pix_per_mm.value(), 1000)
+        self.blur_sz_mm.setRange(1/self.target_pix_per_mm.value(), 1000)
 
         tracker_param = BodyTrackerParamTracking(
             pix_per_mm = self.pix_per_mm.value(),

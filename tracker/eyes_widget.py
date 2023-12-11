@@ -40,7 +40,7 @@ class EyesTrackerWidget(QWidget):
         # eye gamma
         self.eye_gamma = LabeledDoubleSpinBox(self)
         self.eye_gamma.setText('eye gamma')
-        self.eye_gamma.setRange(0,100)
+        self.eye_gamma.setRange(0.1,100)
         self.eye_gamma.setValue(3.0)
         self.eye_gamma.setSingleStep(0.1)
         self.eye_gamma.valueChanged.connect(self.update_tracker) 
@@ -48,7 +48,7 @@ class EyesTrackerWidget(QWidget):
         # eye constrast
         self.eye_contrast = LabeledDoubleSpinBox(self)
         self.eye_contrast.setText('eye contrast')
-        self.eye_contrast.setRange(0,100)
+        self.eye_contrast.setRange(0.1,100)
         self.eye_contrast.setValue(1.5)
         self.eye_contrast.setSingleStep(0.1)
         self.eye_contrast.valueChanged.connect(self.update_tracker) 
@@ -56,8 +56,8 @@ class EyesTrackerWidget(QWidget):
         # eye brightness
         self.eye_brightness = LabeledDoubleSpinBox(self)
         self.eye_brightness.setText('eye brightness')
-        self.eye_brightness.setRange(0,1)
-        self.eye_brightness.setValue(0.3)
+        self.eye_brightness.setRange(-1,1)
+        self.eye_brightness.setValue(0.0)
         self.eye_brightness.setSingleStep(0.025)
         self.eye_brightness.valueChanged.connect(self.update_tracker) 
 
@@ -162,6 +162,9 @@ class EyesTrackerWidget(QWidget):
         self.setLayout(mainlayout)
 
     def update_tracker(self) -> None:
+
+        self.median_filter_sz_mm.setRange(1/self.target_pix_per_mm.value(), 1000)
+        self.blur_sz_mm.setRange(1/self.target_pix_per_mm.value(), 1000)
 
         tracker_param = EyesTrackerParamTracking(
             pix_per_mm = self.pix_per_mm.value(),

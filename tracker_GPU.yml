@@ -1,0 +1,20 @@
+name: tracker_GPU
+channels:
+- conda-forge
+dependencies:
+- python == 3.8.16
+- ipython
+- pyqt
+- numpy
+- cupy
+- scipy
+- scikit-learn
+- cuml
+- opencv
+- tqdm
+- pip
+- pip:
+  - git+https://github.com/ElTinmar/video_tools.git@main
+  - git+https://github.com/ElTinmar/image_tools.git@main
+  - git+https://github.com/ElTinmar/qt_widgets.git@main
+  - git+https://github.com/ElTinmar/geometry.git@main

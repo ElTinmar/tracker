@@ -63,6 +63,26 @@ class TailTrackerParamTracking:
             self.mm2px(self.crop_dimension_mm[1])
         ) 
 
+    def to_dict(self):
+        res = {}
+        res['pix_per_mm'] = self.pix_per_mm
+        res['target_pix_per_mm'] = self.target_pix_per_mm
+        res['tail_contrast'] = self.tail_contrast
+        res['tail_gamma'] = self.tail_gamma
+        res['tail_brightness'] = self.tail_brightness
+        res['arc_angle_deg'] = self.arc_angle_deg
+        res['n_tail_points'] = self.n_tail_points
+        res['n_pts_arc'] = self.n_pts_arc
+        res['n_pts_interp'] = self.n_pts_interp
+        res['tail_length_mm'] = self.tail_length_mm
+        res['dist_swim_bladder_mm'] = self.dist_swim_bladder_mm
+        res['blur_sz_mm'] = self.blur_sz_mm
+        res['median_filter_sz_mm'] = self.median_filter_sz_mm
+        res['crop_dimension_mm'] = self.crop_dimension_mm
+        res['crop_offset_tail_mm'] = self.crop_offset_tail_mm
+        return res
+    
+
 @dataclass
 class TailTrackerParamOverlay:
     pix_per_mm: float = 40

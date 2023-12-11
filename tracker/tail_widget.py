@@ -39,7 +39,7 @@ class TailTrackerWidget(QWidget):
         # tail contrast
         self.tail_contrast = LabeledDoubleSpinBox(self)
         self.tail_contrast.setText('tail contrast')
-        self.tail_contrast.setRange(0,10)
+        self.tail_contrast.setRange(0.1,100)
         self.tail_contrast.setValue(1.0)
         self.tail_contrast.setSingleStep(0.1)
         self.tail_contrast.valueChanged.connect(self.update_tracker) 
@@ -47,7 +47,7 @@ class TailTrackerWidget(QWidget):
         # tail gamma
         self.tail_gamma = LabeledDoubleSpinBox(self)
         self.tail_gamma.setText('tail gamma')
-        self.tail_gamma.setRange(0,10)
+        self.tail_gamma.setRange(0.1,100)
         self.tail_gamma.setValue(0.75)
         self.tail_gamma.setSingleStep(0.05)
         self.tail_gamma.valueChanged.connect(self.update_tracker) 
@@ -55,8 +55,8 @@ class TailTrackerWidget(QWidget):
         # tail brightness 
         self.tail_brightness = LabeledDoubleSpinBox(self)
         self.tail_brightness.setText('tail brightness')
-        self.tail_brightness.setRange(0,1)
-        self.tail_brightness.setValue(0.2)
+        self.tail_brightness.setRange(-1,1)
+        self.tail_brightness.setValue(0.0)
         self.tail_brightness.setSingleStep(0.025)
         self.tail_brightness.valueChanged.connect(self.update_tracker) 
         
@@ -188,6 +188,9 @@ class TailTrackerWidget(QWidget):
         self.setLayout(mainlayout)
 
     def update_tracker(self) -> None:
+    
+        self.median_filter_sz_mm.setRange(1/self.target_pix_per_mm.value(), 1000)
+        self.blur_sz_mm.setRange(1/self.target_pix_per_mm.value(), 1000)
 
         tracker_param = TailTrackerParamTracking(
             pix_per_mm = self.pix_per_mm.value(),

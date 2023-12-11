@@ -70,7 +70,16 @@ class MultiFishTracker(Tracker):
 
         # if nothing was detected at that stage, stop here
         if centroids.size == 0:
-            return
+            res = MultiFishTracking(
+                identities =  None, 
+                indices = None,
+                animals = animals,
+                body = None,
+                eyes = None,
+                tail =  None,
+                image = im2uint8(image)
+            )
+            return res
         
         # assign identities to animals 
         self.assignment.update(centroids)
@@ -162,7 +171,7 @@ class MultiFishOverlay(TrackingOverlay):
         - 3. fish coordinates: fish egocentric coordinates, rotation = fish heading, origin = fish centroid
         '''
 
-        if tracking is not None:
+        if (tracking is not None) and (tracking.identities is not None):
 
             overlay = im2rgb(im2uint8(image))
 

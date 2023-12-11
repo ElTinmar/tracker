@@ -12,7 +12,7 @@ from numpy.typing import NDArray
 class AnimalTrackerWidget(QWidget):
     def __init__(self, *args, **kwargs) -> None:
         
-        super().__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs) # TODO provide a tracker constructor to be able to use different trackers ?
         self.tracker = None
         self.declare_components()
         self.layout_components()
@@ -50,7 +50,7 @@ class AnimalTrackerWidget(QWidget):
         # gamma
         self.animal_gamma = LabeledDoubleSpinBox(self)
         self.animal_gamma.setText('animal gamma')
-        self.animal_gamma.setRange(0,100)
+        self.animal_gamma.setRange(0.1,100)
         self.animal_gamma.setValue(1.0)
         self.animal_gamma.setSingleStep(0.1)
         self.animal_gamma.valueChanged.connect(self.update_tracker) 
@@ -58,7 +58,7 @@ class AnimalTrackerWidget(QWidget):
         # constrast
         self.animal_contrast = LabeledDoubleSpinBox(self)
         self.animal_contrast.setText('animal contrast')
-        self.animal_contrast.setRange(0,100)
+        self.animal_contrast.setRange(0.1,100)
         self.animal_contrast.setValue(1.0)
         self.animal_contrast.setSingleStep(0.1)
         self.animal_contrast.valueChanged.connect(self.update_tracker) 
@@ -66,8 +66,8 @@ class AnimalTrackerWidget(QWidget):
         # brightness
         self.animal_brightness = LabeledDoubleSpinBox(self)
         self.animal_brightness.setText('animal brightness')
-        self.animal_brightness.setRange(0,1)
-        self.animal_brightness.setValue(1.0)
+        self.animal_brightness.setRange(-1,1)
+        self.animal_brightness.setValue(0.0)
         self.animal_brightness.setSingleStep(0.025)
         self.animal_brightness.valueChanged.connect(self.update_tracker) 
 
@@ -188,6 +188,9 @@ class AnimalTrackerWidget(QWidget):
 
     def update_tracker(self) -> None:
 
+        self.median_filter_sz_mm.setRange(1/self.target_pix_per_mm.value(), 1000)
+        self.blur_sz_mm.setRange(1/self.target_pix_per_mm.value(), 1000)
+
         tracker_param = AnimalTrackerParamTracking(
             pix_per_mm = self.pix_per_mm.value(),
             target_pix_per_mm = self.target_pix_per_mm.value(),
@@ -222,10 +225,11 @@ class AnimalTrackerWidget(QWidget):
 
             zoom = self.zoom.value()/100.0
             image = cv2.resize(tracking.image,None,None,zoom,zoom,cv2.INTER_NEAREST)
-            mask = cv2.resize(tracking.mask,None,None,zoom,zoom,cv2.INTER_NEAREST)
-            overlay = cv2.resize(overlay,None,None,zoom,zoom,cv2.INTER_NEAREST)
-
             self.image.setPixmap(NDarray_to_QPixmap(image))
+            mask = cv2.resize(tracking.mask,None,None,zoom,zoom,cv2.INTER_NEAREST)
             self.mask.setPixmap(NDarray_to_QPixmap(mask))
-            self.image_overlay.setPixmap(NDarray_to_QPixmap(overlay))
+            if (overlay is not None) and (overlay.size > 0): 
+                overlay = cv2.resize(overlay,None,None,zoom,zoom,cv2.INTER_NEAREST)
+                self.image_overlay.setPixmap(NDarray_to_QPixmap(overlay))
+
             self.update()
