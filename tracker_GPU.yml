@@ -2,7 +2,7 @@ name: tracker_GPU
 channels:
 - conda-forge
 dependencies:
-- python == 3.8.16
+- python == 3.8
 - ipython
 - pyqt
 - numpy
@@ -10,10 +10,10 @@ dependencies:
 - scipy
 - scikit-learn
 - cuml
-- opencv
 - tqdm
 - pip
 - pip:
+  - https://github.com/ElTinmar/build_opencv/raw/main/opencv_contrib_python_rolling-4.8.0.20231210-cp38-cp38-linux_x86_64.whl
   - git+https://github.com/ElTinmar/video_tools.git@main
   - git+https://github.com/ElTinmar/image_tools.git@main
   - git+https://github.com/ElTinmar/qt_widgets.git@main

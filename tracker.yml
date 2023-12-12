@@ -2,7 +2,7 @@ name: tracker
 channels:
 - conda-forge
 dependencies:
-- python == 3.8.16
+- python == 3.8
 - ipython
 - pyqt
 - numpy
