@@ -13,14 +13,15 @@ and associated qt widgets to set parameters
 TODO create GPU class to do the tracking on GPU
 
 ```
+git clone git@github.com:ElTinmar/tracker.git
+cd tracker
+conda env create -f tracker_GPU.yml
+export PATH=/usr/local/cuda-${CUDA_VERSION}/bin${PATH:+:${PATH}}
+export LD_LIBRARY_PATH=/usr/local/cuda-${CUDA_VERSION}/lib64${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
+conda env create -f tracker_GPU.yml
+```
+
+```
 pip install git+https://github.com/ElTinmar/tracker.git@main
 ```
 
-# GPU option
-
-```
-export CUDA_VERSION=12.3
-export PATH=/usr/local/cuda-${CUDA_VERSION}/bin${PATH:+:${PATH}}
-export LD_LIBRARY_PATH=/usr/local/cuda-${CUDA_VERSION}/lib64${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
-pip install -e git+https://github.com/ElTinmar/tracker.git@main#egg=tracker[gpu]
-```
