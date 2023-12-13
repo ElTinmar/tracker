@@ -1,11 +1,11 @@
 name: tracker_GPU
 channels:
-- conda-forge
 - rapidsai
+- conda-forge
 - nvidia
 dependencies:
-- python == 3.9
 - rapids == 23.12
+- python == 3.9
 - ipython
 - pyqt
 - numpy
