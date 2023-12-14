@@ -1,15 +1,14 @@
 from PyQt5.QtWidgets import QWidget, QLabel, QHBoxLayout, QVBoxLayout
-from .animal import *
+from .core import AnimalTracker, AnimalOverlay, AnimalTrackerParamOverlay, AnimalTrackerParamTracking, AnimalTracking
+from .tracker import AnimalTracker_CPU
+from .overlay import AnimalOverlay_opencv
 from qt_widgets import NDarray_to_QPixmap, LabeledDoubleSpinBox, LabeledSpinBox
 import cv2
 from geometry import Affine2DTransform
-from typing import Any
-from numpy.typing import NDArray
 
-# TODO maybe group settings into collapsable blocks
-
-
+# TODO maybe group settings into collapsable block
 class AnimalTrackerWidget(QWidget):
+    
     def __init__(
             self, 
             tracker_class: AnimalTracker = AnimalTracker_CPU, 
@@ -17,7 +16,7 @@ class AnimalTrackerWidget(QWidget):
             *args, **kwargs
         ) -> None:
         
-        super().__init__(*args, **kwargs) # TODO provide a tracker constructor to be able to use different trackers ?
+        super().__init__(*args, **kwargs) 
         self.tracker = None
         self.tracker_class = tracker_class
         self.overlay_class = overlay_class

@@ -1,5 +1,7 @@
 from PyQt5.QtWidgets import QWidget, QLabel, QHBoxLayout, QVBoxLayout
-from .eyes import *
+from .core import EyesTracker, EyesOverlay, EyesTrackerParamOverlay, EyesTrackerParamTracking, EyesTracking
+from .tracker import EyesTracker_CPU
+from .overlay import EyesOverlay_opencv
 from qt_widgets import NDarray_to_QPixmap, LabeledDoubleSpinBox, LabeledSpinBox
 import cv2
 from geometry import Affine2DTransform

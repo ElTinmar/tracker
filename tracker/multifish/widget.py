@@ -1,9 +1,11 @@
-from .animal_widget import AnimalTrackerWidget
-from .body_widget import BodyTrackerWidget
-from .eyes_widget import EyesTrackerWidget
-from .tail_widget import TailTrackerWidget 
+from tracker.animal import AnimalTrackerWidget
+from tracker.body import BodyTrackerWidget
+from tracker.eyes import EyesTrackerWidget
+from tracker.tail import TailTrackerWidget 
 from .assignment_widget import AssignmentWidget
-from .multifish import *
+from .core import MultiFishTracker, MultiFishOverlay, MultiFishTracking
+from .tracker import MultiFishTracker_CPU
+from .overlay import MultiFishOverlay_opencv
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QMainWindow, QTabWidget, QDockWidget, QLabel, QVBoxLayout, QHBoxLayout, QWidget
 from typing import Protocol, Optional

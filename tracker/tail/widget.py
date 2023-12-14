@@ -1,5 +1,7 @@
 from PyQt5.QtWidgets import QWidget, QLabel, QHBoxLayout, QVBoxLayout
-from .tail import *
+from .core import TailTracker, TailOverlay, TailTrackerParamOverlay, TailTrackerParamTracking, TailTracking
+from .tracker import TailTracker_CPU
+from .overlay import TailOverlay_opencv
 from qt_widgets import NDarray_to_QPixmap, LabeledDoubleSpinBox, LabeledSpinBox
 import cv2
 from geometry import Affine2DTransform

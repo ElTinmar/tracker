@@ -1,11 +1,12 @@
 from PyQt5.QtWidgets import QWidget, QLabel, QHBoxLayout, QVBoxLayout
-from .body import *
+from .core import BodyTracker, BodyOverlay, BodyTrackerParamOverlay, BodyTrackerParamTracking, BodyTracking
+from .tracker import BodyTracker_CPU
+from .overlay import BodyOverlay_opencv
 from qt_widgets import NDarray_to_QPixmap, LabeledDoubleSpinBox, LabeledSpinBox
 import cv2
 from geometry import Affine2DTransform
 
 # TODO maybe group settings into collapsable blocks
-
 
 class BodyTrackerWidget(QWidget):
 

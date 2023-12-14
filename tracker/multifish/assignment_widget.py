@@ -1,6 +1,6 @@
-from PyQt5.QtWidgets import QWidget, QLabel, QStackedWidget, QVBoxLayout
+from PyQt5.QtWidgets import QWidget, QStackedWidget, QVBoxLayout
 from .assignment import LinearSumAssignment, GridAssignment
-from qt_widgets import LabeledDoubleSpinBox, LabeledComboBox, NDarray_to_QPixmap
+from qt_widgets import LabeledDoubleSpinBox, LabeledComboBox
 from image_tools import ROISelectorDialog
 from numpy.typing import NDArray
 import numpy as np
