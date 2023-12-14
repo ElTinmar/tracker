@@ -11,7 +11,8 @@ dependencies:
 - scikit-learn
 - pip
 - pip:
+  - git+https://github.com/ElTinmar/video_tools.git@main
   - git+https://github.com/ElTinmar/image_tools.git@main
   - git+https://github.com/ElTinmar/qt_widgets.git@main
   - git+https://github.com/ElTinmar/geometry.git@main
-  - git+https://github.com/ElTinmar/video_tools.git@main
+  
