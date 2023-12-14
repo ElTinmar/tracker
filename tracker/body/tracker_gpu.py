@@ -27,7 +27,7 @@ def get_orientation_GPU(coordinates: CuNDArray) -> Tuple[CuNDArray, CuNDArray]:
     
     return (principal_components, centroid)
 
-class BodyTrackerGPU(BodyTracker):
+class BodyTracker_GPU(BodyTracker):
 
     def track(
             self,
