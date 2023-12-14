@@ -4,18 +4,13 @@ channels:
 - conda-forge
 - nvidia
 dependencies:
-- python >= 3.9, < 3.10
-- cuml = 23.12
+- python = 3.10
 - ipython
-- pyqt
-- numpy
+- cuml = 23.12
 - cupy
-- scipy
 - scikit-learn
-- tqdm
 - pip
 - pip:
-  - https://github.com/ElTinmar/build_opencv/raw/main/opencv_contrib_python_rolling-4.8.0.20231212-cp39-cp39-linux_x86_64.whl
   - git+https://github.com/ElTinmar/image_tools.git@main
   - git+https://github.com/ElTinmar/qt_widgets.git@main
   - git+https://github.com/ElTinmar/geometry.git@main
