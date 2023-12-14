@@ -4,7 +4,7 @@ channels:
 - conda-forge
 - nvidia
 dependencies:
-- python = 3.10
+- python = 3.9
 - ipython
 - cuml = 23.12
 - cupy
