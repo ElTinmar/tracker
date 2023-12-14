@@ -1,6 +1,6 @@
 from typing import Protocol, Optional, List
 from numpy.typing import NDArray
-from .core import Tracker, TrackingOverlay
+from tracker.core import Tracker, TrackingOverlay
 from tracker.animal import AnimalTracking, AnimalOverlay, AnimalTracker
 from tracker.body import BodyTracking, BodyOverlay, BodyTracker
 from tracker.eyes import EyesTracking, EyesOverlay, EyesTracker
