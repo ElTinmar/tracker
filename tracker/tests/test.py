@@ -1,11 +1,11 @@
 from video_tools import Buffered_OpenCV_VideoReader, VideoDisplay
 from image_tools import im2single, im2gray
 from tracker import (
-    GridAssignment, MultiFishTracker, MultiFishOverlay,
-    AnimalTracker, AnimalOverlay, AnimalTrackerParamTracking, AnimalTrackerParamOverlay,
-    BodyTracker, BodyOverlay, BodyTrackerParamTracking, BodyTrackerParamOverlay,
-    EyesTracker, EyesOverlay, EyesTrackerParamTracking, EyesTrackerParamOverlay,
-    TailTracker, TailOverlay, TailTrackerParamTracking, TailTrackerParamOverlay
+    GridAssignment, MultiFishTracker_CPU, MultiFishOverlay_opencv,
+    AnimalTracker_CPU, AnimalOverlay_opencv, AnimalTrackerParamTracking, AnimalTrackerParamOverlay,
+    BodyTracker_CPU, BodyOverlay_opencv, BodyTrackerParamTracking, BodyTrackerParamOverlay,
+    EyesTracker_CPU, EyesOverlay_opencv, EyesTrackerParamTracking, EyesTrackerParamOverlay,
+    TailTracker_CPU, TailOverlay_opencv, TailTrackerParamTracking, TailTrackerParamOverlay
 )
 from tqdm import tqdm
 import numpy as np
@@ -39,7 +39,7 @@ display_eyes.start()
 display_tail.start()
 
 # tracking 
-animal_tracker = AnimalTracker(
+animal_tracker = AnimalTracker_CPU(
     AnimalTrackerParamTracking(
         pix_per_mm=40,
         target_pix_per_mm=7.5,
@@ -58,7 +58,7 @@ animal_tracker = AnimalTracker(
         median_filter_sz_mm=1/7.5,
     )
 )
-body_tracker = BodyTracker(
+body_tracker = BodyTracker_CPU(
     BodyTrackerParamTracking(
         pix_per_mm=40,
         target_pix_per_mm=7.5,
@@ -76,7 +76,7 @@ body_tracker = BodyTracker(
         median_filter_sz_mm=1/7.5,
     )
 )
-eyes_tracker = EyesTracker(
+eyes_tracker = EyesTracker_CPU(
     EyesTrackerParamTracking(
         pix_per_mm=40,
         target_pix_per_mm=40,
@@ -92,7 +92,7 @@ eyes_tracker = EyesTracker(
         crop_offset_mm=-0.30
     )
 )
-tail_tracker = TailTracker(
+tail_tracker = TailTracker_CPU(
     TailTrackerParamTracking(
         pix_per_mm=40,
         target_pix_per_mm=20,
@@ -113,12 +113,12 @@ tail_tracker = TailTracker(
 )
 
 # overlay
-animal_overlay = AnimalOverlay(AnimalTrackerParamOverlay())
-body_overlay = BodyOverlay(BodyTrackerParamOverlay())
-eyes_overlay = EyesOverlay(EyesTrackerParamOverlay())
-tail_overlay = TailOverlay(TailTrackerParamOverlay())
+animal_overlay = AnimalOverlay_opencv(AnimalTrackerParamOverlay())
+body_overlay = BodyOverlay_opencv(BodyTrackerParamOverlay())
+eyes_overlay = EyesOverlay_opencv(EyesTrackerParamOverlay())
+tail_overlay = TailOverlay_opencv(TailTrackerParamOverlay())
 
-tracker = MultiFishTracker(            
+tracker = MultiFishTracker_CPU(            
     assignment,
     accumulator,
     animal_tracker,
@@ -127,7 +127,7 @@ tracker = MultiFishTracker(
     tail_tracker
 )
 
-overlay = MultiFishOverlay(
+overlay = MultiFishOverlay_opencv(
     animal_overlay,
     body_overlay,
     eyes_overlay,
