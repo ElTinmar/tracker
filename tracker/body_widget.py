@@ -9,10 +9,17 @@ from geometry import Affine2DTransform
 
 class BodyTrackerWidget(QWidget):
 
-    def __init__(self, *args, **kwargs) -> None:
+    def __init__(
+            self, 
+            tracker_class: BodyTracker = BodyTracker_CPU, 
+            overlay_class: BodyOverlay = BodyOverlay_opencv,
+            *args, **kwargs
+        ) -> None:
     
         super().__init__(*args, **kwargs)
         self.tracker = None
+        self.tracker_class = tracker_class
+        self.overlay_class = overlay_class
         self.declare_components()
         self.layout_components()
 
@@ -194,12 +201,12 @@ class BodyTrackerWidget(QWidget):
             blur_sz_mm = self.blur_sz_mm.value(),
             median_filter_sz_mm = self.median_filter_sz_mm.value()
         )
-        self.tracker = BodyTracker(tracker_param)
+        self.tracker = self.tracker_class(tracker_param)
 
         overlay_param = BodyTrackerParamOverlay(
             pix_per_mm = self.target_pix_per_mm.value(),
         )
-        self.overlay = BodyOverlay(overlay_param)
+        self.overlay = self.overlay_class(overlay_param)
 
     def display(self, tracking: BodyTracking):
         

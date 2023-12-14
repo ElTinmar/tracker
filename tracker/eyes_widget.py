@@ -8,10 +8,17 @@ from geometry import Affine2DTransform
 # TODO maybe group settings into collapsable blocks
 
 class EyesTrackerWidget(QWidget):
-    def __init__(self, *args, **kwargs) -> None:
+    def __init__(
+            self, 
+            tracker_class: EyesTracker = EyesTracker_CPU, 
+            overlay_class: EyesOverlay = EyesOverlay_opencv,
+            *args, **kwargs
+        ) -> None:
 
         super().__init__(*args, **kwargs)
         self.tracker = None
+        self.tracker_class = tracker_class
+        self.overlay_class = overlay_class
         self.declare_components()
         self.layout_components()
 
@@ -180,12 +187,12 @@ class EyesTrackerWidget(QWidget):
             blur_sz_mm = self.blur_sz_mm.value(),
             median_filter_sz_mm = self.median_filter_sz_mm.value(),
         )
-        self.tracker = EyesTracker(tracker_param)
+        self.tracker = self.tracker_class(tracker_param)
 
         overlay_param = EyesTrackerParamOverlay(
             pix_per_mm = self.target_pix_per_mm.value(),
         )
-        self.overlay = EyesOverlay(overlay_param)
+        self.overlay = self.overlay_class(overlay_param)
 
     def display(self, tracking: EyesTracking) -> None:
 

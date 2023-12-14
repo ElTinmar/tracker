@@ -10,10 +10,17 @@ from numpy.typing import NDArray
 
 
 class AnimalTrackerWidget(QWidget):
-    def __init__(self, *args, **kwargs) -> None:
+    def __init__(
+            self, 
+            tracker_class: AnimalTracker = AnimalTracker_CPU, 
+            overlay_class: AnimalOverlay = AnimalOverlay_opencv, 
+            *args, **kwargs
+        ) -> None:
         
         super().__init__(*args, **kwargs) # TODO provide a tracker constructor to be able to use different trackers ?
         self.tracker = None
+        self.tracker_class = tracker_class
+        self.overlay_class = overlay_class
         self.declare_components()
         self.layout_components()
 
@@ -208,12 +215,12 @@ class AnimalTrackerWidget(QWidget):
             median_filter_sz_mm = self.median_filter_sz_mm.value(),
             pad_value_mm = self.pad_value_mm.value()
         )
-        self.tracker = AnimalTracker(tracker_param)
+        self.tracker = self.tracker_class(tracker_param)
 
         overlay_param = AnimalTrackerParamOverlay(
             pix_per_mm=self.target_pix_per_mm.value()
         )
-        self.overlay = AnimalOverlay(overlay_param)
+        self.overlay = self.overlay_class(overlay_param)
 
     def display(self, tracking: AnimalTracking) -> None:
 

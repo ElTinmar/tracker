@@ -6,8 +6,6 @@ import numpy as np
 from numpy.typing import NDArray
 from typing import Tuple, Optional
 from image_tools import (
-    bwareafilter_props, bwareafilter_props_GPU, 
-    bwareafilter, bwareafilter_GPU,
     enhance, enhance_GPU, 
     im2uint8, im2rgb, 
     GpuMat_to_cupy_array, cupy_array_to_GpuMat
@@ -120,6 +118,17 @@ class TailTracker(Tracker):
 
         self.tracking_param = tracking_param
 
+class TailOverlay(TrackingOverlay):
+
+    def __init__(
+            self, 
+            overlay_param: TailTrackerParamOverlay
+        ) -> None:
+
+        self.overlay_param = overlay_param
+
+class TailTracker_CPU(TailTracker):
+
     def track(
             self,
             image: NDArray, 
@@ -208,14 +217,7 @@ class TailTracker(Tracker):
 
         return res
 
-class TailOverlay(TrackingOverlay):
-
-    def __init__(
-            self, 
-            overlay_param: TailTrackerParamOverlay
-        ) -> None:
-
-        self.overlay_param = overlay_param
+class TailOverlay_opencv(TailOverlay):
 
     def overlay(
             self,
@@ -247,14 +249,7 @@ class TailOverlay(TrackingOverlay):
             
             return overlay
 
-class TailTrackerGPU(Tracker):
-
-    def __init__(
-            self, 
-            tracking_param: TailTrackerParamTracking, 
-        ) -> None:
-
-        self.tracking_param = tracking_param
+class TailTracker_GPU(TailTracker):
 
     def track(
             self,

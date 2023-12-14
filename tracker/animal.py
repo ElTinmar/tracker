@@ -129,7 +129,7 @@ class AnimalTracking:
         '''
         pass    
 
-class AnimalTrackerGPU(Tracker):
+class AnimalTracker(Tracker):
 
     def __init__(
             self, 
@@ -137,6 +137,17 @@ class AnimalTrackerGPU(Tracker):
         ):
 
         self.tracking_param = tracking_param
+
+class AnimalOverlay(TrackingOverlay):
+
+    def __init__(
+            self, 
+            overlay_param: AnimalTrackerParamOverlay
+        ):
+
+        self.overlay_param = overlay_param
+
+class AnimalTracker_GPU(AnimalTracker):
 
     def track(self, image: CuNDArray, centroid: Optional[NDArray] = None) -> Optional[AnimalTracking]:
 
@@ -199,7 +210,7 @@ class AnimalTrackerGPU(Tracker):
 
         return res
 
-class AnimalTracker(Tracker):
+class AnimalTracker_CPU(AnimalTracker):
     
     def track(self, image: NDArray, centroid: Optional[NDArray] = None) -> Optional[AnimalTracking]:
 
@@ -258,14 +269,7 @@ class AnimalTracker(Tracker):
 
         return res
 
-class AnimalOverlay(TrackingOverlay):
-
-    def __init__(
-            self, 
-            overlay_param: AnimalTrackerParamOverlay
-        ):
-
-        self.overlay_param = overlay_param
+class AnimalOverlay_opencv(AnimalOverlay):
 
     def overlay(
             self,

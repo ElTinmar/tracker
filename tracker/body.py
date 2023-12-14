@@ -123,6 +123,24 @@ class BodyTracking:
         '''
         pass    
 
+class BodyTracker(Tracker):
+
+    def __init__(
+            self, 
+            tracking_param: BodyTrackerParamTracking, 
+        ) -> None:
+
+        self.tracking_param = tracking_param
+
+class BodyOverlay(TrackingOverlay):
+
+    def __init__(
+            self, 
+            overlay_param: BodyTrackerParamOverlay
+        ) -> None:
+
+        self.overlay_param = overlay_param
+
 def get_orientation(coordinates: NDArray) -> Tuple[NDArray, NDArray]:
     '''
     get blob main axis using PCA
@@ -165,14 +183,7 @@ def get_orientation_GPU(coordinates: CuNDArray) -> Tuple[CuNDArray, CuNDArray]:
     
     return (principal_components, centroid)
 
-class BodyTracker(Tracker):
-
-    def __init__(
-            self, 
-            tracking_param: BodyTrackerParamTracking, 
-        ) -> None:
-
-        self.tracking_param = tracking_param
+class BodyTracker_CPU(BodyTracker):
         
     def track(
             self,
@@ -257,14 +268,8 @@ class BodyTracker(Tracker):
             )
             return res
 
-class BodyOverlay(TrackingOverlay):
+class BodyOverlay_opencv(BodyOverlay):
 
-    def __init__(
-            self, 
-            overlay_param: BodyTrackerParamOverlay
-        ) -> None:
-
-        self.overlay_param = overlay_param
 
     def overlay(
             self,
@@ -309,7 +314,7 @@ class BodyOverlay(TrackingOverlay):
         
             return overlay
 
-class BodyTrackerGPU(Tracker):
+class BodyTrackerGPU(BodyTracker):
 
     def track(
             self,

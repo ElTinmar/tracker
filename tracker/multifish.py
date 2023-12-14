@@ -2,14 +2,25 @@ import numpy as np
 import cv2
 from typing import Protocol, Optional, List
 from numpy.typing import NDArray
-from image_tools import enhance, imrotate, im2rgb, im2uint8
+from image_tools import (
+    enhance, enhance_GPU, 
+    imrotate, imrotate_GPU,
+    im2uint8, im2rgb, 
+    GpuMat_to_cupy_array, cupy_array_to_GpuMat
+)
 from geometry import Affine2DTransform
 from .core import Tracker, TrackingOverlay
-from .animal import AnimalTracking
-from .body import BodyTracking
-from .eyes import EyesTracking
-from .tail import TailTracking 
+from .animal import AnimalTracking, AnimalOverlay, AnimalTracker
+from .body import BodyTracking, BodyOverlay, BodyTracker
+from .eyes import EyesTracking, EyesOverlay, EyesTracker
+from .tail import TailTracking, TailOverlay, TailTracker
 from dataclasses import dataclass
+
+try:
+    import cupy as cp
+    from cupy.typing import NDArray as CuNDArray
+except:
+    print('No GPU available, cupy not imported')
 
 class Accumulator(Protocol):
     def update(self):
@@ -37,17 +48,16 @@ class MultiFishTracking:
         '''export data as csv'''
         pass
 
-
 class MultiFishTracker(Tracker):
 
     def __init__(
             self, 
             assignment: Assignment,
             accumulator: Accumulator,
-            animal: Tracker,
-            body: Optional[Tracker], 
-            eyes: Optional[Tracker], 
-            tail: Optional[Tracker]
+            animal: AnimalTracker,
+            body: Optional[BodyTracker], 
+            eyes: Optional[EyesTracker], 
+            tail: Optional[TailTracker]
         ):
         self.assignment = assignment
         self.accumulator = accumulator
@@ -55,7 +65,26 @@ class MultiFishTracker(Tracker):
         self.body = body
         self.eyes = eyes
         self.tail = tail
-        
+
+    
+class MultiFishOverlay(TrackingOverlay):
+
+    def __init__(
+            self, 
+            animal: AnimalOverlay,
+            body: Optional[BodyOverlay], 
+            eyes: Optional[EyesOverlay], 
+            tail: Optional[TailOverlay]
+        ) -> None:
+        super().__init__()
+
+        self.animal = animal
+        self.body = body
+        self.eyes = eyes
+        self.tail = tail    
+
+class MultiFishTracker_CPU(MultiFishTracker):
+
     def track(self, image: NDArray, centroid: Optional[NDArray] = None) -> Optional[MultiFishTracking]:
 
         if (image is None) or (image.size == 0):
@@ -141,22 +170,105 @@ class MultiFishTracker(Tracker):
         )
         
         return res 
+    
+class MultiFishTracker_GPU(MultiFishTracker):
 
-class MultiFishOverlay(TrackingOverlay):
+    def track(self, image: CuNDArray, centroid: Optional[NDArray] = None) -> Optional[MultiFishTracking]:
 
-    def __init__(
-            self, 
-            animal: TrackingOverlay,
-            body: Optional[TrackingOverlay], 
-            eyes: Optional[TrackingOverlay], 
-            tail: Optional[TrackingOverlay]
-        ) -> None:
-        super().__init__()
+        if (image is None) or (image.size == 0):
+            return None
+        
+        image_gpumat = cupy_array_to_GpuMat(image)
 
-        self.animal = animal
-        self.body = body
-        self.eyes = eyes
-        self.tail = tail    
+        # restrain image between 0 and 1
+        image = enhance(image)
+
+        image = GpuMat_to_cupy_array(image_gpumat)
+
+        # get animal centroids (only crude location is necessary)
+        animals = self.animal.track(image)
+        centroids = animals.centroids
+
+        # if nothing was detected at that stage, stop here
+        if centroids.size == 0:
+            res = MultiFishTracking(
+                identities =  None, 
+                indices = None,
+                animals = animals,
+                body = None,
+                eyes = None,
+                tail =  None,
+                image = im2uint8(image.get())
+            )
+            return res
+        
+        # assign identities to animals 
+        self.assignment.update(centroids)
+        identities = self.assignment.get_ID()
+        to_keep = self.assignment.get_kept_centroids()        
+        data = np.hstack(
+            (identities[np.newaxis].T, 
+             animals.bb_centroids[to_keep,:], 
+             animals.bounding_boxes[to_keep,:])
+        ) 
+
+        # loop over animals
+        body = {}
+        eyes = {}
+        tail = {}
+        for (id, bb_x, bb_y, left, bottom, right, top) in data.astype(np.int64): 
+            eyes[id] = None
+            tail[id] = None
+            body[id] = None
+
+            # crop each animal's bounding box
+            image_cropped = image[bottom:top, left:right] 
+            offset = np.array([bb_x, bb_y])
+            if self.body is not None:
+
+                # get more precise centroid and orientation of the animals
+                
+                body[id] = self.body.track(image_cropped, centroid=offset)
+                if (body[id] is not None) and (body[id].centroid is not None):
+                    
+                    image_cropped_gpu = cupy_array_to_GpuMat(image_cropped)
+
+                    # rotate the animal so that it's vertical head up
+                    image_rot_gpu, centroid_rot = imrotate_GPU(
+                        image_cropped_gpu, 
+                        body[id].centroid[0], body[id].centroid[1], 
+                        np.rad2deg(body[id].angle_rad)
+                    )
+
+                    image_rot = GpuMat_to_cupy_array(image_rot_gpu)
+
+                    # track eyes 
+                    if self.eyes is not None:
+                        eyes[id] = self.eyes.track(image_rot, centroid=centroid_rot)
+
+                    # track tail
+                    if self.tail is not None:
+                        tail[id] = self.tail.track(image_rot, centroid=centroid_rot)
+
+                # compute additional features based on tracking
+                if self.accumulator is not None:
+                    self.accumulator.update(id,body[id],eyes[id],tail[id])
+
+        # save tracking results in a dict and return
+        res = MultiFishTracking(
+            identities =  identities, 
+            indices = to_keep,
+            animals = animals,
+            body = body,
+            eyes = eyes,
+            tail =  tail,
+            image = im2uint8(image.get())
+        )
+        
+        return res 
+
+
+class MultiFishOverlay_opencv(MultiFishOverlay):
 
     def overlay(
             self, 

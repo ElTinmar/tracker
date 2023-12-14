@@ -28,6 +28,8 @@ class TrackerWidget(QMainWindow):
             body_tracker_widget: Optional[BodyTrackerWidget],
             eyes_tracker_widget: Optional[EyesTrackerWidget],
             tail_tracker_widget: Optional[TailTrackerWidget],
+            tracker_class: MultiFishTracker = MultiFishTracker_CPU,
+            overlay_class: MultiFishOverlay = MultiFishOverlay_opencv,
             *args, **kwargs
         ) -> None:
 
@@ -38,6 +40,8 @@ class TrackerWidget(QMainWindow):
         self.eyes_tracker_widget = eyes_tracker_widget
         self.tail_tracker_widget = tail_tracker_widget
         self.tracker = None
+        self.tracker_class = tracker_class
+        self.overlay_class = overlay_class
         self.current_id = 0
         self.declare_components()
         self.layout_components()
@@ -147,7 +151,7 @@ class TrackerWidget(QMainWindow):
 
         if assignment is not None:
 
-            self.tracker = MultiFishTracker(
+            self.tracker = self.tracker_class(
                 assignment,
                 None,
                 animal_tracker,
@@ -156,7 +160,7 @@ class TrackerWidget(QMainWindow):
                 tail_tracker
             )
 
-            self.overlay = MultiFishOverlay(
+            self.overlay = self.overlay_class(
                 animal_overlay,
                 body_overlay,
                 eyes_overlay,

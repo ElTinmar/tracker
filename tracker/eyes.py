@@ -114,6 +114,24 @@ class EyesTracking:
         '''export data as csv'''
         pass
 
+class EyesTracker(Tracker):
+
+    def __init__(
+            self, 
+            tracking_param: EyesTrackerParamTracking, 
+        ) -> None:
+
+        self.tracking_param = tracking_param
+
+class EyesOverlay(TrackingOverlay):
+
+    def __init__(
+            self, 
+            overlay_param: EyesTrackerParamOverlay
+        ) -> None:
+
+        self.overlay_param = overlay_param
+
 def get_eye_prop(blob, offset: NDArray, resize: float) -> Dict:
 
     # fish must be vertical head up
@@ -255,14 +273,7 @@ def disp_eye(
 
     return overlay
 
-class EyesTracker(Tracker):
-
-    def __init__(
-            self, 
-            tracking_param: EyesTrackerParamTracking, 
-        ) -> None:
-
-        self.tracking_param = tracking_param
+class EyesTracker_CPU(EyesTracker):
 
     def track(
             self,
@@ -337,14 +348,7 @@ class EyesTracker(Tracker):
 
         return res
     
-class EyesOverlay(TrackingOverlay):
-
-    def __init__(
-            self, 
-            overlay_param: EyesTrackerParamOverlay
-        ) -> None:
-
-        self.overlay_param = overlay_param
+class EyesOverlay_opencv(EyesOverlay):
 
     def overlay(
             self,
@@ -389,14 +393,7 @@ class EyesOverlay(TrackingOverlay):
         
             return overlay
 
-class EyesTrackerGPU(Tracker):
-
-    def __init__(
-            self, 
-            tracking_param: EyesTrackerParamTracking, 
-        ) -> None:
-
-        self.tracking_param = tracking_param
+class EyesTracker_GPU(EyesTracker):
 
     def track(
             self,
