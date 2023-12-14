@@ -21,3 +21,8 @@ mamba env create -f tracker_GPU.yml
 pip install git+https://github.com/ElTinmar/tracker.git@main
 ```
 
+# troubleshooting
+
+There seems to be a problem with the version of Glib used by rapids and distributed on ubuntu
+such that compiling opencv and using it with rapids is hard to pull off without 
+triggering all kinds of errors
