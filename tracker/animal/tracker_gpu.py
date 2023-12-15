@@ -39,7 +39,7 @@ class AnimalTracker_GPU(AnimalTracker):
 
         height, width = image.shape
         mask = (image >= self.tracking_param.animal_intensity)
-        centroids = bwareafilter_centroids_GPU(
+        centroids_gpu = bwareafilter_centroids_GPU(
             mask, 
             min_size = self.tracking_param.min_animal_size_px,
             max_size = self.tracking_param.max_animal_size_px, 
@@ -48,6 +48,7 @@ class AnimalTracker_GPU(AnimalTracker):
             min_width = self.tracking_param.min_animal_width_px,
             max_width = self.tracking_param.max_animal_width_px
         )
+        centroids = centroids_gpu.get()
 
         bboxes = np.zeros((centroids.shape[0],4), dtype=int)
         bb_centroids = np.zeros((centroids.shape[0],2), dtype=float)

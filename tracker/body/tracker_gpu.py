@@ -41,7 +41,7 @@ class BodyTracker_GPU(BodyTracker):
         image_gpumat = cupy_array_to_GpuMat(image)
 
         if self.tracking_param.resize != 1:
-            image_gpumat = cv2.resize(
+            image_gpumat = cv2.cuda.resize(
                 image_gpumat, 
                 None, 
                 None,
