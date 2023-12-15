@@ -8,15 +8,15 @@ from typing import Tuple
 
 def tail_skeleton(
         image_crop: NDArray,
-        arc_angle_deg,
-        tail_length_px,
-        n_tail_points,
-        n_pts_arc,
-        dist_swim_bladder_px,
-        n_pts_interp,
-        offset,
-        resize,
-        w
+        arc_angle_deg: float,
+        tail_length_px: int,
+        n_tail_points: int,
+        n_pts_arc: int,
+        dist_swim_bladder_px: int,
+        n_pts_interp: int,
+        offset: NDArray,
+        resize: float,
+        w: float
     ) -> Tuple[NDArray,NDArray]: 
         
         # track max intensity along tail

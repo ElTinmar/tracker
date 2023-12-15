@@ -1,6 +1,5 @@
 import cv2
 import numpy as np
-from numpy.typing import NDArray
 from typing import Tuple, Optional
 from image_tools import bwareafilter_props_GPU, bwareafilter_GPU, enhance_GPU, im2uint8, GpuMat_to_cupy_array, cupy_array_to_GpuMat
 from .tracker import get_eye_prop, assign_features
@@ -41,7 +40,7 @@ class EyesTracker_GPU(EyesTracker):
     def track(
             self,
             image: CuNDArray, 
-            centroid: Optional[NDArray],
+            centroid: Optional[CuNDArray],
         ) -> Optional[EyesTracking]:
 
         if (image is None) or (image.size == 0) or (centroid is None):
@@ -67,8 +66,8 @@ class EyesTracker_GPU(EyesTracker):
 
         # crop image
         w, h = self.tracking_param.crop_dimension_px
-        offset = np.array((-w//2, -h//2+self.tracking_param.crop_offset_px), dtype=np.int32)
-        left, bottom = (centroid * self.tracking_param.resize).astype(np.int32) + offset 
+        offset = cp.array((-w//2, -h//2+self.tracking_param.crop_offset_px), dtype=cp.int32)
+        left, bottom = (centroid * self.tracking_param.resize).astype(cp.int32) + offset 
         right, top = left+w, bottom+h 
 
         image_crop = image[bottom:top, left:right]
