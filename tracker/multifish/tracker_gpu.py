@@ -4,6 +4,7 @@ from numpy.typing import NDArray
 from image_tools import im2uint8, imrotate_GPU, enhance_GPU, GpuMat_to_cupy_array, cupy_array_to_GpuMat
 from .core import MultiFishTracker, MultiFishTracking
 from cupy.typing import NDArray as CuNDArray
+import cupy as cp
     
 class MultiFishTracker_GPU(MultiFishTracker):
 
@@ -57,11 +58,10 @@ class MultiFishTracker_GPU(MultiFishTracker):
 
             # crop each animal's bounding box
             image_cropped = image[bottom:top, left:right] 
-            offset = np.array([bb_x, bb_y])
+            offset = cp.array([bb_x, bb_y])
             if self.body is not None:
 
                 # get more precise centroid and orientation of the animals
-                
                 body[id] = self.body.track(image_cropped, centroid=offset)
                 if (body[id] is not None) and (body[id].centroid is not None):
                     

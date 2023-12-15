@@ -11,8 +11,8 @@ def get_orientation_GPU(coordinates: CuNDArray) -> Tuple[CuNDArray, CuNDArray]:
     get blob main axis using PCA
     '''
 
-    pca = PCA_GPU()
-    scores = pca.fit_transform(coordinates)
+    pca = PCA_GPU(n_components=2)
+    scores = pca.fit_transform(coordinates.astype(cp.float32))
     # PCs are organized in rows, transform to columns
     principal_components = pca.components_.T
     centroid = pca.mean_
@@ -106,7 +106,7 @@ class BodyTracker_GPU(BodyTracker):
             res = BodyTracking(
                 heading = principal_components.get(),
                 centroid = centroid_coords.get() / self.tracking_param.resize,
-                angle_rad = cp.arctan2(principal_components[1,1], principal_components[0,1]),
+                angle_rad = cp.arctan2(principal_components[1,1], principal_components[0,1]).get(),
                 mask = im2uint8(mask.get()),
                 image = im2uint8(image.get())
             )
