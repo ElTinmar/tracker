@@ -1,7 +1,7 @@
-from tracker.core import *
-from tracker.animal import *
-from tracker.body import *
-from tracker.eyes import *
-from tracker.tail import *
-from tracker.multifish import *
+from .core import *
+from .animal import *
+from .body import *
+from .eyes import *
+from .tail import *
+from .multifish import *
 
