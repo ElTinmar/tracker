@@ -2,7 +2,7 @@ from distutils.core import setup
 
 setup(
     name='tracker',
-    python_requires='==3.10',
+    python_requires='>=3.8',
     author='Martin Privat',
     version='0.1.18',
     packages=['tracker','tracker.tests'],
@@ -13,7 +13,7 @@ setup(
         "numpy", 
         "scipy",
         "scikit-learn",
-        "opencv-contrib-python-rolling @ https://github.com/ElTinmar/build_opencv/raw/main/opencv_contrib_python_rolling-4.8.0.20231212-cp310-cp310-linux_x86_64.whl",
+        "opencv-contrib-python",
         "PyQt5",
         "tqdm",
         "video_tools @ git+https://github.com/ElTinmar/video_tools.git@main",
