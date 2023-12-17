@@ -13,7 +13,7 @@ setup(
         "numpy", 
         "scipy",
         "scikit-learn",
-        "opencv-contrib-python",
+        "opencv-python",
         "PyQt5",
         "tqdm",
         "video_tools @ git+https://github.com/ElTinmar/video_tools.git@main",
