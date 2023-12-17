@@ -29,7 +29,6 @@ LUT = np.zeros((width, height))
 assignment = GridAssignment(LUT)
 accumulator = None
 
-'''
 q = Queue()
 q_eyes = Queue()
 q_tail = Queue()
@@ -39,7 +38,6 @@ display_tail = VideoDisplay(q_tail, fps=10, winname='tail')
 display.start()
 display_eyes.start()
 display_tail.start()
-'''
 
 # tracking 
 animal_tracker = AnimalTracker_GPU(
@@ -150,7 +148,6 @@ try:
         cu_frame = cp.asarray(frame_gray)
         tracking = tracker.track(cu_frame)
 
-        '''
         # display tracking
         display.queue_image(overlay.overlay(frame_gray, tracking))
 
@@ -173,16 +170,13 @@ try:
             display_tail.queue_image(
                 tail_overlay.overlay(tracking.tail[0].image, tracking.tail[0], T @ S)
             )
-        '''
 
 finally:
     video_reader.exit()
     video_reader.join()
-    '''
     display.exit()
     display_eyes.exit()
     display_tail.exit()
     display.join()
     display_eyes.join()
     display_tail.join()
-    '''
