@@ -12,7 +12,7 @@ class MultiFishTracker_CPU(MultiFishTracker):
             return None
         
         # restrain image between 0 and 1
-        image = enhance(image)
+        # image = enhance(image)
 
         # get animal centroids (only crude location is necessary)
         animals = self.animal.track(image)

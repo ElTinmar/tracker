@@ -171,8 +171,6 @@ try:
                 tail_overlay.overlay(tracking.tail[0].image, tracking.tail[0], T @ S)
             )
 
-        break
-
 finally:
     video_reader.exit()
     video_reader.join()

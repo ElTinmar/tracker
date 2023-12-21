@@ -14,7 +14,7 @@ class MultiFishTracker_GPU(MultiFishTracker):
             return None
         
         # restrain image between 0 and 1
-        image = enhance_GPU(image)
+        # image = enhance_GPU(image)
 
         # get animal centroids (only crude location is necessary)
         animals = self.animal.track(image)
@@ -59,6 +59,7 @@ class MultiFishTracker_GPU(MultiFishTracker):
 
                 # get more precise centroid and orientation of the animals
                 body[id] = self.body.track(image_cropped, centroid=offset)
+
                 if (body[id] is not None) and (body[id].centroid is not None):
                     
                     image_cropped_gpu = cupy_array_to_GpuMat(image_cropped)

@@ -18,7 +18,7 @@ def get_orientation_GPU(coordinates: CuNDArray) -> Tuple[CuNDArray, CuNDArray]:
     centroid = pca.mean_
 
     # resolve 180 degrees ambiguity in first PC
-    if abs(max(scores[:,0])) > abs(min(scores[:,0])):
+    if abs(cp.max(scores[:,0])) > abs(cp.min(scores[:,0])):
         principal_components[:,0] = - principal_components[:,0]
 
     # make sure the second axis always points to the same side
