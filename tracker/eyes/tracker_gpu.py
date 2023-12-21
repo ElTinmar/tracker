@@ -92,20 +92,21 @@ class EyesTracker_GPU(EyesTracker):
             self.tracking_param.eye_size_hi_px
         )
         
+        offset_cpu = offset.get()
         if found_eyes_and_sb: 
             # identify left eye, right eye and swimbladder
             blob_centroids = np.array([blob.centroid for blob in props])
             sb_idx, left_idx, right_idx = assign_features(blob_centroids)
 
             # compute eye orientation
-            left_eye = get_eye_prop(props[left_idx], offset, self.tracking_param.resize)
-            right_eye = get_eye_prop(props[right_idx], offset, self.tracking_param.resize)
+            left_eye = get_eye_prop(props[left_idx], offset_cpu, self.tracking_param.resize)
+            right_eye = get_eye_prop(props[right_idx], offset_cpu, self.tracking_param.resize)
             #new_heading = (props[left_idx].centroid + props[right_idx].centroid)/2 - props[sb_idx].centroid
             #new_heading = new_heading / np.linalg.norm(new_heading)
 
         res = EyesTracking(
-            centroid = centroid,
-            offset = offset,
+            centroid = centroid.get(),
+            offset = offset.get(),
             left_eye = left_eye,
             right_eye = right_eye,
             mask = im2uint8(mask.get()),
