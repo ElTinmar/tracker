@@ -150,7 +150,7 @@ try:
         display.queue_image(overlay.overlay(frame_gray, tracking))
 
         # display eyes 
-        if tracking.eyes[0] is not None:
+        if tracking.eyes is not None and tracking.eyes[0] is not None:
             s = eyes_tracker.tracking_param.resize
             tx, ty = -tracking.eyes[0].offset
             S = Affine2DTransform.scaling(s,s)
@@ -160,7 +160,7 @@ try:
             )
 
         # display tail
-        if tracking.tail[0] is not None:
+        if tracking.tail is not None and tracking.tail[0] is not None:
             s = tail_tracker.tracking_param.resize
             tx, ty = -tracking.tail[0].offset
             S = Affine2DTransform.scaling(s,s)
@@ -168,6 +168,8 @@ try:
             display_tail.queue_image(
                 tail_overlay.overlay(tracking.tail[0].image, tracking.tail[0], T @ S)
             )
+
+        break
 
 finally:
     video_reader.exit()
