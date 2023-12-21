@@ -13,12 +13,8 @@ class MultiFishTracker_GPU(MultiFishTracker):
         if (image is None) or (image.size == 0):
             return None
         
-        image_gpumat = cupy_array_to_GpuMat(image)
-
         # restrain image between 0 and 1
         image = enhance_GPU(image)
-
-        image = GpuMat_to_cupy_array(image_gpumat)
 
         # get animal centroids (only crude location is necessary)
         animals = self.animal.track(image)
