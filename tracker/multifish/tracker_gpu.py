@@ -55,6 +55,7 @@ class MultiFishTracker_GPU(MultiFishTracker):
             # crop each animal's bounding box
             image_cropped = image[bottom:top, left:right] 
             offset = cp.array([bb_x, bb_y])
+
             if self.body is not None:
 
                 # get more precise centroid and orientation of the animals
@@ -62,6 +63,7 @@ class MultiFishTracker_GPU(MultiFishTracker):
 
                 if (body[id] is not None) and (body[id].centroid is not None):
                     
+                    # problem here without copy WHY ?
                     image_cropped_gpu = cupy_array_to_GpuMat(image_cropped)
 
                     # rotate the animal so that it's vertical head up
