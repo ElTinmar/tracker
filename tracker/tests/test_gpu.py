@@ -72,7 +72,7 @@ body_tracker = BodyTracker_GPU_cucim(
         min_body_length_mm=2.0,
         max_body_length_mm=6.0,
         min_body_width_mm=0.4,
-        max_body_width_mm=1.2,
+        max_body_width_mm=2.0,
         blur_sz_mm=1/7.5,
         median_filter_sz_mm=1/7.5,
     )

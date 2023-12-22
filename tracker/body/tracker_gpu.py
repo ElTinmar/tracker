@@ -6,6 +6,7 @@ import cupy as cp
 from cupy.typing import NDArray as CuNDArray
 from cuml.decomposition import PCA as PCA_GPU # GPU equivalent of sklearn
 from cucim.skimage import transform
+import cv2
 
 def get_orientation_GPU(coordinates: CuNDArray) -> Tuple[CuNDArray, CuNDArray]:
     '''
