@@ -1,11 +1,11 @@
 from video_tools import Buffered_OpenCV_VideoReader, VideoDisplay
 from image_tools import im2single, im2gray
 from tracker import (
-    GridAssignment, MultiFishTracker_GPU, MultiFishOverlay_opencv,
-    AnimalTracker_GPU, AnimalOverlay_opencv, AnimalTrackerParamTracking, AnimalTrackerParamOverlay,
-    BodyTracker_GPU, BodyOverlay_opencv, BodyTrackerParamTracking, BodyTrackerParamOverlay,
-    EyesTracker_GPU, EyesOverlay_opencv, EyesTrackerParamTracking, EyesTrackerParamOverlay,
-    TailTracker_GPU, TailOverlay_opencv, TailTrackerParamTracking, TailTrackerParamOverlay
+    GridAssignment, MultiFishTracker_GPU_cucim, MultiFishOverlay_opencv,
+    AnimalTracker_GPU_cucim, AnimalOverlay_opencv, AnimalTrackerParamTracking, AnimalTrackerParamOverlay,
+    BodyTracker_GPU_cucim, BodyOverlay_opencv, BodyTrackerParamTracking, BodyTrackerParamOverlay,
+    EyesTracker_GPU_cucim, EyesOverlay_opencv, EyesTrackerParamTracking, EyesTrackerParamOverlay,
+    TailTracker_GPU_cucim, TailOverlay_opencv, TailTrackerParamTracking, TailTrackerParamOverlay
 )
 from tqdm import tqdm
 import numpy as np
@@ -40,7 +40,7 @@ display_eyes.start()
 display_tail.start()
 
 # tracking 
-animal_tracker = AnimalTracker_GPU(
+animal_tracker = AnimalTracker_GPU_cucim(
     AnimalTrackerParamTracking(
         pix_per_mm=40,
         target_pix_per_mm=7.5,
@@ -59,7 +59,7 @@ animal_tracker = AnimalTracker_GPU(
         median_filter_sz_mm=1/7.5,
     )
 )
-body_tracker = BodyTracker_GPU(
+body_tracker = BodyTracker_GPU_cucim(
     BodyTrackerParamTracking(
         pix_per_mm=40,
         target_pix_per_mm=7.5,
@@ -77,7 +77,7 @@ body_tracker = BodyTracker_GPU(
         median_filter_sz_mm=1/7.5,
     )
 )
-eyes_tracker = EyesTracker_GPU(
+eyes_tracker = EyesTracker_GPU_cucim(
     EyesTrackerParamTracking(
         pix_per_mm=40,
         target_pix_per_mm=40,
@@ -93,7 +93,7 @@ eyes_tracker = EyesTracker_GPU(
         crop_offset_mm=-0.30
     )
 )
-tail_tracker = TailTracker_GPU(
+tail_tracker = TailTracker_GPU_cucim(
     TailTrackerParamTracking(
         pix_per_mm=40,
         target_pix_per_mm=20,
@@ -119,7 +119,7 @@ body_overlay = BodyOverlay_opencv(BodyTrackerParamOverlay())
 eyes_overlay = EyesOverlay_opencv(EyesTrackerParamOverlay())
 tail_overlay = TailOverlay_opencv(TailTrackerParamOverlay())
 
-tracker = MultiFishTracker_GPU(            
+tracker = MultiFishTracker_GPU_cucim(            
     assignment,
     accumulator,
     animal_tracker,
