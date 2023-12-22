@@ -5,8 +5,6 @@ from image_tools import im2uint8, imrotate_GPU, imrotate_GPU_cucim, GpuMat_to_cu
 from .core import MultiFishTracker, MultiFishTracking
 from cupy.typing import NDArray as CuNDArray
 import cupy as cp
-
-import cv2
     
 class MultiFishTracker_GPU(MultiFishTracker):
 

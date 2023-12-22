@@ -11,6 +11,9 @@ from tqdm import tqdm
 import numpy as np
 from geometry import Affine2DTransform
 from multiprocessing import Queue
+import cProfile
+import pstats
+from pstats import SortKey
 
 # background subtracted video
 INPUT_VIDEO = 'toy_data/19-40-44_nobckg_static.avi'
@@ -135,41 +138,46 @@ overlay = MultiFishOverlay_opencv(
 )
 
 try:
-    for i in tqdm(range(num_frames)):
-        (rval, frame) = video_reader.next_frame()
-        if not rval:
-            raise RuntimeError('VideoReader was unable to read the whole video')
-        
-        # convert
-        frame_gray = im2single(im2gray(frame))
+    with cProfile.Profile() as pr:
+        for i in tqdm(range(num_frames)):
+            (rval, frame) = video_reader.next_frame()
+            if not rval:
+                raise RuntimeError('VideoReader was unable to read the whole video')
+            
+            # convert
+            frame_gray = im2single(im2gray(frame))
 
-        # track
-        tracking = tracker.track(frame_gray)
+            # track
+            tracking = tracker.track(frame_gray)
 
-        # display tracking
-        display.queue_image(overlay.overlay(frame_gray, tracking))
+            # display tracking
+            display.queue_image(overlay.overlay(frame_gray, tracking))
 
-        # display eyes 
-        if tracking.eyes is not None and tracking.eyes[0] is not None:
-            s = eyes_tracker.tracking_param.resize
-            tx, ty = -tracking.eyes[0].offset
-            S = Affine2DTransform.scaling(s,s)
-            T = Affine2DTransform.translation(tx, ty)
-            display_eyes.queue_image(
-                eyes_overlay.overlay(tracking.eyes[0].image, tracking.eyes[0], T @ S)
-            )
+            # display eyes 
+            if tracking.eyes is not None and tracking.eyes[0] is not None:
+                s = eyes_tracker.tracking_param.resize
+                tx, ty = -tracking.eyes[0].offset
+                S = Affine2DTransform.scaling(s,s)
+                T = Affine2DTransform.translation(tx, ty)
+                display_eyes.queue_image(
+                    eyes_overlay.overlay(tracking.eyes[0].image, tracking.eyes[0], T @ S)
+                )
 
-        # display tail
-        if tracking.tail is not None and tracking.tail[0] is not None:
-            s = tail_tracker.tracking_param.resize
-            tx, ty = -tracking.tail[0].offset
-            S = Affine2DTransform.scaling(s,s)
-            T = Affine2DTransform.translation(tx, ty)
-            display_tail.queue_image(
-                tail_overlay.overlay(tracking.tail[0].image, tracking.tail[0], T @ S)
-            )
+            # display tail
+            if tracking.tail is not None and tracking.tail[0] is not None:
+                s = tail_tracker.tracking_param.resize
+                tx, ty = -tracking.tail[0].offset
+                S = Affine2DTransform.scaling(s,s)
+                T = Affine2DTransform.translation(tx, ty)
+                display_tail.queue_image(
+                    tail_overlay.overlay(tracking.tail[0].image, tracking.tail[0], T @ S)
+                )
 
 finally:
+    sortby = SortKey.CUMULATIVE
+    ps = pstats.Stats(pr).sort_stats(sortby)
+    ps.print_stats(20)
+
     video_reader.exit()
     video_reader.join()
     display.exit()
