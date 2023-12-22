@@ -7,7 +7,7 @@ import cupy as cp
 from cupy.typing import NDArray as CuNDArray
 from .core import EyesTracker, EyesTracking
 from cucim.skimage import transform
-from .utils import get_eye_prop, find_eyes_and_swimbladder, assign_features
+from .utils import get_eye_prop, assign_features
 
 def find_eyes_and_swimbladder_GPU(
         image: CuNDArray, 
