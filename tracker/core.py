@@ -3,7 +3,7 @@ from numpy.typing import NDArray
 from typing import Any, Optional
 
 # I know that this could be functions, I just find it easier to deal 
-# with objects rather than Callable 
+# with objects rather than Callable te
 
 class Tracker(ABC):
     
