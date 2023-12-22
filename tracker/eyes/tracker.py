@@ -65,8 +65,18 @@ class EyesTracker_CPU(EyesTracker):
             sb_idx, left_idx, right_idx = assign_features(blob_centroids)
 
             # compute eye orientation
-            left_eye = get_eye_prop(props[left_idx], offset, self.tracking_param.resize)
-            right_eye = get_eye_prop(props[right_idx], offset, self.tracking_param.resize)
+            left_eye = get_eye_prop(
+                props[left_idx].centroid, 
+                props[left_idx].inertia_tensor, 
+                offset, 
+                self.tracking_param.resize
+            )
+            right_eye = get_eye_prop(
+                props[right_idx].centroid, 
+                props[right_idx].inertia_tensor,
+                offset, 
+                self.tracking_param.resize
+            )
             #new_heading = (props[left_idx].centroid + props[right_idx].centroid)/2 - props[sb_idx].centroid
             #new_heading = new_heading / np.linalg.norm(new_heading)
 

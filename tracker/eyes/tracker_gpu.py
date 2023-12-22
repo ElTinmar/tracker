@@ -7,6 +7,7 @@ import cupy as cp
 from cupy.typing import NDArray as CuNDArray
 from .core import EyesTracker, EyesTracking
 from cucim.skimage import transform
+from .utils import get_eye_prop, find_eyes_and_swimbladder, assign_features
 
 def find_eyes_and_swimbladder_GPU(
         image: CuNDArray, 
@@ -100,8 +101,18 @@ class EyesTracker_GPU(EyesTracker):
             sb_idx, left_idx, right_idx = assign_features(blob_centroids)
 
             # compute eye orientation
-            left_eye = get_eye_prop(props[left_idx], offset_cpu, self.tracking_param.resize)
-            right_eye = get_eye_prop(props[right_idx], offset_cpu, self.tracking_param.resize)
+            left_eye = get_eye_prop(
+                props[left_idx].centroid,
+                props[left_idx].inertia_tensor.get(), 
+                offset_cpu, 
+                self.tracking_param.resize
+            )
+            right_eye = get_eye_prop(
+                props[right_idx].centroid,
+                props[right_idx].inertia_tensor.get(),
+                offset_cpu, 
+                self.tracking_param.resize
+            )
             #new_heading = (props[left_idx].centroid + props[right_idx].centroid)/2 - props[sb_idx].centroid
             #new_heading = new_heading / np.linalg.norm(new_heading)
 
@@ -128,7 +139,7 @@ class EyesTracker_GPU_cucim(EyesTracker):
             return None
 
         if self.tracking_param.resize != 1:
-            image = cv2.resize(image, self.tracking_param.resize)
+            image = transform.rescale(image, self.tracking_param.resize)
 
         left_eye = None
         right_eye = None
@@ -169,8 +180,19 @@ class EyesTracker_GPU_cucim(EyesTracker):
             sb_idx, left_idx, right_idx = assign_features(blob_centroids)
 
             # compute eye orientation
-            left_eye = get_eye_prop(props[left_idx], offset_cpu, self.tracking_param.resize)
-            right_eye = get_eye_prop(props[right_idx], offset_cpu, self.tracking_param.resize)
+            # compute eye orientation
+            left_eye = get_eye_prop(
+                props[left_idx].centroid,
+                props[left_idx].inertia_tensor.get(), 
+                offset_cpu, 
+                self.tracking_param.resize
+            )
+            right_eye = get_eye_prop(
+                props[right_idx].centroid,
+                props[right_idx].inertia_tensor.get(),
+                offset_cpu, 
+                self.tracking_param.resize
+            )
             #new_heading = (props[left_idx].centroid + props[right_idx].centroid)/2 - props[sb_idx].centroid
             #new_heading = new_heading / np.linalg.norm(new_heading)
 

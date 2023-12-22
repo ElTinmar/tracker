@@ -5,15 +5,20 @@ from typing import Tuple, Dict
 from image_tools import bwareafilter_props, bwareafilter
 from geometry import ellipse_direction, angle_between_vectors
 
-def get_eye_prop(blob, offset: NDArray, resize: float) -> Dict:
+def get_eye_prop(
+        centroid: NDArray, 
+        inertia_tensor: NDArray, 
+        offset: NDArray, 
+        resize: float
+    ) -> Dict:
 
     # fish must be vertical head up
     heading = np.array([0, 1], dtype=np.float32)
 
-    eye_dir = ellipse_direction(blob.inertia_tensor, heading)
+    eye_dir = ellipse_direction(inertia_tensor, heading)
     eye_angle = angle_between_vectors(eye_dir, heading)
     # (row,col) to (x,y) coordinates 
-    y, x = blob.centroid 
+    y, x = centroid 
     eye_centroid = np.array([x, y], dtype = np.float32) + offset
     return {'direction': eye_dir, 'angle': eye_angle, 'centroid': eye_centroid/resize}
 
