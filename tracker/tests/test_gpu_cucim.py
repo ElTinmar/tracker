@@ -180,6 +180,14 @@ finally:
     ps = pstats.Stats(pr).sort_stats(sortby)
     ps.print_stats(20)
 
+    sortby = SortKey.TIME
+    ps = pstats.Stats(pr).sort_stats(sortby)
+    ps.print_stats(20)
+
+    sortby = SortKey.CALLS
+    ps = pstats.Stats(pr).sort_stats(sortby)
+    ps.print_stats(20)
+
     video_reader.exit()
     video_reader.join()
     display.exit()
