@@ -33,6 +33,11 @@ class MultiFishTracking:
         '''export data as csv'''
         pass
 
+    def to_numpy(self):
+        # TODO
+        '''serialize to numpy array'''
+        pass
+
 class MultiFishTracker(Tracker):
 
     def __init__(
