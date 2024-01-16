@@ -1,4 +1,5 @@
 from numpy.typing import NDArray
+import numpy as np
 from dataclasses import dataclass
 from tracker.core import Tracker, TrackingOverlay
 
@@ -104,6 +105,18 @@ class BodyTracking:
         export data to csv
         '''
         pass    
+
+    def to_numpy(self) -> NDArray:
+        '''serialize to structured numpy array'''
+        dt = np.dtype([
+            ('heading', self.heading.dtype, self.heading.shape),
+            ('centroid',  self.centroid.dtype, self.centroid.shape),
+            ('angle_rad',  np.float32, self.angle_rad),
+            ('mask',  self.mask.dtype, self.mask.shape),
+            ('image',  self.image.dtype, self.image.shape),
+        ])
+        arr = np.array((self.heading, self.centroid, self.angle_rad, self.mask, self.image), dtype=dt)
+        return arr
 
 class BodyTracker(Tracker):
 

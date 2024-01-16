@@ -6,6 +6,7 @@ from tracker.body import BodyTracking, BodyOverlay, BodyTracker
 from tracker.eyes import EyesTracking, EyesOverlay, EyesTracker
 from tracker.tail import TailTracking, TailOverlay, TailTracker
 from dataclasses import dataclass
+import numpy as np
 
 class Accumulator(Protocol):
     def update(self):
@@ -33,10 +34,20 @@ class MultiFishTracking:
         '''export data as csv'''
         pass
 
-    def to_numpy(self):
-        # TODO
-        '''serialize to numpy array'''
-        pass
+    def to_numpy(self) -> NDArray:
+        '''serialize to structured numpy array'''
+        animals = self.animals.to_numpy()
+        
+
+        dt = np.dtype([
+            ('centroid', self.centroids.dtype, self.centroid.shape),
+            ('bounding_boxes',  self.bounding_boxes.dtype, self.bounding_boxes.shape),
+            ('bb_centroids',  self.bb_centroids.dtype, self.bb_centroids.shape),
+            ('mask',  self.mask.dtype, self.mask.shape),
+            ('image',  self.image.dtype, self.image.shape),
+        ])
+        arr = np.array((self.centroids, self.bounding_boxes, self.bb_centroids, self.mask, self.image), dtype=dt)
+        return arr
 
 class MultiFishTracker(Tracker):
 

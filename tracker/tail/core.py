@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from numpy.typing import NDArray
+import numpy as np
 from typing import Tuple
 from tracker.core import Tracker, TrackingOverlay
 
@@ -92,6 +93,18 @@ class TailTracking:
     def to_csv(self):
         '''export data as csv'''
         pass
+
+    def to_numpy(self) -> NDArray:
+        '''serialize to structured numpy array'''
+        dt = np.dtype([
+            ('centroid', self.centroid.dtype, self.centroid.shape),
+            ('offset',  self.offset.dtype, self.offset.shape),
+            ('skeleton',  self.skeleton.dtype, self.skeleton.shape),
+            ('skeleton_interp',  self.skeleton_interp.dtype, self.skeleton_interp.shape),
+            ('image',  self.image.dtype, self.image.shape),
+        ])
+        arr = np.array((self.centroid, self.offset, self.skeleton, self.skeleton_interp, self.image), dtype=dt)
+        return arr
 
 class TailTracker(Tracker):
 

@@ -1,6 +1,7 @@
 from numpy.typing import NDArray
 from dataclasses import dataclass
 from tracker.core import Tracker, TrackingOverlay
+import numpy as np
 
 @dataclass
 class AnimalTrackerParamTracking:
@@ -113,6 +114,18 @@ class AnimalTracking:
         '''
         pass    
 
+    def to_numpy(self) -> NDArray:
+        '''serialize to structured numpy array'''
+        dt = np.dtype([
+            ('centroid', self.centroids.dtype, self.centroid.shape),
+            ('bounding_boxes',  self.bounding_boxes.dtype, self.bounding_boxes.shape),
+            ('bb_centroids',  self.bb_centroids.dtype, self.bb_centroids.shape),
+            ('mask',  self.mask.dtype, self.mask.shape),
+            ('image',  self.image.dtype, self.image.shape),
+        ])
+        arr = np.array((self.centroids, self.bounding_boxes, self.bb_centroids, self.mask, self.image), dtype=dt)
+        return arr
+    
 class AnimalTracker(Tracker):
 
     def __init__(
