@@ -14,13 +14,13 @@ def get_eye_prop(
     ) -> Eye:
 
     # fish must be vertical head up
-    heading = np.array([0, 1], dtype=np.float32)
+    heading = np.array([0, 1], dtype=np.single)
 
     eye_dir = ellipse_direction(inertia_tensor, heading)
     eye_angle = angle_between_vectors(eye_dir, heading)
     # (row,col) to (x,y) coordinates 
     y, x = centroid 
-    eye_centroid = np.array([x, y], dtype = np.float32) + offset
+    eye_centroid = np.array([x, y], dtype = np.single) + offset
     return Eye(direction=eye_dir, angle=eye_angle, centroid=eye_centroid/resize)
 
 

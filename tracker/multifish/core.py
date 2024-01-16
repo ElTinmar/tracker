@@ -21,6 +21,7 @@ class Assignment(Protocol):
 
 @dataclass
 class MultiFishTracking:
+    max_num_animals: int
     identities: NDArray
     indices: NDArray
     animals: AnimalTracking
@@ -36,23 +37,26 @@ class MultiFishTracking:
 
     def to_numpy(self) -> NDArray:
         '''serialize to structured numpy array'''
+        # I need to generate empty bodies/eyes/tails with the right datatype if they are not there
         animals = self.animals.to_numpy()
-        
+        bodies = [body.to_numpy() for body in self.body]
+        eyes = [eyes.to_numpy() for eyes in self.eyes]
+        tails = [tail.to_numpy() for tail in self.tail]
 
         dt = np.dtype([
-            ('centroid', self.centroids.dtype, self.centroid.shape),
-            ('bounding_boxes',  self.bounding_boxes.dtype, self.bounding_boxes.shape),
-            ('bb_centroids',  self.bb_centroids.dtype, self.bb_centroids.shape),
-            ('mask',  self.mask.dtype, self.mask.shape),
+            ('identities', self.identities.dtype, self.identities.shape),
+            ('indices',  self.indices.dtype, self.indices.shape),
+            ('animals',  animals.dtype, (1,)),
             ('image',  self.image.dtype, self.image.shape),
         ])
-        arr = np.array((self.centroids, self.bounding_boxes, self.bb_centroids, self.mask, self.image), dtype=dt)
+        arr = np.array((self.identities, self.indices, animals, self.image), dtype=dt)
         return arr
 
 class MultiFishTracker(Tracker):
 
     def __init__(
             self, 
+            max_num_animals: int,
             assignment: Assignment,
             accumulator: Accumulator,
             animal: AnimalTracker,
@@ -60,6 +64,7 @@ class MultiFishTracker(Tracker):
             eyes: Optional[EyesTracker], 
             tail: Optional[TailTracker]
         ):
+        self.max_num_animals = max_num_animals
         self.assignment = assignment
         self.accumulator = accumulator
         self.animal = animal

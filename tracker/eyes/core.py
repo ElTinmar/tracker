@@ -1,7 +1,7 @@
 from dataclasses import dataclass
-from numpy.typing import NDArray
+from numpy.typing import NDArray, ArrayLike
 import numpy as np
-from typing import Tuple
+from typing import Tuple, Optional
 from tracker.core import Tracker, TrackingOverlay
 
 @dataclass
@@ -92,27 +92,37 @@ class EyesTrackerParamOverlay:
 
 @dataclass
 class Eye:
-    direction: NDArray
-    angle: float
-    centroid: NDArray
+    direction: NDArray = np.zeros((2,), dtype=np.single)
+    angle: float = 0.0
+    centroid: NDArray = np.zeros((2,), dtype=np.single)
 
     def to_numpy(self) -> NDArray:
         dt = np.dtype([
             ('direction', self.direction.dtype, self.direction.shape),
-            ('angle', np.float32, (1,)),
+            ('angle', np.single, (1,)),
             ('centroid', self.centroid.dtype, self.centroid.shape)
         ])
         arr = np.array((self.direction, self.angle, self.centroid), dtype=dt)
         return arr
 
-@dataclass
 class EyesTracking:
-    centroid: NDArray 
-    offset: NDArray # position of centroid in cropped image
-    left_eye: Eye
-    right_eye: Eye
-    mask: NDArray
-    image: NDArray
+    def __init__(
+            self,
+            im_shape: ArrayLike,
+            mask: Optional[NDArray],
+            image: Optional[NDArray],
+            centroid: NDArray = np.zeros((2,), dtype=np.single),
+            offset: NDArray = np.zeros((2,), dtype=np.single),
+            left_eye: Eye = Eye(),
+            right_eye: Eye = Eye()
+        ) -> None:
+    
+        self.centroid = centroid
+        self.offset = offset # position of centroid in cropped image
+        self.left_eye =  left_eye
+        self.right_eye = right_eye
+        self.mask = mask if mask is not None else np.zeros(im_shape, dtype=np.single)
+        self.image = image if image is not None else np.zeros(im_shape, dtype=np.single)
     
     def to_csv(self):
         '''export data as csv'''

@@ -27,7 +27,7 @@ class AssignmentWidget(QWidget):
     def set_background_image(self, height, width, background_image_bytes: bytes) -> None:
         # NOTE THIS IS EXPECTING A SINGLE PRECISION IMAGE
 
-        image = np.frombuffer(background_image_bytes, dtype=np.float32).reshape(height,width)
+        image = np.frombuffer(background_image_bytes, dtype=np.single).reshape(height,width)
         self.background_image = (255*image).astype(np.uint8)
         self.grid_dialog = ROISelectorDialog(image = self.background_image)
     
