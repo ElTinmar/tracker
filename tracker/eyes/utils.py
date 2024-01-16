@@ -4,13 +4,14 @@ from numpy.typing import NDArray, ArrayLike
 from typing import Tuple, Dict
 from image_tools import bwareafilter_props, bwareafilter
 from geometry import ellipse_direction, angle_between_vectors
+from .core import Eye
 
 def get_eye_prop(
         centroid: NDArray, 
         inertia_tensor: NDArray, 
         offset: NDArray, 
         resize: float
-    ) -> Dict:
+    ) -> Eye:
 
     # fish must be vertical head up
     heading = np.array([0, 1], dtype=np.float32)
@@ -20,7 +21,7 @@ def get_eye_prop(
     # (row,col) to (x,y) coordinates 
     y, x = centroid 
     eye_centroid = np.array([x, y], dtype = np.float32) + offset
-    return {'direction': eye_dir, 'angle': eye_angle, 'centroid': eye_centroid/resize}
+    return Eye(direction=eye_dir, angle=eye_angle, centroid=eye_centroid/resize)
 
 
 def assign_features(blob_centroids: ArrayLike) -> Tuple[int, int, int]:

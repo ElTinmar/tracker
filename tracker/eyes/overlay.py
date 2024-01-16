@@ -13,7 +13,8 @@ def disp_eye(
         transformation_matrix: NDArray,
         color: tuple, 
         eye_len_px: float, 
-        thickness: int
+        thickness: int,
+        radius: int
     ) -> NDArray:
 
     overlay = image.copy()
@@ -47,7 +48,7 @@ def disp_eye(
     overlay = cv2.circle(
         overlay,
         pts_[2].astype(np.int32),
-        2, # TODO this is hardcoded, make it a param ?
+        radius, 
         color,
         thickness
     )
@@ -76,12 +77,13 @@ class EyesOverlay_opencv(EyesOverlay):
 
                 overlay = disp_eye(
                     overlay, 
-                    tracking.left_eye['centroid'],
-                    tracking.left_eye['direction'],
+                    tracking.left_eye.centroid,
+                    tracking.left_eye.direction,
                     transformation_matrix,
                     self.overlay_param.color_eye_left, 
                     self.overlay_param.eye_len_px, 
-                    self.overlay_param.thickness
+                    self.overlay_param.thickness,
+                    self.overlay_param.arrow_radius_px
                 )
 
             # right eye
@@ -89,12 +91,13 @@ class EyesOverlay_opencv(EyesOverlay):
 
                 overlay = disp_eye(
                     overlay, 
-                    tracking.right_eye['centroid'],
-                    tracking.right_eye['direction'],
+                    tracking.right_eye.centroid,
+                    tracking.right_eye.direction,
                     transformation_matrix,
                     self.overlay_param.color_eye_right, 
                     self.overlay_param.eye_len_px, 
-                    self.overlay_param.thickness
+                    self.overlay_param.thickness,
+                    self.overlay_param.arrow_radius_px
                 )
         
             return overlay

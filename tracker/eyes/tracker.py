@@ -51,7 +51,7 @@ class EyesTracker_CPU(EyesTracker):
             self.tracking_param.median_filter_sz_px
         )
 
-        # sweep threshold to obtain 3 connected component within size range (include SB)
+        # sweep threshold to obtain 3 connected component within size range (include swim bladder)
         found_eyes_and_sb, props, mask = find_eyes_and_swimbladder(
             image_crop, 
             self.tracking_param.eye_dyntresh_res, 
