@@ -37,16 +37,22 @@ class MultiFishTracking:
 
     def to_numpy(self) -> NDArray:
         '''serialize to structured numpy array'''
-        # I need to generate empty bodies/eyes/tails with the right datatype if they are not there
+        # I need to generate empty bodies/eyes/tails with 
+        # the right datatype if they are not there
         animals = self.animals.to_numpy()
         bodies = [body.to_numpy() for body in self.body]
         eyes = [eyes.to_numpy() for eyes in self.eyes]
         tails = [tail.to_numpy() for tail in self.tail]
 
+        # TODO need to pad identities, indices, bodies, eyes, tails 
+        # up to max_num_animals with default empty value
         dt = np.dtype([
-            ('identities', self.identities.dtype, self.identities.shape),
-            ('indices',  self.indices.dtype, self.indices.shape),
+            ('identities', self.identities.dtype, (self.max_num_animals,)),
+            ('indices',  self.indices.dtype, (self.max_num_animals,)),
             ('animals',  animals.dtype, (1,)),
+            ('bodies',  body.dtype, (self.max_num_animals,)),
+            ('eyes',  eye.dtype, (self.max_num_animals,)),
+            ('tails',  tail.dtype, (self.max_num_animals,)),
             ('image',  self.image.dtype, self.image.shape),
         ])
         arr = np.array((self.identities, self.indices, animals, self.image), dtype=dt)
