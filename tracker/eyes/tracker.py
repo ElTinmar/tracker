@@ -82,7 +82,6 @@ class EyesTracker_CPU(EyesTracker):
             #new_heading = new_heading / np.linalg.norm(new_heading)
 
         res = EyesTracking(
-            im_shape = image_crop.shape,
             centroid = centroid,
             offset = offset,
             left_eye = left_eye,

@@ -29,7 +29,6 @@ class MultiFishTracking:
     eyes: Optional[List[EyesTracking]]
     tail: Optional[List[TailTracking]]
     image: NDArray
-
     
     def to_csv(self):
         '''export data as csv'''

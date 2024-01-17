@@ -1,4 +1,5 @@
-from numpy.typing import NDArray
+from numpy.typing import NDArray, ArrayLike
+from typing import Optional
 import numpy as np
 from dataclasses import dataclass
 from tracker.core import Tracker, TrackingOverlay
@@ -92,13 +93,23 @@ class BodyTrackerParamOverlay:
     def heading_len_px(self):
         return self.mm2px(self.heading_len_mm)
         
-@dataclass 
+
 class BodyTracking:
-    heading: NDArray # 2x2 matrix, column 1 = fish heading, column 2 = fish right direction
-    centroid: NDArray # 1x2 vector. (x,y) coordinates of the fish centroid ~ swim bladder location
-    angle_rad: float
-    mask: NDArray
-    image: NDArray  
+
+    def __init__(self,
+            im_shape: Optional[ArrayLike],
+            heading: Optional[NDArray],
+            centroid: Optional[NDArray],
+            angle_rad: Optional[float],
+            mask: Optional[NDArray],
+            image: Optional[NDArray] 
+        ) -> None:
+    
+            self.heading = heading if heading is not None else np.zeros((2,2), dtype=np.single) # 2x2 matrix, column 1 = fish heading, column 2 = fish right direction
+            self.centroid = centroid if centroid is not None else np.zeros((2,), dtype=np.single) # 1x2 vector. (x,y) coordinates of the fish centroid ~ swim bladder location
+            self.angle_rad = angle_rad if angle_rad is not None else 0.0
+            self.mask = mask if mask is not None else np.zeros(im_shape, dtype=np.uint8)
+            self.image = image if image is not None else np.zeros(im_shape, dtype=np.uint8)
 
     def to_csv(self):
         '''

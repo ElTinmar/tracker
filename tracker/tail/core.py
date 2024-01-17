@@ -1,7 +1,7 @@
 from dataclasses import dataclass
-from numpy.typing import NDArray
+from numpy.typing import NDArray, ArrayLike
 import numpy as np
-from typing import Tuple
+from typing import Tuple, Optional
 from tracker.core import Tracker, TrackingOverlay
 
 @dataclass
@@ -82,13 +82,24 @@ class TailTrackerParamOverlay:
     color_tail: tuple = (255, 128, 128)
     thickness: int = 2
 
-@dataclass
 class TailTracking:
-    centroid: NDArray
-    offset: NDArray # position of centroid in cropped image
-    skeleton: NDArray
-    skeleton_interp: NDArray
-    image: NDArray
+    def __init__(
+            self,
+            im_shape: Optional[ArrayLike],
+            num_tail_pts: Optional[int],
+            num_tailinterp_pts: Optional[int],
+            centroid: Optional[NDArray],
+            offset: Optional[NDArray],
+            skeleton: Optional[NDArray],
+            skeleton_interp: Optional[NDArray],
+            image: Optional[NDArray]
+        ) -> None:
+                
+            self.centroid = centroid if centroid is not None else np.zeros((2,), dtype=np.single)
+            self.offset = offset if offset is not None else np.zeros((num_tail_pts,2), dtype=np.single)# position of centroid in cropped image
+            self.skeleton = skeleton if skeleton is not None else np.zeros((2,), dtype=np.single)
+            self.skeleton_interp = skeleton_interp if skeleton_interp is not None else np.zeros((num_tailinterp_pts,2), dtype=np.single)
+            self.image = image if centroid is not None else np.zeros(im_shape, dtype=np.uint8)
 
     def to_csv(self):
         '''export data as csv'''

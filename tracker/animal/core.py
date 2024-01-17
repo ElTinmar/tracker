@@ -1,4 +1,5 @@
-from numpy.typing import NDArray
+from typing import Optional
+from numpy.typing import NDArray, ArrayLike
 from dataclasses import dataclass
 from tracker.core import Tracker, TrackingOverlay
 import numpy as np
@@ -100,13 +101,23 @@ class AnimalTrackerParamOverlay:
     def radius_px(self):
         return self.mm2px(self.radius_mm)
     
-@dataclass
 class AnimalTracking:
-    centroids: NDArray # nx2 vector. (x,y) coordinates of the n fish centroid ~ swim bladder location
-    bounding_boxes: NDArray
-    bb_centroids: NDArray
-    mask: NDArray
-    image: NDArray
+    def __init__(
+            self,
+            im_shape: Optional[ArrayLike],
+            max_num_animals: Optional[int],
+            centroids: Optional[NDArray],
+            bounding_boxes: Optional[NDArray],
+            bb_centroids: Optional[NDArray],
+            mask: Optional[NDArray],
+            image: Optional[NDArray],
+        ) -> None:
+        
+        self.centroids = centroids if centroids is not None else np.zeros((max_num_animals,2), dtype = np.single) # nx2 vector. (x,y) coordinates of the n fish centroid ~ swim bladder location
+        self.bounding_boxes = bounding_boxes  if bounding_boxes is not None else np.zeros((max_num_animals,4), dtype = np.single)
+        self.bb_centroids = bb_centroids  if bb_centroids is not None else np.zeros((max_num_animals,2), dtype = np.single)
+        self.mask = mask if mask is not None else np.zeros(im_shape, dtype = np.uint8)
+        self.image = image if image is not None else np.zeros(im_shape, dtype = np.uint8)
 
     def to_csv(self):
         '''

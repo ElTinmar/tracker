@@ -108,7 +108,7 @@ class Eye:
 class EyesTracking:
     def __init__(
             self,
-            im_shape: ArrayLike,
+            im_shape: Optional[ArrayLike],
             mask: Optional[NDArray],
             image: Optional[NDArray],
             centroid: NDArray = np.zeros((2,), dtype=np.single),
@@ -121,8 +121,8 @@ class EyesTracking:
         self.offset = offset # position of centroid in cropped image
         self.left_eye =  left_eye
         self.right_eye = right_eye
-        self.mask = mask if mask is not None else np.zeros(im_shape, dtype=np.single)
-        self.image = image if image is not None else np.zeros(im_shape, dtype=np.single)
+        self.mask = mask if mask is not None else np.zeros(im_shape, dtype=np.uint8)
+        self.image = image if image is not None else np.zeros(im_shape, dtype=np.uint8)
     
     def to_csv(self):
         '''export data as csv'''
