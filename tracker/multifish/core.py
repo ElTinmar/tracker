@@ -1,5 +1,5 @@
 from typing import Protocol, Optional, List
-from numpy.typing import NDArray
+from numpy.typing import NDArray, ArrayLike
 from tracker.core import Tracker, TrackingOverlay
 from tracker.animal import AnimalTracking, AnimalOverlay, AnimalTracker, AnimalTracking
 from tracker.body import BodyTracking, BodyOverlay, BodyTracker, BodyTracking
@@ -22,6 +22,10 @@ class Assignment(Protocol):
 @dataclass
 class MultiFishTracking:
     max_num_animals: int
+    im_shape: Optional[ArrayLike]
+    im_body_shape: Optional[ArrayLike]
+    im_eyes_shape: Optional[ArrayLike]
+    im_tail_shape: Optional[ArrayLike]
     identities: NDArray
     indices: NDArray
     animals: AnimalTracking
@@ -45,6 +49,9 @@ class MultiFishTracking:
 
         # TODO need to pad identities, indices, bodies, eyes, tails 
         # up to max_num_animals with default empty value
+
+        # also different dtypes depending on which tracker are provided
+        
         dt = np.dtype([
             ('identities', self.identities.dtype, (self.max_num_animals,)),
             ('indices',  self.indices.dtype, (self.max_num_animals,)),
