@@ -131,7 +131,7 @@ class EyesTracking:
     def to_numpy(self) -> NDArray:
         '''serialize to structured numpy array'''
         left_eye = self.left_eye.to_numpy()
-        right_eye = self.left_eye.to_numpy()
+        right_eye = self.right_eye.to_numpy()
 
         dt = np.dtype([
             ('centroid', self.centroid.dtype, self.centroid.shape),
