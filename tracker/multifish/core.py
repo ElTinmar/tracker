@@ -1,10 +1,10 @@
 from typing import Protocol, Optional, List
 from numpy.typing import NDArray
 from tracker.core import Tracker, TrackingOverlay
-from tracker.animal import AnimalTracking, AnimalOverlay, AnimalTracker
-from tracker.body import BodyTracking, BodyOverlay, BodyTracker
-from tracker.eyes import EyesTracking, EyesOverlay, EyesTracker
-from tracker.tail import TailTracking, TailOverlay, TailTracker
+from tracker.animal import AnimalTracking, AnimalOverlay, AnimalTracker, AnimalTracking
+from tracker.body import BodyTracking, BodyOverlay, BodyTracker, BodyTracking
+from tracker.eyes import EyesTracking, EyesOverlay, EyesTracker, EyesTracking
+from tracker.tail import TailTracking, TailOverlay, TailTracker, TailTracking
 from dataclasses import dataclass
 import numpy as np
 
