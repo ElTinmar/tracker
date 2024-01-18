@@ -128,7 +128,7 @@ class AnimalTracking:
     def to_numpy(self) -> NDArray:
         '''serialize to structured numpy array'''
         dt = np.dtype([
-            ('centroid', self.centroids.dtype, self.centroid.shape),
+            ('centroid', self.centroids.dtype, self.centroids.shape),
             ('bounding_boxes',  self.bounding_boxes.dtype, self.bounding_boxes.shape),
             ('bb_centroids',  self.bb_centroids.dtype, self.bb_centroids.shape),
             ('mask',  self.mask.dtype, self.mask.shape),
