@@ -35,7 +35,11 @@ class TailTracker_CPU(TailTracker):
         left, bottom = (centroid * self.tracking_param.resize).astype(np.int32) + offset 
         right, top = left+w, bottom+h 
 
-        image_crop = image[bottom:top, left:right]
+        # pad image to get fixed image size
+        pad_width = np.max(self.tracking_param.crop_dimension_px)
+        image_padded = np.pad(image, (0,pad_width))
+
+        image_crop = image_padded[bottom:top, left:right]
         if image_crop.size == 0:
             return None
 
