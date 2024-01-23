@@ -301,9 +301,11 @@ def smooth(y, box_pts):
     y_smooth = np.convolve(y, box, mode='same')
     return y_smooth
 
-plt.plot(smooth(df.left_eye_angle[26000:27500], 20), color= np.array(eyes_overlay.overlay_param.color_eye_left_BGR)[[2,1,0]]/255)
-plt.plot(smooth(df.right_eye_angle[26000:27500], 20), color= np.array(eyes_overlay.overlay_param.color_eye_right_BGR)[[2,1,0]]/255)
-plt.plot(np.array(df.tail_tip_angle[26000:27500]), color= np.array(tail_overlay.overlay_param.color_tail_BGR)[[2,1,0]]/255)
-plt.show()
-
-# TODO smooth
+t = np.arange(26000,27500)/fps
+fig, ax = plt.subplots(nrows=1, ncols=1)
+fig.set_size_inches(10, 5)
+ax.set_facecolor((0,0,0))
+plt.plot(t,smooth(df.left_eye_angle[26000:27500], 20), color= np.array(eyes_overlay.overlay_param.color_eye_left_BGR)[[2,1,0]]/255)
+plt.plot(t,smooth(df.right_eye_angle[26000:27500], 20), color= np.array(eyes_overlay.overlay_param.color_eye_right_BGR)[[2,1,0]]/255)
+plt.plot(t,np.array(df.tail_tip_angle[26000:27500]), color= np.array(tail_overlay.overlay_param.color_tail_BGR)[[2,1,0]]/255)
+plt.savefig("tracking.svg")
