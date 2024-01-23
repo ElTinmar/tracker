@@ -72,11 +72,7 @@ class MultiFishTracker_CPU(MultiFishTracker):
                     if self.tail is not None:
                         tail[id] = self.tail.track(image_rot, centroid=centroid_rot)
 
-                # compute additional features based on tracking
-                if self.accumulator is not None:
-                    self.accumulator.update(id,body[id],eyes[id],tail[id])
-
-        # save tracking results in a dict and return
+        # save tracking results and return
         res = MultiFishTracking(
             identities =  identities, 
             indices = to_keep,
@@ -86,6 +82,10 @@ class MultiFishTracker_CPU(MultiFishTracker):
             tail =  tail,
             image = im2uint8(image)
         )
-        
+
+        # compute additional features based on tracking
+        if self.accumulator is not None:
+            self.accumulator.update(res)
+
         return res 
     

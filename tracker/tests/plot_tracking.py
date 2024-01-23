@@ -44,7 +44,7 @@ class csv_saver(Accumulator):
                 left_eye_angle = np.rad2deg(tracking.eyes[0].left_eye.angle)
                 right_eye_angle = np.rad2deg(tracking.eyes[0].right_eye.angle)
 
-            if tracking.tail is not None:
+            if tracking.tail is not None and tracking.tail[0] is not None:
                 tail_tip_angle = np.rad2deg(
                     np.arctan2(
                         tracking.tail[0].skeleton_interp[-1,1] - tracking.tail[0].skeleton_interp[-2,1],
@@ -57,7 +57,8 @@ class csv_saver(Accumulator):
         self.fish_angle.append(fish_angle)
         self.left_eye_angle.append(left_eye_angle)
         self.right_eye_angle.append(right_eye_angle)
-        self.tail_tip_angle.append(tail_tip_angle)                
+        self.tail_tip_angle.append(tail_tip_angle)     
+        
 
 # background subtracted video
 INPUT_VIDEO = 'toy_data/19-40-44_nobckg_static.avi'
