@@ -80,7 +80,7 @@ class EyesOverlay_opencv(EyesOverlay):
                     tracking.left_eye.centroid,
                     tracking.left_eye.direction,
                     transformation_matrix,
-                    self.overlay_param.color_eye_left, 
+                    self.overlay_param.color_eye_left_BGR, 
                     self.overlay_param.eye_len_px, 
                     self.overlay_param.thickness,
                     self.overlay_param.arrow_radius_px
@@ -94,7 +94,7 @@ class EyesOverlay_opencv(EyesOverlay):
                     tracking.right_eye.centroid,
                     tracking.right_eye.direction,
                     transformation_matrix,
-                    self.overlay_param.color_eye_right, 
+                    self.overlay_param.color_eye_right_BGR, 
                     self.overlay_param.eye_len_px, 
                     self.overlay_param.thickness,
                     self.overlay_param.arrow_radius_px

@@ -221,7 +221,7 @@ class TailTrackerWidget(QWidget):
 
         overlay_param = TailTrackerParamOverlay(
             pix_per_mm = self.target_pix_per_mm.value(),
-            color_tail = (255, 128, 128),
+            color_tail_BGR = (255, 128, 128),
             thickness = 2
         )
         self.overlay = self.overlay_class(overlay_param)

@@ -79,7 +79,7 @@ class TailTrackerParamTracking:
 @dataclass
 class TailTrackerParamOverlay:
     pix_per_mm: float = 40
-    color_tail: tuple = (255, 128, 128)
+    color_tail_BGR: tuple = (255, 128, 128)
     thickness: int = 2
 
 class TailTracking:

@@ -32,7 +32,7 @@ class TailOverlay_opencv(TailOverlay):
                         overlay,
                         pt1.astype(np.int32),
                         pt2.astype(np.int32),
-                        self.overlay_param.color_tail,
+                        self.overlay_param.color_tail_BGR,
                         self.overlay_param.thickness
                     )
             

@@ -25,7 +25,7 @@ class AnimalOverlay_opencv(AnimalOverlay):
                     overlay,
                     (int(x),int(y)), 
                     self.overlay_param.radius_px, 
-                    self.overlay_param.centroid_color, 
+                    self.overlay_param.centroid_color_BGR, 
                     self.overlay_param.centroid_thickness
                 )
 
@@ -39,7 +39,7 @@ class AnimalOverlay_opencv(AnimalOverlay):
                     overlay, 
                     topleft,
                     bottomright, 
-                    self.overlay_param.bbox_color, 
+                    self.overlay_param.bbox_color_BGR, 
                     self.overlay_param.bbox_thickness
                 )
 
