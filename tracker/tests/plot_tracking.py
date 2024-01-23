@@ -12,6 +12,7 @@ import numpy as np
 from geometry import Affine2DTransform
 from multiprocessing import Queue
 from tracker import Accumulator
+import pandas as pd
 
 class csv_saver(Accumulator):
 
@@ -58,6 +59,19 @@ class csv_saver(Accumulator):
         self.left_eye_angle.append(left_eye_angle)
         self.right_eye_angle.append(right_eye_angle)
         self.tail_tip_angle.append(tail_tip_angle)     
+
+    def to_csv(self, filename: str):
+        df = pd.DataFrame.from_dict(
+            {
+                'x': self.x,
+                'y': self.y,
+                'fish_angle': self.fish_angle,
+                'left_eye_angle': self.left_eye_angle,
+                'right_eye_angle': self.right_eye_angle,
+                'tail_tip_angle': self.tail_tip_angle
+            }
+        )
+        df.to_csv(filename)
         
 
 # background subtracted video
