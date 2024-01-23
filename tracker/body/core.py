@@ -97,12 +97,12 @@ class BodyTrackerParamOverlay:
 class BodyTracking:
 
     def __init__(self,
-            im_shape: Optional[ArrayLike],
             heading: Optional[NDArray],
             centroid: Optional[NDArray],
             angle_rad: Optional[float],
             mask: Optional[NDArray],
-            image: Optional[NDArray] 
+            image: Optional[NDArray],
+            im_shape: Optional[ArrayLike] = None,
         ) -> None:
     
             self.heading = heading if heading is not None else np.zeros((2,2), dtype=np.single) # 2x2 matrix, column 1 = fish heading, column 2 = fish right direction

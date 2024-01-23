@@ -104,13 +104,13 @@ class AnimalTrackerParamOverlay:
 class AnimalTracking:
     def __init__(
             self,
-            im_shape: Optional[ArrayLike],
-            max_num_animals: Optional[int],
             centroids: Optional[NDArray],
             bounding_boxes: Optional[NDArray],
             bb_centroids: Optional[NDArray],
             mask: Optional[NDArray],
             image: Optional[NDArray],
+            im_shape: Optional[ArrayLike] = None,
+            max_num_animals: Optional[int] = None
         ) -> None:
         
         self.centroids = centroids if centroids is not None else np.zeros((max_num_animals,2), dtype = np.single) # nx2 vector. (x,y) coordinates of the n fish centroid ~ swim bladder location

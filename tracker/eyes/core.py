@@ -18,7 +18,6 @@ class EyesTrackerParamTracking:
     median_filter_sz_mm: float = 0.15
     crop_dimension_mm: Tuple[float, float] = (1.2, 1.2) 
     crop_offset_mm: float = -0.3
-    arrow_radius_mm: float = 0.1
 
     def mm2px(self, val_mm):
         return int(val_mm * self.target_pix_per_mm) 
@@ -53,10 +52,6 @@ class EyesTrackerParamTracking:
     @property
     def crop_offset_px(self):
         return self.mm2px(self.crop_offset_mm)
-
-    @property
-    def arrow_radius_px(self):
-        return self.mm2px(self.arrow_radius_mm)
     
     def to_dict(self):
         res = {}
@@ -81,6 +76,8 @@ class EyesTrackerParamOverlay:
     color_eye_left: tuple = (255, 255, 128)
     color_eye_right: tuple = (128, 255, 255)
     thickness: int = 2
+    arrow_radius_mm: float = 0.1
+
 
     def mm2px(self, val_mm):
         val_px = int(val_mm * self.pix_per_mm) 
@@ -89,6 +86,10 @@ class EyesTrackerParamOverlay:
     @property
     def eye_len_px(self):
         return self.mm2px(self.eye_len_mm)
+    
+    @property
+    def arrow_radius_px(self):
+        return self.mm2px(self.arrow_radius_mm)
 
 @dataclass
 class Eye:
@@ -108,13 +109,13 @@ class Eye:
 class EyesTracking:
     def __init__(
             self,
-            im_shape: Optional[ArrayLike],
             mask: Optional[NDArray],
             image: Optional[NDArray],
             centroid: NDArray = np.zeros((2,), dtype=np.single),
             offset: NDArray = np.zeros((2,), dtype=np.single),
             left_eye: Eye = Eye(),
-            right_eye: Eye = Eye()
+            right_eye: Eye = Eye(),
+            im_shape: Optional[ArrayLike] = None
         ) -> None:
     
         self.centroid = centroid

@@ -121,13 +121,14 @@ body_overlay = BodyOverlay_opencv(BodyTrackerParamOverlay())
 eyes_overlay = EyesOverlay_opencv(EyesTrackerParamOverlay())
 tail_overlay = TailOverlay_opencv(TailTrackerParamOverlay())
 
-tracker = MultiFishTracker_CPU(            
-    assignment,
-    accumulator,
-    animal_tracker,
-    body_tracker, 
-    eyes_tracker, 
-    tail_tracker
+tracker = MultiFishTracker_CPU(
+    max_num_animals=1,            
+    assignment=assignment,
+    accumulator=accumulator,
+    animal=animal_tracker,
+    body=body_tracker, 
+    eyes=eyes_tracker, 
+    tail=tail_tracker
 )
 
 overlay = MultiFishOverlay_opencv(

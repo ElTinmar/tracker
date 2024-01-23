@@ -21,11 +21,6 @@ class Assignment(Protocol):
 
 @dataclass
 class MultiFishTracking:
-    max_num_animals: int
-    im_shape: Optional[ArrayLike]
-    im_body_shape: Optional[ArrayLike]
-    im_eyes_shape: Optional[ArrayLike]
-    im_tail_shape: Optional[ArrayLike]
     identities: NDArray
     indices: NDArray
     animals: AnimalTracking
@@ -33,6 +28,11 @@ class MultiFishTracking:
     eyes: Optional[List[EyesTracking]]
     tail: Optional[List[TailTracking]]
     image: NDArray
+    max_num_animals: int = 1
+    im_shape: Optional[ArrayLike] = None
+    im_body_shape: Optional[ArrayLike] = None
+    im_eyes_shape: Optional[ArrayLike] = None
+    im_tail_shape: Optional[ArrayLike] = None
     
     def to_csv(self):
         '''export data as csv'''
