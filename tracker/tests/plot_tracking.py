@@ -1,4 +1,4 @@
-from video_tools import Buffered_OpenCV_VideoReader, VideoDisplay
+from video_tools import Buffered_OpenCV_VideoReader, VideoDisplay, FFMPEG_VideoWriter
 from image_tools import im2single, im2gray
 from tracker import (
     GridAssignment, MultiFishTracker_CPU, MultiFishOverlay_opencv, MultiFishTracking,
@@ -95,6 +95,7 @@ height = video_reader.get_height()
 width = video_reader.get_width()
 fps = video_reader.get_fps()  
 num_frames = video_reader.get_number_of_frame()
+
 
 LUT = np.zeros((width, height))
 assignment = GridAssignment(LUT)
@@ -207,6 +208,32 @@ overlay = MultiFishOverlay_opencv(
     tail_overlay
 )
 
+video_writer = FFMPEG_VideoWriter(
+    height=height,
+    width=width,
+    fps=fps,
+    filename='19-40-44_tracking.avi'
+)
+
+video_writer_eyes= FFMPEG_VideoWriter(
+    height=eyes_tracker.tracking_param.crop_dimension_px[1],
+    width=eyes_tracker.tracking_param.crop_dimension_px[0],
+    fps=fps,
+    filename='19-40-44_eyes_tracking.avi',
+    codec = 'libx264',
+    preset = 'medium'
+)
+
+video_writer_tail = FFMPEG_VideoWriter(
+    height=tail_tracker.tracking_param.crop_dimension_px[1],
+    width=tail_tracker.tracking_param.crop_dimension_px[0],
+    fps=fps,
+    filename='19-40-44_tail_tracking.avi',
+    codec = 'libx264',
+    preset = 'medium'
+)
+
+
 try:
     for i in tqdm(range(num_frames)):
         (rval, frame) = video_reader.next_frame()
@@ -220,17 +247,21 @@ try:
         tracking = tracker.track(frame_gray)
 
         # display tracking
-        display.queue_image(overlay.overlay(frame_gray, tracking))
+        oly = overlay.overlay(frame_gray, tracking)
+        display.queue_image(oly)
 
+        # save video
+        video_writer.write_frame(oly[:,:,[2,1,0]])
+        
         # display eyes 
         if tracking.eyes is not None and tracking.eyes[0] is not None:
             s = eyes_tracker.tracking_param.resize
             tx, ty = -tracking.eyes[0].offset
             S = Affine2DTransform.scaling(s,s)
             T = Affine2DTransform.translation(tx, ty)
-            display_eyes.queue_image(
-                eyes_overlay.overlay(tracking.eyes[0].image, tracking.eyes[0], T @ S)
-            )
+            eye_oly = eyes_overlay.overlay(tracking.eyes[0].image, tracking.eyes[0], T @ S)
+            display_eyes.queue_image(eye_oly)
+            video_writer_eyes.write_frame(eye_oly[:,:,[2,1,0]])
 
         # display tail
         if tracking.tail is not None and tracking.tail[0] is not None:
@@ -238,9 +269,9 @@ try:
             tx, ty = -tracking.tail[0].offset
             S = Affine2DTransform.scaling(s,s)
             T = Affine2DTransform.translation(tx, ty)
-            display_tail.queue_image(
-                tail_overlay.overlay(tracking.tail[0].image, tracking.tail[0], T @ S)
-            )
+            tail_oly = tail_overlay.overlay(tracking.tail[0].image, tracking.tail[0], T @ S)
+            display_tail.queue_image(tail_oly)
+            video_writer_tail.write_frame(tail_oly[:,:,[2,1,0]])
 
 finally:
     video_reader.exit()
@@ -253,6 +284,10 @@ finally:
     display_tail.join()
 
 accumulator.to_csv('tracking_results.csv')
+video_writer.close()
+video_writer_eyes.close()
+video_writer_tail.close()
+
 
 # plot
 
