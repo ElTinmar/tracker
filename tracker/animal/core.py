@@ -109,15 +109,13 @@ class AnimalTracking:
             bb_centroids: Optional[NDArray],
             mask: Optional[NDArray],
             image: Optional[NDArray],
-            im_shape: Optional[ArrayLike] = None,
-            max_num_animals: Optional[int] = None
         ) -> None:
         
-        self.centroids = centroids if centroids is not None else np.zeros((max_num_animals,2), dtype = np.single) # nx2 vector. (x,y) coordinates of the n fish centroid ~ swim bladder location
-        self.bounding_boxes = bounding_boxes  if bounding_boxes is not None else np.zeros((max_num_animals,4), dtype = np.single)
-        self.bb_centroids = bb_centroids  if bb_centroids is not None else np.zeros((max_num_animals,2), dtype = np.single)
-        self.mask = mask if mask is not None else np.zeros(im_shape, dtype = np.uint8)
-        self.image = image if image is not None else np.zeros(im_shape, dtype = np.uint8)
+        self.centroids = centroids # nx2 vector. (x,y) coordinates of the n fish centroid ~ swim bladder location
+        self.bounding_boxes = bounding_boxes 
+        self.bb_centroids = bb_centroids
+        self.mask = mask
+        self.image = image
 
     def to_csv(self):
         '''
@@ -125,8 +123,13 @@ class AnimalTracking:
         '''
         pass    
 
-    def to_numpy(self) -> NDArray:
+    def to_numpy(
+            self,
+            im_shape: Optional[ArrayLike] = None,
+            max_num_animals: Optional[int] = None
+        ) -> NDArray:
         '''serialize to structured numpy array'''
+
         dt = np.dtype([
             ('centroid', self.centroids.dtype, self.centroids.shape),
             ('bounding_boxes',  self.bounding_boxes.dtype, self.bounding_boxes.shape),

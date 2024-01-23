@@ -102,14 +102,13 @@ class BodyTracking:
             angle_rad: Optional[float],
             mask: Optional[NDArray],
             image: Optional[NDArray],
-            im_shape: Optional[ArrayLike] = None,
         ) -> None:
     
-            self.heading = heading if heading is not None else np.zeros((2,2), dtype=np.single) # 2x2 matrix, column 1 = fish heading, column 2 = fish right direction
-            self.centroid = centroid if centroid is not None else np.zeros((2,), dtype=np.single) # 1x2 vector. (x,y) coordinates of the fish centroid ~ swim bladder location
-            self.angle_rad = angle_rad if angle_rad is not None else 0.0
-            self.mask = mask if mask is not None else np.zeros(im_shape, dtype=np.uint8)
-            self.image = image if image is not None else np.zeros(im_shape, dtype=np.uint8)
+            self.heading = heading # 2x2 matrix, column 1 = fish heading, column 2 = fish right direction
+            self.centroid = centroid # 1x2 vector. (x,y) coordinates of the fish centroid ~ swim bladder location
+            self.angle_rad = angle_rad 
+            self.mask = mask
+            self.image = image 
 
     def to_csv(self):
         '''
@@ -117,8 +116,12 @@ class BodyTracking:
         '''
         pass    
 
-    def to_numpy(self) -> NDArray:
+    def to_numpy(
+            self,           
+            im_shape: Optional[ArrayLike] = None
+        ) -> NDArray:
         '''serialize to structured numpy array'''
+
         dt = np.dtype([
             ('heading', self.heading.dtype, self.heading.shape),
             ('centroid',  self.centroid.dtype, self.centroid.shape),

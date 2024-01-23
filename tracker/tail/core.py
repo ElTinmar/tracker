@@ -90,23 +90,25 @@ class TailTracking:
             skeleton: Optional[NDArray],
             skeleton_interp: Optional[NDArray],
             image: Optional[NDArray],
-            num_tail_pts: Optional[int] = None,
-            num_tailinterp_pts: Optional[int] = None,
-            im_shape: Optional[ArrayLike] = None
         ) -> None:
                 
-            self.centroid = centroid if centroid is not None else np.zeros((2,), dtype=np.single)
-            self.offset = offset if offset is not None else np.zeros((num_tail_pts,2), dtype=np.single)# position of centroid in cropped image
-            self.skeleton = skeleton if skeleton is not None else np.zeros((2,), dtype=np.single)
-            self.skeleton_interp = skeleton_interp if skeleton_interp is not None else np.zeros((num_tailinterp_pts,2), dtype=np.single)
-            self.image = image if centroid is not None else np.zeros(im_shape, dtype=np.uint8)
+            self.centroid = centroid 
+            self.offset = offset
+            self.skeleton = skeleton
+            self.skeleton_interp = skeleton_interp
+            self.image = image
 
     def to_csv(self):
         '''export data as csv'''
         pass
 
-    def to_numpy(self) -> NDArray:
+    def to_numpy(self,
+            num_tail_pts: Optional[int] = None,
+            num_tailinterp_pts: Optional[int] = None,
+            im_shape: Optional[ArrayLike] = None
+        ) -> NDArray:
         '''serialize to structured numpy array'''
+        
         dt = np.dtype([
             ('centroid', self.centroid.dtype, self.centroid.shape),
             ('offset',  self.offset.dtype, self.offset.shape),
