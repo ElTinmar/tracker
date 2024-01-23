@@ -8,6 +8,8 @@ dependencies:
 - scipy
 - scikit-learn
 - tqdm
+- pandas
+- seaborn
 - pip
 - pip:
   - opencv-python
