@@ -1,16 +1,15 @@
-from video_tools import Buffered_OpenCV_VideoReader, VideoDisplay
+from video_tools import Buffered_OpenCV_VideoReader
 from image_tools import im2single, im2gray
 from tracker import (
-    GridAssignment, MultiFishTracker_CPU, MultiFishOverlay_opencv,
-    AnimalTracker_CPU, AnimalOverlay_opencv, AnimalTrackerParamTracking, AnimalTrackerParamOverlay,
-    BodyTracker_CPU, BodyOverlay_opencv, BodyTrackerParamTracking, BodyTrackerParamOverlay,
-    EyesTracker_CPU, EyesOverlay_opencv, EyesTrackerParamTracking, EyesTrackerParamOverlay,
-    TailTracker_CPU, TailOverlay_opencv, TailTrackerParamTracking, TailTrackerParamOverlay
+    GridAssignment, MultiFishTracker_CPU,
+    AnimalTracker_CPU, AnimalTrackerParamTracking,
+    BodyTracker_CPU, BodyTrackerParamTracking,
+    EyesTracker_CPU, EyesTrackerParamTracking,
+    TailTracker_CPU, TailTrackerParamTracking
 )
 from tqdm import tqdm
 import numpy as np
-from geometry import Affine2DTransform
-from multiprocessing import Queue
+
 import cProfile
 import pstats
 from pstats import SortKey
