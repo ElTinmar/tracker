@@ -330,22 +330,21 @@ reader.seek_to(frame)
 ret, img = reader.next_frame()
 cv2.imshow('tracking', img)
 cv2.waitKey(0)
-cv2.imwrite(f'tracking_{frame}.png')
+cv2.imwrite(f'tracking_{frame}.png', img)
 
 reader.open_file('19-40-44_eyes_tracking.avi', safe=True)
 reader.seek_to(frame)
 ret, img = reader.next_frame()
 cv2.imshow('eyes', img)
 cv2.waitKey(0)
-cv2.imwrite(f'tracking_eyes_{frame}.png')
-
+cv2.imwrite(f'tracking_eyes_{frame}.png', img)
 
 reader.open_file('19-40-44_tail_tracking.avi', safe=True)
 reader.seek_to(frame)
 ret, img = reader.next_frame()
 cv2.imshow('tail',img)
 cv2.waitKey(0)
-cv2.imwrite(f'tracking_tail_{frame}.png')
+cv2.imwrite(f'tracking_tail_{frame}.png', img)
 
 
 cv2.destroyAllWindows()
