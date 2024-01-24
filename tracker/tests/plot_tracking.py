@@ -1,4 +1,4 @@
-from video_tools import Buffered_OpenCV_VideoReader, VideoDisplay, FFMPEG_VideoWriter
+from video_tools import Buffered_OpenCV_VideoReader, VideoDisplay, FFMPEG_VideoWriter, OpenCV_VideoReader
 from image_tools import im2single, im2gray
 from tracker import (
     GridAssignment, MultiFishTracker_CPU, MultiFishOverlay_opencv, MultiFishTracking,
@@ -13,6 +13,8 @@ from geometry import Affine2DTransform
 from multiprocessing import Queue
 from tracker import Accumulator
 import pandas as pd
+
+EXPORT_FPS = 100
 
 class csv_saver(Accumulator):
 
@@ -152,7 +154,7 @@ body_tracker = BodyTracker_CPU(
 eyes_tracker = EyesTracker_CPU(
     EyesTrackerParamTracking(
         pix_per_mm=40,
-        target_pix_per_mm=40,
+        target_pix_per_mm=120,
         eye_brightness=0.0,
         eye_gamma=3.0,
         eye_dyntresh_res=20,
@@ -168,7 +170,7 @@ eyes_tracker = EyesTracker_CPU(
 tail_tracker = TailTracker_CPU(
     TailTrackerParamTracking(
         pix_per_mm=40,
-        target_pix_per_mm=40,
+        target_pix_per_mm=80,
         arc_angle_deg=120,
         n_tail_points=10,
         n_pts_arc=20,
@@ -211,14 +213,14 @@ overlay = MultiFishOverlay_opencv(
 video_writer = FFMPEG_VideoWriter(
     height=height,
     width=width,
-    fps=fps,
+    fps=EXPORT_FPS,
     filename='19-40-44_tracking.avi'
 )
 
 video_writer_eyes= FFMPEG_VideoWriter(
     height=eyes_tracker.tracking_param.crop_dimension_px[1],
     width=eyes_tracker.tracking_param.crop_dimension_px[0],
-    fps=fps,
+    fps=EXPORT_FPS,
     filename='19-40-44_eyes_tracking.avi',
     codec = 'libx264',
     preset = 'medium'
@@ -227,7 +229,7 @@ video_writer_eyes= FFMPEG_VideoWriter(
 video_writer_tail = FFMPEG_VideoWriter(
     height=tail_tracker.tracking_param.crop_dimension_px[1],
     width=tail_tracker.tracking_param.crop_dimension_px[0],
-    fps=fps,
+    fps=EXPORT_FPS,
     filename='19-40-44_tail_tracking.avi',
     codec = 'libx264',
     preset = 'medium'
@@ -262,6 +264,8 @@ try:
             eye_oly = eyes_overlay.overlay(tracking.eyes[0].image, tracking.eyes[0], T @ S)
             display_eyes.queue_image(eye_oly)
             video_writer_eyes.write_frame(eye_oly[:,:,[2,1,0]])
+        else:
+            video_writer_eyes.write_frame(np.zeros((eyes_tracker.tracking_param.crop_dimension_px[1],eyes_tracker.tracking_param.crop_dimension_px[0],3), dtype=np.uint8))
 
         # display tail
         if tracking.tail is not None and tracking.tail[0] is not None:
@@ -272,6 +276,8 @@ try:
             tail_oly = tail_overlay.overlay(tracking.tail[0].image, tracking.tail[0], T @ S)
             display_tail.queue_image(tail_oly)
             video_writer_tail.write_frame(tail_oly[:,:,[2,1,0]])
+        else:
+            video_writer_tail.write_frame(np.zeros((tail_tracker.tracking_param.crop_dimension_px[1],tail_tracker.tracking_param.crop_dimension_px[0],3), dtype=np.uint8))
 
 finally:
     video_reader.exit()
@@ -292,6 +298,7 @@ video_writer_tail.close()
 # plot
 
 import matplotlib.pyplot as plt
+import cv2
 
 df = accumulator.to_pandas()
 #df = pd.read_csv('tracking_results.csv')
@@ -309,3 +316,49 @@ plt.plot(t,smooth(df.left_eye_angle[26000:27500], 20), color= np.array(eyes_over
 plt.plot(t,smooth(df.right_eye_angle[26000:27500], 20), color= np.array(eyes_overlay.overlay_param.color_eye_right_BGR)[[2,1,0]]/255)
 plt.plot(t,np.array(df.tail_tip_angle[26000:27500]), color= np.array(tail_overlay.overlay_param.color_tail_BGR)[[2,1,0]]/255)
 plt.savefig("tracking.svg")
+
+# extract specific frame 
+# NOTE safe = True is necessary here
+
+frame = 27182
+
+reader = OpenCV_VideoReader()
+reader.open_file('19-40-44_tracking.avi', safe=True)
+reader.seek_to(frame)
+ret, img = reader.next_frame()
+cv2.imshow('tracking', img)
+cv2.waitKey(0)
+
+reader.open_file('19-40-44_eyes_tracking.avi', safe=True)
+reader.seek_to(frame)
+ret, img = reader.next_frame()
+cv2.imshow(
+    'eyes', 
+    cv2.resize(
+        img,                
+        None, 
+        None,
+        3,
+        3,
+        cv2.INTER_LINEAR
+    )
+)
+cv2.waitKey(0)
+
+reader.open_file('19-40-44_tail_tracking.avi', safe=True)
+reader.seek_to(frame)
+ret, img = reader.next_frame()
+cv2.imshow(
+    'tail', 
+    cv2.resize(
+        img,                
+        None, 
+        None,
+        2,
+        2,
+        cv2.INTER_LINEAR
+    )
+)
+cv2.waitKey(0)
+
+cv2.destroyAllWindows()
