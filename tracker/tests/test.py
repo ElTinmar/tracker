@@ -41,6 +41,7 @@ display.start()
 display_eyes.start()
 display_tail.start()
 
+
 # tracking 
 animal_tracker = AnimalTracker_CPU(
     AnimalTrackerParamTracking(
@@ -64,17 +65,17 @@ animal_tracker = AnimalTracker_CPU(
 body_tracker = BodyTracker_CPU(
     BodyTrackerParamTracking(
         pix_per_mm=40,
-        target_pix_per_mm=7.5,
-        body_intensity=0.06,
+        target_pix_per_mm=20,
+        body_intensity=0.20,
         body_brightness=0.0,
         body_gamma=1.0,
-        body_contrast=1.0,
-        min_body_size_mm=2.0,
+        body_contrast=3.0,
+        min_body_size_mm=0.0,
         max_body_size_mm=30.0,
-        min_body_length_mm=2.0,
-        max_body_length_mm=6.0,
-        min_body_width_mm=0.4,
-        max_body_width_mm=2.0,
+        min_body_length_mm=0.0,
+        max_body_length_mm=12.0,
+        min_body_width_mm=0.2,
+        max_body_width_mm=6.0,
         blur_sz_mm=1/7.5,
         median_filter_sz_mm=1/7.5,
     )
@@ -92,26 +93,26 @@ eyes_tracker = EyesTracker_CPU(
         blur_sz_mm=0.06,
         median_filter_sz_mm=0.06,
         crop_dimension_mm=(1.0,1.5),
-        crop_offset_mm=-0.30
+        crop_offset_mm=-0.75
     )
 )
 tail_tracker = TailTracker_CPU(
     TailTrackerParamTracking(
         pix_per_mm=40,
-        target_pix_per_mm=20,
+        target_pix_per_mm=40,
         arc_angle_deg=120,
         n_tail_points=10,
         n_pts_arc=20,
         n_pts_interp=40,
-        tail_length_mm=2.4,
-        dist_swim_bladder_mm=0.2,
+        tail_length_mm=2.2,
+        dist_swim_bladder_mm=0.0,
         blur_sz_mm=0.06,
         median_filter_sz_mm=0.06,
         tail_brightness=0.0,
         tail_contrast=3.0,
         tail_gamma=0.75,
         crop_dimension_mm=(3.5,3.5),
-        crop_offset_tail_mm=2.25
+        crop_offset_tail_mm=1.75
     )
 )
 

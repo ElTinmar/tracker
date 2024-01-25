@@ -214,7 +214,9 @@ video_writer = FFMPEG_VideoWriter(
     height=height,
     width=width,
     fps=EXPORT_FPS,
-    filename='19-40-44_tracking.avi'
+    filename='19-40-44_tracking.avi',
+    codec = 'libx264',
+    preset = 'medium'
 )
 
 video_writer_eyes= FFMPEG_VideoWriter(
@@ -320,7 +322,7 @@ plt.savefig("tracking.svg")
 # extract specific frame 
 # NOTE safe = True is necessary here
 
-frame = 27182
+frame = 27368
 
 reader = OpenCV_VideoReader()
 reader.open_file('19-40-44_tracking.avi', safe=True)
@@ -328,37 +330,21 @@ reader.seek_to(frame)
 ret, img = reader.next_frame()
 cv2.imshow('tracking', img)
 cv2.waitKey(0)
+cv2.imwrite(f'tracking_{frame}.png', img)
 
 reader.open_file('19-40-44_eyes_tracking.avi', safe=True)
 reader.seek_to(frame)
 ret, img = reader.next_frame()
-cv2.imshow(
-    'eyes', 
-    cv2.resize(
-        img,                
-        None, 
-        None,
-        3,
-        3,
-        cv2.INTER_LINEAR
-    )
-)
+cv2.imshow('eyes', img)
 cv2.waitKey(0)
+cv2.imwrite(f'tracking_eyes_{frame}.png', img)
 
 reader.open_file('19-40-44_tail_tracking.avi', safe=True)
 reader.seek_to(frame)
 ret, img = reader.next_frame()
-cv2.imshow(
-    'tail', 
-    cv2.resize(
-        img,                
-        None, 
-        None,
-        2,
-        2,
-        cv2.INTER_LINEAR
-    )
-)
+cv2.imshow('tail',img)
 cv2.waitKey(0)
+cv2.imwrite(f'tracking_tail_{frame}.png', img)
+
 
 cv2.destroyAllWindows()
