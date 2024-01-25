@@ -29,11 +29,6 @@ class EyesTracker_CPU(EyesTracker):
 
         # crop image
         w, h = self.tracking_param.crop_dimension_px
-
-        # some video codec require height, width to be divisible by 2
-        w = 2*w//2
-        h = 2*h//2
-
         offset = np.array((-w//2, -h//2+self.tracking_param.crop_offset_px), dtype=np.int32)
         left, bottom = (centroid * self.tracking_param.resize).astype(np.int32) + offset 
         right, top = left+w, bottom+h 
@@ -43,7 +38,6 @@ class EyesTracker_CPU(EyesTracker):
         image_padded = np.pad(image, (0,pad_width))
 
         image_crop = image_padded[bottom:top, left:right]
-        print(image_crop.shape)
         if image_crop.size == 0:
             return None
 

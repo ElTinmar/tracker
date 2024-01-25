@@ -51,9 +51,10 @@ class TailTrackerParamTracking:
     
     @property
     def crop_dimension_px(self):
+        # some video codec require height, width to be divisible by 2
         return (
-            self.mm2px(self.crop_dimension_mm[0]),
-            self.mm2px(self.crop_dimension_mm[1])
+            2*self.mm2px(self.crop_dimension_mm[0])//2,
+            2*self.mm2px(self.crop_dimension_mm[1])//2
         ) 
 
     def to_dict(self):
