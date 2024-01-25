@@ -31,6 +31,11 @@ class TailTracker_CPU(TailTracker):
 
         # crop image
         w, h = self.tracking_param.crop_dimension_px
+
+        # some video codec require height, width to be divisible by 2
+        w = 2*w//2
+        h = 2*h//2
+        
         offset = np.array((-w//2, -h//2+self.tracking_param.crop_offset_tail_px), dtype=np.int32)
         left, bottom = (centroid * self.tracking_param.resize).astype(np.int32) + offset 
         right, top = left+w, bottom+h 
