@@ -98,7 +98,6 @@ width = video_reader.get_width()
 fps = video_reader.get_fps()  
 num_frames = video_reader.get_number_of_frame()
 
-
 LUT = np.zeros((height, width))
 assignment = GridAssignment(LUT)
 accumulator = csv_saver()
