@@ -73,11 +73,11 @@ class EyesTrackerParamTracking:
 @dataclass
 class EyesTrackerParamOverlay:
     pix_per_mm: float = 40.0
-    eye_len_mm: float = 0.2
+    eye_len_mm: float = 0.25
     color_eye_left_BGR: tuple = (255, 255, 128)
     color_eye_right_BGR: tuple = (128, 255, 255)
     thickness: int = 2
-    arrow_radius_mm: float = 0.025
+    arrow_radius_mm: float = 0.05
 
 
     def mm2px(self, val_mm):

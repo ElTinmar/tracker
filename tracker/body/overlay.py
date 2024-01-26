@@ -41,12 +41,13 @@ class BodyOverlay_opencv(BodyOverlay):
             )
 
             # show heading direction with a circle (easier than arrowhead)
+            filled = -1
             overlay = cv2.circle(
                 overlay,
                 pts_[1].astype(np.int32),
                 2,
                 self.overlay_param.heading_color_BGR,
-                self.overlay_param.thickness
+                filled
             )
         
             return overlay
