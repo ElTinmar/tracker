@@ -45,12 +45,14 @@ def disp_eye(
     )
 
     # indicate eye direction with a circle (easier than arrowhead)
+    filled = -1
+    
     overlay = cv2.circle(
         overlay,
         pts_[2].astype(np.int32),
         radius, 
         color,
-        thickness
+        filled
     )
 
     return overlay
