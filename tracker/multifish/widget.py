@@ -152,7 +152,7 @@ class TrackerWidget(QMainWindow):
         assignment = self.assignment_widget.get_assignment()
 
         # TODO update this 
-        max_num_animals = 1
+        max_num_animals = 10
 
         if assignment is not None:
 
