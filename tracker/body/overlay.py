@@ -45,7 +45,7 @@ class BodyOverlay_opencv(BodyOverlay):
             overlay = cv2.circle(
                 overlay,
                 pts_[1].astype(np.int32),
-                2,
+                self.overlay_param.arrow_radius_px,
                 self.overlay_param.heading_color_BGR,
                 filled
             )

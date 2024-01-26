@@ -84,6 +84,7 @@ class BodyTrackerParamOverlay:
     heading_len_mm: float = 1.25
     heading_color_BGR: tuple = (0,128,255)
     thickness: int = 2
+    arrow_radius_mm: float = 0.1
 
     def mm2px(self, val_mm):
         val_px = int(val_mm * self.pix_per_mm) 
@@ -92,7 +93,10 @@ class BodyTrackerParamOverlay:
     @property
     def heading_len_px(self):
         return self.mm2px(self.heading_len_mm)
-        
+
+    @property
+    def arrow_radius_px(self):
+        return self.mm2px(self.arrow_radius_mm)        
 
 class BodyTracking:
 
