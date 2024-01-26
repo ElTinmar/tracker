@@ -217,7 +217,7 @@ class AnimalTrackerWidget(QWidget):
         self.tracker = self.tracker_class(tracker_param)
 
         overlay_param = AnimalTrackerParamOverlay(
-            pix_per_mm=self.target_pix_per_mm.value()
+            pix_per_mm=self.pix_per_mm.value()
         )
         self.overlay = self.overlay_class(overlay_param)
 
