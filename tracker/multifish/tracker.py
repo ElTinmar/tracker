@@ -1,7 +1,7 @@
 import numpy as np
 from typing import Optional
 from numpy.typing import NDArray
-from image_tools import enhance,imrotate, im2uint8
+from image_tools import imrotate, im2uint8
 from .core import MultiFishTracker, MultiFishTracking
 
 class MultiFishTracker_CPU(MultiFishTracker):
@@ -38,7 +38,7 @@ class MultiFishTracker_CPU(MultiFishTracker):
              animals.bounding_boxes[to_keep,:])
         ) 
 
-        # loop over animals
+        # loop over detected animals to get body, eyes and tail tracking
         body = {}
         eyes = {}
         tail = {}
@@ -53,8 +53,9 @@ class MultiFishTracker_CPU(MultiFishTracker):
             if self.body is not None:
 
                 # get more precise centroid and orientation of the animals
-                
                 body[id] = self.body.track(image_cropped, centroid=offset)
+
+                # if body was found, track eyes and tail
                 if (body[id] is not None) and (body[id].centroid is not None):
                     
                     # rotate the animal so that it's vertical head up
