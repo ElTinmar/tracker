@@ -89,7 +89,7 @@ class AnimalTrackerParamTracking:
 class AnimalTrackerParamOverlay:
     pix_per_mm: float = 40.0
     radius_mm: float = 0.1
-    centroid_color_BGR: tuple = (255, 128, 128)
+    centroid_color_BGR: tuple = (128, 255, 128)
     bbox_color_BGR: tuple = (255, 255, 255) 
     centroid_thickness: int = -1
     bbox_thickness: int = 2
