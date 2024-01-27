@@ -131,13 +131,23 @@ class AnimalTracking:
         '''serialize to structured numpy array'''
 
         dt = np.dtype([
-            ('centroid', self.centroids.dtype, self.centroids.shape),
-            ('bounding_boxes',  self.bounding_boxes.dtype, self.bounding_boxes.shape),
-            ('bb_centroids',  self.bb_centroids.dtype, self.bb_centroids.shape),
-            ('mask',  self.mask.dtype, self.mask.shape),
-            ('image',  self.image.dtype, self.image.shape),
+            ('centroid', np.single, (max_num_animals, 2)),
+            ('bounding_boxes', np.single, (max_num_animals, 4)),
+            ('bb_centroids', np.single, (max_num_animals, 2)),
+            ('mask', np.uint8, im_shape),
+            ('image', np.uint8, im_shape),
         ])
-        arr = np.array((self.centroids, self.bounding_boxes, self.bb_centroids, self.mask, self.image), dtype=dt)
+        
+        arr = np.array(
+            (
+                self.centroids or np.zeros((max_num_animals, 2), np.single), 
+                self.bounding_boxes or np.zeros((max_num_animals, 4), np.single), 
+                self.bb_centroids or np.zeros((max_num_animals, 2), np.single), 
+                self.mask or np.zeros(im_shape, np.uint8), 
+                self.image or np.zeros(im_shape, np.uint8)
+            ), 
+            dtype=dt
+        )
         return arr
     
 class AnimalTracker(Tracker):

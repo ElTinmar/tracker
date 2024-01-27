@@ -94,17 +94,27 @@ class EyesTrackerParamOverlay:
 
 @dataclass
 class Eye:
-    direction: NDArray = np.zeros((2,), dtype=np.single)
-    angle: float = 0.0
-    centroid: NDArray = np.zeros((2,), dtype=np.single)
+    direction: Optional[NDArray]
+    angle: Optional[float]
+    centroid: Optional[NDArray]
 
     def to_numpy(self) -> NDArray:
+        '''serialize to structured numpy array'''
+
         dt = np.dtype([
-            ('direction', self.direction.dtype, self.direction.shape),
+            ('direction', np.single, (1,2)),
             ('angle', np.single, (1,)),
-            ('centroid', self.centroid.dtype, self.centroid.shape)
+            ('centroid', np.single, (1,2))
         ])
-        arr = np.array((self.direction, self.angle, self.centroid), dtype=dt)
+
+        arr = np.array(
+            (
+                self.direction or np.zeros((1,2), np.single), 
+                self.angle or np.zeros((1,), np.single), 
+                self.centroid or np.zeros((1,2), np.single)
+            ), 
+            dtype=dt
+        )
         return arr
 
 class EyesTracking:
@@ -112,8 +122,8 @@ class EyesTracking:
             self,
             mask: Optional[NDArray],
             image: Optional[NDArray],
-            centroid: NDArray = np.zeros((2,), dtype=np.single),
-            offset: NDArray = np.zeros((2,), dtype=np.single),
+            centroid: Optional[NDArray],
+            offset: Optional[NDArray],
             left_eye: Eye = Eye(),
             right_eye: Eye = Eye(),
         ) -> None:
@@ -139,15 +149,25 @@ class EyesTracking:
         right_eye = self.right_eye.to_numpy()
 
         dt = np.dtype([
-            ('centroid', self.centroid.dtype, self.centroid.shape),
-            ('offset',  self.offset.dtype, self.offset.shape),
+            ('centroid', np.single, (1,2)),
+            ('offset',  np.single, (1,2)),
             ('left_eye',  left_eye.dtype, left_eye.shape),
             ('right_eye',  right_eye.dtype, right_eye.shape),
-            ('mask',  self.mask.dtype, self.mask.shape),
-            ('image',  self.image.dtype, self.image.shape),
+            ('mask',  np.uint8, im_shape),
+            ('image',  np.uint8, im_shape),
         ])
 
-        arr = np.array((self.centroid, self.offset, left_eye, right_eye, self.mask, self.image), dtype=dt)
+        arr = np.array(
+            (
+                self.centroid or np.zeros((1,2), np.single),
+                self.offset or np.zeros((1,2), np.single),
+                left_eye, 
+                right_eye,                
+                self.mask or np.zeros(im_shape, np.uint8), 
+                self.image or np.zeros(im_shape, np.uint8)
+            ), 
+            dtype=dt
+        )
         return arr
 
 class EyesTracker(Tracker):

@@ -127,13 +127,23 @@ class BodyTracking:
         '''serialize to structured numpy array'''
 
         dt = np.dtype([
-            ('heading', self.heading.dtype, self.heading.shape),
-            ('centroid',  self.centroid.dtype, self.centroid.shape),
-            ('angle_rad',  np.single, self.angle_rad),
-            ('mask',  self.mask.dtype, self.mask.shape),
-            ('image',  self.image.dtype, self.image.shape),
+            ('heading', np.single, (2,2)),
+            ('centroid',  np.single, (1,2)),
+            ('angle_rad',  np.single, (1,)),
+            ('mask',  np.uint8, im_shape),
+            ('image',  np.uint8, im_shape),
         ])
-        arr = np.array((self.heading, self.centroid, self.angle_rad, self.mask, self.image), dtype=dt)
+
+        arr = np.array(
+            (
+                self.heading or np.zeros((2,2), np.single), 
+                self.centroid or np.zeros((1,2), np.single),
+                self.angle_rad or 0.0, 
+                self.mask or np.zeros(im_shape, np.uint8), 
+                self.image or np.zeros(im_shape, np.uint8)
+            ), 
+            dtype=dt
+        )
         return arr
 
 class BodyTracker(Tracker):

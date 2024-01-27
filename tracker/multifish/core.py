@@ -43,6 +43,7 @@ class MultiFishTracking:
         ) -> NDArray:
     
         '''serialize to structured numpy array'''
+        
         # I need to generate empty bodies/eyes/tails with 
         # the right datatype if they are not there
         animals = self.animals.to_numpy()
