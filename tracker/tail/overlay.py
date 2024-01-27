@@ -25,8 +25,8 @@ class TailOverlay_opencv(TailOverlay):
             
             if tracking.skeleton_interp is not None:
                 
-                transformed_coord = from_homogeneous((transformation_matrix @ to_homogeneous(tracking.skeleton_interp).T).T)
-                tail_segments = zip(transformed_coord[:-1,], transformed_coord[1:,])
+                transformed_coord_interp = from_homogeneous((transformation_matrix @ to_homogeneous(tracking.skeleton_interp).T).T)
+                tail_segments = zip(transformed_coord_interp[:-1,], transformed_coord_interp[1:,])
                 for pt1, pt2 in tail_segments:
                     overlay = cv2.line(
                         overlay,
@@ -35,7 +35,15 @@ class TailOverlay_opencv(TailOverlay):
                         self.overlay_param.color_tail_BGR,
                         self.overlay_param.thickness
                     )
-                
-                overlay = cv2.circle(overlay, pt2.astype(np.int32), self.overlay_param.ball_radius_px, self.overlay_param.color_tail_BGR, -1)
+
+                transformed_coord = from_homogeneous((transformation_matrix @ to_homogeneous(tracking.skeleton).T).T)
+                for pt in transformed_coord:
+                    overlay = cv2.circle(
+                        overlay, 
+                        pt.astype(np.int32), 
+                        self.overlay_param.ball_radius_px, 
+                        self.overlay_param.color_tail_BGR, 
+                        1
+                    )
 
             return overlay
