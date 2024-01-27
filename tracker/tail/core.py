@@ -21,6 +21,7 @@ class TailTrackerParamTracking:
     median_filter_sz_mm: float = 0.110
     crop_dimension_mm: Tuple[float, float] = (1.5, 1.5) 
     crop_offset_tail_mm: float = 2.25
+    ball_radius_mm: float = 0.1 
     
     def mm2px(self, val_mm: float) -> int:
         return int(val_mm * self.target_pix_per_mm) 
@@ -48,6 +49,10 @@ class TailTrackerParamTracking:
     @property
     def crop_offset_tail_px(self):
         return self.mm2px(self.crop_offset_tail_mm) 
+
+    @property
+    def ball_radius_px(self):
+        return self.mm2px(self.ball_radius_mm) 
     
     @property
     def crop_dimension_px(self):
@@ -74,6 +79,7 @@ class TailTrackerParamTracking:
         res['median_filter_sz_mm'] = self.median_filter_sz_mm
         res['crop_dimension_mm'] = self.crop_dimension_mm
         res['crop_offset_tail_mm'] = self.crop_offset_tail_mm
+        res['ball_radius_mm'] = self.ball_radius_mm
         return res
     
 
@@ -82,7 +88,15 @@ class TailTrackerParamOverlay:
     pix_per_mm: float = 40
     color_tail_BGR: tuple = (255, 128, 128)
     thickness: int = 2
+    ball_radius_mm: float = 0.1 
 
+    def mm2px(self, val_mm: float) -> int:
+        return int(val_mm * self.pix_per_mm) 
+
+    @property
+    def ball_radius_px(self):
+        return self.mm2px(self.ball_radius_mm) 
+        
 class TailTracking:
     def __init__(
             self,

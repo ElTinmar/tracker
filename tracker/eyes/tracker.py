@@ -60,8 +60,8 @@ class EyesTracker_CPU(EyesTracker):
         )
 
         # find eye angles
-        left_eye = Eye()
-        right_eye = Eye()
+        left_eye = Eye(None,None,None)
+        right_eye = Eye(None,None,None)
         new_heading = None
         
         if found_eyes_and_sb: 

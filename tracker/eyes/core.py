@@ -124,8 +124,8 @@ class EyesTracking:
             image: Optional[NDArray],
             centroid: Optional[NDArray],
             offset: Optional[NDArray],
-            left_eye: Eye = Eye(),
-            right_eye: Eye = Eye(),
+            left_eye: Eye = Eye(None,None,None),
+            right_eye: Eye = Eye(None,None,None),
         ) -> None:
     
         self.centroid = centroid

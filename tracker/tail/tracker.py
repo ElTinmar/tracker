@@ -6,7 +6,7 @@ from numpy.typing import NDArray
 from typing import Optional
 from image_tools import enhance, im2uint8
 from .core import TailTracker, TailTracking
-from .utils import tail_skeleton
+from .utils import tail_skeleton_ball
 
 class TailTracker_CPU(TailTracker):
 
@@ -53,17 +53,18 @@ class TailTracker_CPU(TailTracker):
             self.tracking_param.median_filter_sz_px
         )
 
-        skeleton, skeleton_interp = tail_skeleton(
-            image_crop,
-            self.tracking_param.arc_angle_deg,
-            self.tracking_param.tail_length_px,
-            self.tracking_param.n_tail_points,
-            self.tracking_param.n_pts_arc,
-            self.tracking_param.dist_swim_bladder_px,
-            self.tracking_param.n_pts_interp,
-            offset,
-            self.tracking_param.resize,
-            w
+        skeleton, skeleton_interp = tail_skeleton_ball(
+            image_crop = image_crop,
+            ball_radius_px = self.tracking_param.ball_radius_px,
+            arc_angle_deg = self.tracking_param.arc_angle_deg,
+            tail_length_px = self.tracking_param.tail_length_px,
+            n_tail_points = self.tracking_param.n_tail_points,
+            n_pts_arc = self.tracking_param.n_pts_arc,
+            dist_swim_bladder_px = self.tracking_param.dist_swim_bladder_px,
+            n_pts_interp = self.tracking_param.n_pts_interp,
+            offset = offset,
+            resize = self.tracking_param.resize,
+            w = w
         )
 
         res = TailTracking(

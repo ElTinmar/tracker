@@ -35,5 +35,7 @@ class TailOverlay_opencv(TailOverlay):
                         self.overlay_param.color_tail_BGR,
                         self.overlay_param.thickness
                     )
-            
+                
+                overlay = cv2.circle(overlay, pt2.astype(np.int32), self.overlay_param.ball_radius_px, self.overlay_param.color_tail_BGR, -1)
+
             return overlay

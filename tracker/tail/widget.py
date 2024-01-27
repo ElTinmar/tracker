@@ -67,7 +67,15 @@ class TailTrackerWidget(QWidget):
         self.tail_brightness.setValue(0.0)
         self.tail_brightness.setSingleStep(0.025)
         self.tail_brightness.valueChanged.connect(self.update_tracker) 
-        
+
+        # ball radius mm
+        self.ball_radius_mm = LabeledDoubleSpinBox(self)
+        self.ball_radius_mm.setText('ball radius (mm)')
+        self.ball_radius_mm.setRange(0,10)
+        self.ball_radius_mm.setValue(0.1)
+        self.ball_radius_mm.setSingleStep(0.025)
+        self.ball_radius_mm.valueChanged.connect(self.update_tracker) 
+
         # arc angle deg
         self.arc_angle_deg = LabeledDoubleSpinBox(self)
         self.arc_angle_deg.setText('tail max angle (deg)')
@@ -86,7 +94,7 @@ class TailTrackerWidget(QWidget):
 
         # tail_length_mm 
         self.tail_length_mm = LabeledDoubleSpinBox(self)
-        self.tail_length_mm.setText('tail_length_mm')
+        self.tail_length_mm.setText('tail length (mm)')
         self.tail_length_mm.setRange(0,10)
         self.tail_length_mm.setValue(2.6)
         self.tail_length_mm.setSingleStep(0.025)
@@ -170,6 +178,7 @@ class TailTrackerWidget(QWidget):
         parameters.addWidget(self.tail_contrast)
         parameters.addWidget(self.tail_gamma)
         parameters.addWidget(self.tail_brightness)
+        parameters.addWidget(self.ball_radius_mm)
         parameters.addWidget(self.arc_angle_deg)
         parameters.addWidget(self.n_tail_points)
         parameters.addWidget(self.n_pts_arc)
@@ -206,6 +215,7 @@ class TailTrackerWidget(QWidget):
             tail_contrast = self.tail_contrast.value(),
             tail_gamma = self.tail_gamma.value(),
             tail_brightness = self.tail_brightness.value(),
+            ball_radius_mm = self.ball_radius_mm.value(),
             arc_angle_deg = self.arc_angle_deg.value(),
             n_tail_points = self.n_tail_points.value(),
             n_pts_arc = self.n_pts_arc.value(),
