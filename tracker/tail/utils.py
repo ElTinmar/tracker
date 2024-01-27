@@ -98,7 +98,7 @@ def tail_skeleton_ball(
         x = w//2 
         y = dist_swim_bladder_px
 
-        grid_x, grid_y = np.ogrid[:image_crop.shape[0], :image_crop.shape[1]]
+        grid_y, grid_x = np.ogrid[:image_crop.shape[0], :image_crop.shape[1]]
 
         points = [[x, y]]
         for j in range(n_tail_points):
