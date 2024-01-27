@@ -1,31 +1,10 @@
 from image_tools import  bwareafilter_props, enhance, im2uint8
-from sklearn.decomposition import PCA
 import numpy as np
 from numpy.typing import NDArray
 import cv2
-from typing import Optional, Tuple
+from typing import Optional
 from .core import BodyTracker, BodyTracking
-
-def get_orientation(coordinates: NDArray) -> Tuple[NDArray, NDArray]:
-    '''
-    get blob main axis using PCA
-    '''
-
-    pca = PCA()
-    scores = pca.fit_transform(coordinates)
-    # PCs are organized in rows, transform to columns
-    principal_components = pca.components_.T
-    centroid = pca.mean_
-
-    # resolve 180 degrees ambiguity in first PC
-    if abs(max(scores[:,0])) > abs(min(scores[:,0])):
-        principal_components[:,0] = - principal_components[:,0]
-
-    # make sure the second axis always points to the same side
-    if np.linalg.det(principal_components) < 0:
-        principal_components[:,1] = - principal_components[:,1]
-    
-    return (principal_components, centroid)
+from .utils import get_orientation
 
 class BodyTracker_CPU(BodyTracker):
         
