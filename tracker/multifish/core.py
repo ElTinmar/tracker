@@ -41,9 +41,8 @@ class MultiFishTracking:
             im_eyes_shape: Optional[ArrayLike] = None,
             im_tail_shape: Optional[ArrayLike] = None
         ) -> NDArray:
-    
-        '''serialize to structured numpy array'''
-        
+        '''serialize to fixed-size structured numpy array'''
+
         # I need to generate empty bodies/eyes/tails with 
         # the right datatype if they are not there
         animals = self.animals.to_numpy()

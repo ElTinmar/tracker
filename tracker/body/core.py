@@ -124,7 +124,7 @@ class BodyTracking:
             self,           
             im_shape: Optional[ArrayLike] = None
         ) -> NDArray:
-        '''serialize to structured numpy array'''
+        '''serialize to fixed-size structured numpy array'''
 
         dt = np.dtype([
             ('heading', np.single, (2,2)),

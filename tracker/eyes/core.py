@@ -143,7 +143,7 @@ class EyesTracking:
             self,
             im_shape: Optional[ArrayLike] = None
         ) -> NDArray:
-        '''serialize to structured numpy array'''
+        '''serialize to fixed-size structured numpy array'''
 
         left_eye = self.left_eye.to_numpy()
         right_eye = self.right_eye.to_numpy()

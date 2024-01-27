@@ -128,7 +128,7 @@ class AnimalTracking:
             im_shape: Optional[ArrayLike] = None,
             max_num_animals: Optional[int] = None
         ) -> NDArray:
-        '''serialize to structured numpy array'''
+        '''serialize to fixed-size structured numpy array'''
 
         dt = np.dtype([
             ('centroid', np.single, (max_num_animals, 2)),

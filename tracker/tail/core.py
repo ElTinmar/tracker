@@ -108,7 +108,7 @@ class TailTracking:
             num_tailinterp_pts: Optional[int] = None,
             im_shape: Optional[ArrayLike] = None
         ) -> NDArray:
-        '''serialize to structured numpy array'''
+        '''serialize to fixed-size structured numpy array'''
         
         dt = np.dtype([
             ('centroid', np.single, (1,2)),
