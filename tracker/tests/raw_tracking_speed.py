@@ -88,6 +88,7 @@ tail_tracker = TailTracker_CPU(
     TailTrackerParamTracking(
         pix_per_mm=40,
         target_pix_per_mm=40,
+        ball_radius_mm=0.05,
         arc_angle_deg=120,
         n_tail_points=10,
         n_pts_arc=20,

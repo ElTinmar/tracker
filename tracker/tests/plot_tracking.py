@@ -48,8 +48,10 @@ class csv_saver(Accumulator):
                 fish_angle = np.rad2deg(tracking.body[0].angle_rad)
 
             if tracking.eyes is not None and tracking.eyes[0] is not None:
-                left_eye_angle = np.rad2deg(tracking.eyes[0].left_eye.angle)
-                right_eye_angle = np.rad2deg(tracking.eyes[0].right_eye.angle)
+                if tracking.eyes[0].left_eye is not None:
+                    left_eye_angle = np.rad2deg(tracking.eyes[0].left_eye.angle)
+                if tracking.eyes[0].right_eye is not None:
+                    right_eye_angle = np.rad2deg(tracking.eyes[0].right_eye.angle)
 
             if (
                 tracking.tail is not None
@@ -170,7 +172,7 @@ tail_tracker = TailTracker_CPU(
     TailTrackerParamTracking(
         pix_per_mm=40,
         target_pix_per_mm=80,
-        ball_radius_mm=0.1,
+        ball_radius_mm=0.05,
         arc_angle_deg=120,
         n_tail_points=10,
         n_pts_arc=20,

@@ -21,7 +21,7 @@ class TailTrackerParamTracking:
     median_filter_sz_mm: float = 0.110
     crop_dimension_mm: Tuple[float, float] = (1.5, 1.5) 
     crop_offset_tail_mm: float = 2.25
-    ball_radius_mm: float = 0.1 
+    ball_radius_mm: float = 0.05 
     
     def mm2px(self, val_mm: float) -> int:
         return int(val_mm * self.target_pix_per_mm) 
