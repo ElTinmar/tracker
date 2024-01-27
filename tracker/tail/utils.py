@@ -3,6 +3,7 @@ from scipy.interpolate import splprep, splev
 import numpy as np
 from numpy.typing import NDArray
 from typing import Tuple
+from numba import njit
 
 def interpolate_tail(skeleton: NDArray, n_pts_interp: int) -> NDArray:
     '''
@@ -72,6 +73,7 @@ def tail_skeleton_max(
 
         return (skeleton, skeleton_interp)
 
+@njit
 def tail_skeleton_ball(
         image_crop: NDArray,
         ball_radius_px: int,
@@ -90,14 +92,12 @@ def tail_skeleton_ball(
         Pick the location where that sum is maximal. Carry on until you're done
         '''
         
-        # track max intensity along tail
         arc_rad = math.radians(arc_angle_deg)/2
         spacing = float(tail_length_px) / n_tail_points
         start_angle = -np.pi/2 # we are expecting to see the fish head-up and tail-down (-90 deg) 
         arc = np.linspace(-arc_rad, arc_rad, n_pts_arc) + start_angle
         x = w//2 
         y = dist_swim_bladder_px
-
         grid_y, grid_x = np.ogrid[:image_crop.shape[0], :image_crop.shape[1]]
 
         points = [[x, y]]

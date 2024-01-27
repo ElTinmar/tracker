@@ -11,6 +11,7 @@ dependencies:
 - pandas
 - seaborn
 - pip
+- numba
 - pip:
   - opencv-python
   - git+https://github.com/ElTinmar/video_tools.git@main
