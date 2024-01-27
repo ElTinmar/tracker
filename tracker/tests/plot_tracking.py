@@ -155,7 +155,7 @@ body_tracker = BodyTracker_CPU(
 eyes_tracker = EyesTracker_CPU(
     EyesTrackerParamTracking(
         pix_per_mm=40,
-        target_pix_per_mm=120,
+        target_pix_per_mm=40,
         eye_brightness=0.0,
         eye_gamma=3.0,
         eye_dyntresh_res=20,
@@ -171,7 +171,7 @@ eyes_tracker = EyesTracker_CPU(
 tail_tracker = TailTracker_CPU(
     TailTrackerParamTracking(
         pix_per_mm=40,
-        target_pix_per_mm=80,
+        target_pix_per_mm=40,
         ball_radius_mm=0.05,
         arc_angle_deg=120,
         n_tail_points=10,
