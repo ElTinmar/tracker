@@ -101,11 +101,11 @@ class BodyTrackerParamOverlay:
 class BodyTracking:
 
     def __init__(self,
-            heading: Optional[NDArray],
-            centroid: Optional[NDArray],
-            angle_rad: Optional[float],
-            mask: Optional[NDArray],
-            image: Optional[NDArray],
+            heading: Optional[NDArray] = None,
+            centroid: Optional[NDArray] = None,
+            angle_rad: Optional[float] = None,
+            mask: Optional[NDArray] = None,
+            image: Optional[NDArray] = None,
         ) -> None:
     
             self.heading = heading # 2x2 matrix, column 1 = fish heading, column 2 = fish right direction

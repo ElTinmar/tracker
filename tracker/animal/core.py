@@ -104,11 +104,11 @@ class AnimalTrackerParamOverlay:
 class AnimalTracking:
     def __init__(
             self,
-            centroids: Optional[NDArray],
-            bounding_boxes: Optional[NDArray],
-            bb_centroids: Optional[NDArray],
-            mask: Optional[NDArray],
-            image: Optional[NDArray],
+            centroids: Optional[NDArray] = None,
+            bounding_boxes: Optional[NDArray] = None,
+            bb_centroids: Optional[NDArray] = None,
+            mask: Optional[NDArray] = None,
+            image: Optional[NDArray] = None
         ) -> None:
         
         self.centroids = centroids # nx2 vector. (x,y) coordinates of the n fish centroid ~ swim bladder location

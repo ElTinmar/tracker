@@ -94,9 +94,9 @@ class EyesTrackerParamOverlay:
 
 @dataclass
 class Eye:
-    direction: Optional[NDArray]
-    angle: Optional[float]
-    centroid: Optional[NDArray]
+    direction: Optional[NDArray] = None
+    angle: Optional[float] = None
+    centroid: Optional[NDArray] = None
 
     def to_numpy(self) -> NDArray:
         '''serialize to structured numpy array'''
@@ -120,12 +120,12 @@ class Eye:
 class EyesTracking:
     def __init__(
             self,
-            mask: Optional[NDArray],
-            image: Optional[NDArray],
-            centroid: Optional[NDArray],
-            offset: Optional[NDArray],
-            left_eye: Eye = Eye(None,None,None),
-            right_eye: Eye = Eye(None,None,None),
+            mask: Optional[NDArray] = None,
+            image: Optional[NDArray] = None,
+            centroid: Optional[NDArray] = None,
+            offset: Optional[NDArray] = None,
+            left_eye: Eye = Eye(),
+            right_eye: Eye = Eye(),
         ) -> None:
     
         self.centroid = centroid

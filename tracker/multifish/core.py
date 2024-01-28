@@ -36,6 +36,8 @@ class MultiFishTracking:
     def to_numpy(
             self,
             max_num_animals: int = 1,
+            num_tail_pts: int = 20,
+            num_tail_interp_pts: int = 40,
             im_shape: Optional[ArrayLike] = None,
             im_body_shape: Optional[ArrayLike] = None,
             im_eyes_shape: Optional[ArrayLike] = None,
@@ -43,28 +45,39 @@ class MultiFishTracking:
         ) -> NDArray:
         '''serialize to fixed-size structured numpy array'''
 
-        # I need to generate empty bodies/eyes/tails with 
-        # the right datatype if they are not there
         animals = self.animals.to_numpy()
         bodies = [body.to_numpy() for body in self.body]
         eyes = [eyes.to_numpy() for eyes in self.eyes]
         tails = [tail.to_numpy() for tail in self.tail]
 
-        # TODO need to pad identities, indices, bodies, eyes, tails 
+        # Pad identities, indices, bodies, eyes, tails 
         # up to max_num_animals with default empty value
-
-        # also different dtypes depending on which tracker are provided
+        bodies += [BodyTracking().to_numpy(im_body_shape)] * (max_num_animals - len(bodies))
+        eyes += [EyesTracking().to_numpy(im_eyes_shape)] * (max_num_animals - len(eyes))
+        tails += [TailTracking().to_numpy(num_tail_pts, num_tail_interp_pts, im_tail_shape)] * (max_num_animals - len(eyes))
         
         dt = np.dtype([
             ('identities', self.identities.dtype, (self.max_num_animals,)),
             ('indices',  self.indices.dtype, (self.max_num_animals,)),
             ('animals',  animals.dtype, (1,)),
-            ('bodies',  body.dtype, (self.max_num_animals,)),
-            ('eyes',  eye.dtype, (self.max_num_animals,)),
-            ('tails',  tail.dtype, (self.max_num_animals,)),
-            ('image',  self.image.dtype, self.image.shape),
+            ('bodies',  bodies[0].dtype, (self.max_num_animals,)),
+            ('eyes',  eyes[0].dtype, (self.max_num_animals,)),
+            ('tails',  tails[0].dtype, (self.max_num_animals,)),
+            ('image',  self.image.dtype, im_shape),
         ])
-        arr = np.array((self.identities, self.indices, animals, self.image), dtype=dt)
+
+        arr = np.array(
+            (
+                self.identities, 
+                self.indices, 
+                animals, 
+                bodies, 
+                eyes, 
+                tails, 
+                self.image
+            ), 
+            dtype=dt
+        )
         return arr
 
 class MultiFishTracker(Tracker):

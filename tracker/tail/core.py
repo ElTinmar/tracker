@@ -100,11 +100,11 @@ class TailTrackerParamOverlay:
 class TailTracking:
     def __init__(
             self,
-            centroid: Optional[NDArray],
-            offset: Optional[NDArray],
-            skeleton: Optional[NDArray],
-            skeleton_interp: Optional[NDArray],
-            image: Optional[NDArray],
+            centroid: Optional[NDArray] = None,
+            offset: Optional[NDArray] = None,
+            skeleton: Optional[NDArray] = None,
+            skeleton_interp: Optional[NDArray] = None,
+            image: Optional[NDArray] = None
         ) -> None:
                 
             self.centroid = centroid 
