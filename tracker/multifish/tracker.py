@@ -65,6 +65,8 @@ class MultiFishTracker_CPU(MultiFishTracker):
                         np.rad2deg(body[id].angle_rad)
                     )
 
+                    # TODO: multiprocessing, track eyes and tail at the same time ?
+
                     # track eyes 
                     if self.eyes is not None:
                         eyes[id] = self.eyes.track(image_rot, centroid=centroid_rot)
