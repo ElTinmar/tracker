@@ -3,7 +3,7 @@ import numpy as np
 from numpy.typing import NDArray
 from typing import Optional
 from image_tools import enhance, im2uint8
-from .core import EyesTracker, EyesTracking, Eye
+from .core import EyesTracker, EyesTracking
 from .utils import get_eye_prop, find_eyes_and_swimbladder, assign_features
 
 class EyesTracker_CPU(EyesTracker):
