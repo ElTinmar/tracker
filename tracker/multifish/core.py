@@ -57,13 +57,13 @@ class MultiFishTracking:
         tails += [TailTracking().to_numpy(num_tail_pts, num_tail_interp_pts, im_tail_shape)] * (max_num_animals - len(eyes))
         
         dt = np.dtype([
-            ('identities', self.identities.dtype, (self.max_num_animals,)),
-            ('indices',  self.indices.dtype, (self.max_num_animals,)),
+            ('identities', self.identities.dtype, (max_num_animals,)),
+            ('indices',  self.indices.dtype, (max_num_animals,)),
             ('animals',  animals.dtype, (1,)),
-            ('bodies',  bodies[0].dtype, (self.max_num_animals,)),
-            ('eyes',  eyes[0].dtype, (self.max_num_animals,)),
-            ('tails',  tails[0].dtype, (self.max_num_animals,)),
-            ('image',  self.image.dtype, im_shape),
+            ('bodies',  bodies[0].dtype, (max_num_animals,)),
+            ('eyes',  eyes[0].dtype, (max_num_animals,)),
+            ('tails',  tails[0].dtype, (max_num_animals,)),
+            ('image',  np.uint8, im_shape)
         ])
 
         arr = np.array(
