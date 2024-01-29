@@ -14,9 +14,14 @@ import cProfile
 import pstats
 from pstats import SortKey
 
+VIDEOS = [
+    ('toy_data/19-40-44_nobckg_static.avi', 40),
+    ('toy_data/2023_09_14_07_nobckg.avi', 40),
+    ('toy_data/head_embedded_noparam_nobckg.avi', 100)
+]
 # background subtracted video
-INPUT_VIDEO = 'toy_data/19-40-44_nobckg_static.avi'
-PIX_PER_MM = 40
+INPUT_VIDEO, PIX_PER_MM = VIDEOS[0]
+
 
 video_reader = Buffered_OpenCV_VideoReader()
 video_reader.open_file(INPUT_VIDEO)
