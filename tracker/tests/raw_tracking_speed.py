@@ -31,6 +31,13 @@ assignment = GridAssignment(LUT)
 accumulator = None
 
 # tracking 
+
+# those parameters impact performance if > 0:
+#   - median_filter_sz_mm
+#   - max_animal_length_mm
+#   - max_animal_size_mm
+#   - max_animal_width_mm
+
 animal_tracker = AnimalTracker_CPU(
     AnimalTrackerParamTracking(
         pix_per_mm=40,
@@ -41,10 +48,10 @@ animal_tracker = AnimalTracker_CPU(
         animal_contrast=1.0,
         min_animal_size_mm=1.0,
         max_animal_size_mm=30.0,
-        min_animal_length_mm=1.0,
-        max_animal_length_mm=12.0,
-        min_animal_width_mm=0.4,
-        max_animal_width_mm=2.5,
+        min_animal_length_mm=0,
+        max_animal_length_mm=0,
+        min_animal_width_mm=0,
+        max_animal_width_mm=0,
         pad_value_mm=4.0,
         blur_sz_mm=1/7.5,
         median_filter_sz_mm=0,
@@ -60,10 +67,10 @@ body_tracker = BodyTracker_CPU(
         body_contrast=3.0,
         min_body_size_mm=0.0,
         max_body_size_mm=30.0,
-        min_body_length_mm=0.0,
-        max_body_length_mm=12.0,
-        min_body_width_mm=0.2,
-        max_body_width_mm=6.0,
+        min_body_length_mm=0,
+        max_body_length_mm=0,
+        min_body_width_mm=0,
+        max_body_width_mm=0,
         blur_sz_mm=1/7.5,
         median_filter_sz_mm=0,
     )
