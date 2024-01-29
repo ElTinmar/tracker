@@ -139,6 +139,10 @@ sortby = SortKey.TIME
 ps = pstats.Stats(pr).sort_stats(sortby)
 ps.print_stats(50)
 
+ps = pstats.Stats(pr)
+ps.dump_stats('raw_speed.prof')
+# then snakeviz raw_speed.prof
+
 '''
 # plot cumtime vs tottime
 import pandas as pd

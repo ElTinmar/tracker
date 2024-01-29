@@ -5,6 +5,11 @@ from typing import Tuple, Dict
 from image_tools import bwareafilter_props, bwareafilter
 from geometry import ellipse_direction, angle_between_vectors
 from .core import Eye
+import cv2
+
+# TODO implement watershed segmentation for eye and swimmbladder 
+# this may help disconnect eye and swimmbladder when they are 
+# connected together and remove the need to swipe the threshold
 
 def get_eye_prop(
         centroid: NDArray, 
@@ -74,3 +79,4 @@ def find_eyes_and_swimbladder(
             break
 
     return (found_eyes_and_sb, props, mask)
+
