@@ -90,12 +90,13 @@ class csv_saver(Accumulator):
 
 # background subtracted video
 VIDEOS = [
-    ('toy_data/19-40-44_nobckg_static.avi', 40),
-    ('toy_data/2023_09_14_07_nobckg.avi', 40),
-    ('toy_data/head_embedded_noparam_nobckg.avi', 100)
+    ('toy_data/multi_freelyswimming_1800x1800px_nobckg.avi', 40),
+    ('toy_data/single_freelyswimming_504x500px_nobckg.avi', 40),
+    ('toy_data/single_headembedded_544x380px_noparam_nobckg.avi', 100),
+    ('toy_data/single_headembedded_544x380px_param_nobckg.avi', 100)
 ]
 # background subtracted video
-INPUT_VIDEO, PIX_PER_MM = VIDEOS[1]
+INPUT_VIDEO, PIX_PER_MM = VIDEOS[0]
 
 video_reader = Buffered_OpenCV_VideoReader()
 video_reader.open_file(INPUT_VIDEO)
@@ -178,7 +179,7 @@ tail_tracker = TailTracker_CPU(
     TailTrackerParamTracking(
         pix_per_mm=PIX_PER_MM,
         target_pix_per_mm=20,
-        ball_radius_mm=0.05,
+        ball_radius_mm=0.1,
         arc_angle_deg=90,
         n_tail_points=6,
         n_pts_arc=20,
