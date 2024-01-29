@@ -66,7 +66,7 @@ class BodyTracker_CPU(BodyTracker):
         else:
             if centroid is not None:
             # in case of multiple tracking, there may be other blobs
-                closest_coords = None
+                track_coords = None
                 min_dist = None
                 for blob in props:
                     row, col = blob.centroid
@@ -74,13 +74,22 @@ class BodyTracker_CPU(BodyTracker):
                     fish_coords = np.fliplr(blob.coords)
                     dist = np.linalg.norm(fish_centroid/self.tracking_param.resize - centroid)
                     if (min_dist is None) or (dist < min_dist): 
-                        closest_coords = fish_coords
+                        track_coords = fish_coords
                         min_dist = dist
-
-                (principal_components, centroid_coords) = get_orientation(closest_coords)
             else:
-                fish_coords = np.fliplr(props[0].coords)
-                (principal_components, centroid_coords) = get_orientation(fish_coords)
+                track_coords = np.fliplr(props[0].coords)
+            
+            if track_coords.shape[0] < 2:
+                res = BodyTracking(
+                    heading = None,
+                    centroid = None,
+                    angle_rad = None,
+                    mask = im2uint8(mask),
+                    image = im2uint8(image)
+                )
+                return res
+                    
+            (principal_components, centroid_coords) = get_orientation(track_coords)
 
             res = BodyTracking(
                 heading = principal_components,

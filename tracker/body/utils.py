@@ -14,6 +14,8 @@ def get_orientation(coordinates: NDArray) -> Tuple[NDArray, NDArray]:
     principal_components = pca.components_.T
     centroid = pca.mean_
 
+    print(coordinates)
+
     # resolve 180 degrees ambiguity in first PC
     if abs(max(scores[:,0])) > abs(min(scores[:,0])):
         principal_components[:,0] = - principal_components[:,0]
