@@ -83,7 +83,7 @@ class MultiFishTracker_CPU(MultiFishTracker):
             body = body,
             eyes = eyes,
             tail =  tail,
-            image = im2uint8(image)
+            image = im2uint8(image) # TODO optimize ? this seems to be slow for large images 
         )
 
         # compute additional features based on tracking

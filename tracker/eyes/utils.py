@@ -1,11 +1,10 @@
 from scipy.spatial.distance import pdist
 import numpy as np
 from numpy.typing import NDArray, ArrayLike
-from typing import Tuple, Dict
+from typing import Tuple
 from image_tools import bwareafilter_props, bwareafilter
 from geometry import ellipse_direction, angle_between_vectors
 from .core import Eye
-import cv2
 
 # TODO implement watershed segmentation for eye and swimmbladder 
 # this may help disconnect eye and swimmbladder when they are 
