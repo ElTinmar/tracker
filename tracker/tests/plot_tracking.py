@@ -90,6 +90,7 @@ class csv_saver(Accumulator):
 
 # background subtracted video
 INPUT_VIDEO = 'toy_data/19-40-44_nobckg_static.avi'
+PIX_PER_MM = 40
 
 video_reader = Buffered_OpenCV_VideoReader()
 video_reader.open_file(INPUT_VIDEO)
@@ -117,7 +118,7 @@ display_tail.start()
 # tracking 
 animal_tracker = AnimalTracker_CPU(
     AnimalTrackerParamTracking(
-        pix_per_mm=40,
+        pix_per_mm=PIX_PER_MM,
         target_pix_per_mm=7.5,
         animal_intensity=0.07,
         animal_brightness=0.0,
@@ -136,7 +137,7 @@ animal_tracker = AnimalTracker_CPU(
 )
 body_tracker = BodyTracker_CPU(
     BodyTrackerParamTracking(
-        pix_per_mm=40,
+        pix_per_mm=PIX_PER_MM,
         target_pix_per_mm=10,
         body_intensity=0.20,
         body_brightness=0.0,
@@ -154,7 +155,7 @@ body_tracker = BodyTracker_CPU(
 )
 eyes_tracker = EyesTracker_CPU(
     EyesTrackerParamTracking(
-        pix_per_mm=40,
+        pix_per_mm=PIX_PER_MM,
         target_pix_per_mm=40,
         eye_brightness=0.0,
         eye_gamma=3.0,
@@ -170,7 +171,7 @@ eyes_tracker = EyesTracker_CPU(
 )
 tail_tracker = TailTracker_CPU(
     TailTrackerParamTracking(
-        pix_per_mm=40,
+        pix_per_mm=PIX_PER_MM,
         target_pix_per_mm=20,
         ball_radius_mm=0.05,
         arc_angle_deg=90,
