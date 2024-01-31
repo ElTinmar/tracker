@@ -99,7 +99,13 @@ VIDEOS = [
 INPUT_VIDEO, PIX_PER_MM = VIDEOS[0]
 
 video_reader = InMemory_OpenCV_VideoReader()
-video_reader.open_file(INPUT_VIDEO, memsize_bytes=4e9, safe=False)
+video_reader.open_file(
+    filename = INPUT_VIDEO, 
+    memsize_bytes = 4e9, 
+    safe = False, 
+    single_precision = True, # WEIRD pre-converting to SP makes the loop slower ???
+    grayscale = True
+)
 
 height = video_reader.get_height()
 width = video_reader.get_width()
@@ -296,9 +302,7 @@ video_writer.close()
 video_writer_eyes.close()
 video_writer_tail.close()
 
-
 # plot
-
 import matplotlib.pyplot as plt
 import cv2
 
