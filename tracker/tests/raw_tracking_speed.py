@@ -28,7 +28,7 @@ video_reader.open_file(
     filename = INPUT_VIDEO, 
     memsize_bytes = 4e9, 
     safe = False, 
-    single_precision = True, 
+    single_precision = True, # WEIRD pre-converting to SP makes the loop slower ???
     grayscale = True
 )
 
@@ -45,8 +45,7 @@ accumulator = None
 
 # those parameters impact performance if > 0:
 #   - median_filter_sz_mm
-#   - max_animal_length_mm
-#   - max_animal_size_mm
+#   - max_animal_length_mm 
 #   - max_animal_width_mm
 
 animal_tracker = AnimalTracker_CPU(
