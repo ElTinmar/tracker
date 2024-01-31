@@ -58,8 +58,8 @@ class BodyTracker_CPU(BodyTracker):
                 heading = None,
                 centroid = None,
                 angle_rad = None,
-                mask = im2uint8(mask),
-                image = im2uint8(image)
+                mask = mask,
+                image = image
             )
             return res
         
@@ -84,8 +84,8 @@ class BodyTracker_CPU(BodyTracker):
                     heading = None,
                     centroid = None,
                     angle_rad = None,
-                    mask = im2uint8(mask),
-                    image = im2uint8(image)
+                    mask = mask,
+                    image = image
                 )
                 return res
                     
@@ -95,7 +95,7 @@ class BodyTracker_CPU(BodyTracker):
                 heading = principal_components,
                 centroid = centroid_coords / self.tracking_param.resize,
                 angle_rad = np.arctan2(principal_components[1,1], principal_components[0,1]),
-                mask = im2uint8(mask),
-                image = im2uint8(image)
+                mask = mask,
+                image = image
             )
             return res

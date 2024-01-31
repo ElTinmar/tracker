@@ -90,8 +90,8 @@ class EyesTracker_CPU(EyesTracker):
             offset = offset,
             left_eye = left_eye,
             right_eye = right_eye,
-            mask = im2uint8(mask),
-            image = im2uint8(image_crop)
+            mask = mask,
+            image = image_crop
         )
 
         return res

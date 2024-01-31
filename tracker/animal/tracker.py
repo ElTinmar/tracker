@@ -59,8 +59,8 @@ class AnimalTracker_CPU(AnimalTracker):
             centroids = centroids/self.tracking_param.resize,
             bounding_boxes = bboxes/self.tracking_param.resize,
             bb_centroids = bb_centroids/self.tracking_param.resize,
-            mask = im2uint8(mask),
-            image = im2uint8(image)
+            mask = mask,
+            image = image
         )
 
         return res

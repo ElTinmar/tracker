@@ -72,7 +72,7 @@ class TailTracker_CPU(TailTracker):
             offset = offset,
             skeleton = skeleton,
             skeleton_interp = skeleton_interp,
-            image = im2uint8(image_crop)
+            image = image_crop
         )    
 
         return res

@@ -21,7 +21,7 @@ VIDEOS = [
     ('toy_data/single_headembedded_544x380px_param_nobckg.avi', 100)
 ]
 # background subtracted video
-INPUT_VIDEO, PIX_PER_MM = VIDEOS[0]
+INPUT_VIDEO, PIX_PER_MM = VIDEOS[2]
 
 video_reader = InMemory_OpenCV_VideoReader()
 video_reader.open_file(
