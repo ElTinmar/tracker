@@ -24,7 +24,13 @@ VIDEOS = [
 INPUT_VIDEO, PIX_PER_MM = VIDEOS[0]
 
 video_reader = InMemory_OpenCV_VideoReader()
-video_reader.open_file(INPUT_VIDEO, memsize_bytes=4e9, safe=False)
+video_reader.open_file(
+    filename = INPUT_VIDEO, 
+    memsize_bytes = 4e9, 
+    safe = False, 
+    single_precision = True, 
+    grayscale = True
+)
 
 height = video_reader.get_height()
 width = video_reader.get_width()
