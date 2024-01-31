@@ -1,4 +1,4 @@
-from video_tools import Buffered_OpenCV_VideoReader
+from video_tools import InMemory_OpenCV_VideoReader
 from image_tools import im2single, im2gray
 from tracker import (
     GridAssignment, MultiFishTracker_CPU,
@@ -23,10 +23,8 @@ VIDEOS = [
 # background subtracted video
 INPUT_VIDEO, PIX_PER_MM = VIDEOS[0]
 
-
-video_reader = Buffered_OpenCV_VideoReader()
-video_reader.open_file(INPUT_VIDEO)
-video_reader.start()
+video_reader = InMemory_OpenCV_VideoReader()
+video_reader.open_file(INPUT_VIDEO, memsize_bytes=4e9, safe=False)
 
 height = video_reader.get_height()
 width = video_reader.get_width()
@@ -131,6 +129,7 @@ tracker = MultiFishTracker_CPU(
 
 with cProfile.Profile() as pr:
 
+    print('Tracking ...')
     for i in tqdm(range(num_frames)):
         (rval, frame) = video_reader.next_frame()
         if not rval:
@@ -142,8 +141,7 @@ with cProfile.Profile() as pr:
         # track
         tracking = tracker.track(frame_gray)
 
-    video_reader.exit()
-    video_reader.join()
+    video_reader.close()
     
 sortby = SortKey.CUMULATIVE
 ps = pstats.Stats(pr).sort_stats(sortby)

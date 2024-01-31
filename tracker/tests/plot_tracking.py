@@ -1,4 +1,4 @@
-from video_tools import Buffered_OpenCV_VideoReader, VideoDisplay, FFMPEG_VideoWriter, OpenCV_VideoReader
+from video_tools import InMemory_OpenCV_VideoReader, VideoDisplay, FFMPEG_VideoWriter_CPU, OpenCV_VideoReader
 from image_tools import im2single, im2gray
 from tracker import (
     GridAssignment, MultiFishTracker_CPU, MultiFishOverlay_opencv, MultiFishTracking,
@@ -98,9 +98,8 @@ VIDEOS = [
 # background subtracted video
 INPUT_VIDEO, PIX_PER_MM = VIDEOS[0]
 
-video_reader = Buffered_OpenCV_VideoReader()
-video_reader.open_file(INPUT_VIDEO)
-video_reader.start()
+video_reader = InMemory_OpenCV_VideoReader()
+video_reader.open_file(INPUT_VIDEO, memsize_bytes=4e9, safe=False)
 
 height = video_reader.get_height()
 width = video_reader.get_width()
@@ -219,31 +218,25 @@ overlay = MultiFishOverlay_opencv(
     tail_overlay
 )
 
-video_writer = FFMPEG_VideoWriter(
+video_writer = FFMPEG_VideoWriter_CPU(
     height=height,
     width=width,
     fps=EXPORT_FPS,
     filename='19-40-44_tracking.avi',
-    codec = 'libx264',
-    preset = 'medium'
 )
 
-video_writer_eyes= FFMPEG_VideoWriter(
+video_writer_eyes= FFMPEG_VideoWriter_CPU(
     height=eyes_tracker.tracking_param.crop_dimension_px[1],
     width=eyes_tracker.tracking_param.crop_dimension_px[0],
     fps=EXPORT_FPS,
     filename='19-40-44_eyes_tracking.avi',
-    codec = 'libx264',
-    preset = 'medium'
 )
 
-video_writer_tail = FFMPEG_VideoWriter(
+video_writer_tail = FFMPEG_VideoWriter_CPU(
     height=tail_tracker.tracking_param.crop_dimension_px[1],
     width=tail_tracker.tracking_param.crop_dimension_px[0],
     fps=EXPORT_FPS,
     filename='19-40-44_tail_tracking.avi',
-    codec = 'libx264',
-    preset = 'medium'
 )
 
 try:
@@ -290,8 +283,7 @@ try:
             video_writer_tail.write_frame(np.zeros((tail_tracker.tracking_param.crop_dimension_px[1],tail_tracker.tracking_param.crop_dimension_px[0],3), dtype=np.uint8))
 
 finally:
-    video_reader.exit()
-    video_reader.join()
+    video_reader.close()
     display.exit()
     display_eyes.exit()
     display_tail.exit()
