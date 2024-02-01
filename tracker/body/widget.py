@@ -5,6 +5,7 @@ from .overlay import BodyOverlay_opencv
 from qt_widgets import NDarray_to_QPixmap, LabeledDoubleSpinBox, LabeledSpinBox
 import cv2
 from geometry import Affine2DTransform
+from image_tools import im2uint8
 
 # TODO maybe group settings into collapsable blocks
 
@@ -217,8 +218,8 @@ class BodyTrackerWidget(QWidget):
             T = Affine2DTransform.scaling(s, s)
            
             zoom = self.zoom.value()/100.0
-            image = cv2.resize(tracking.image,None,None,zoom,zoom,cv2.INTER_NEAREST)
-            mask = cv2.resize(tracking.mask,None,None,zoom,zoom,cv2.INTER_NEAREST)
+            image = cv2.resize(im2uint8(tracking.image),None,None,zoom,zoom,cv2.INTER_NEAREST)
+            mask = cv2.resize(im2uint8(tracking.mask),None,None,zoom,zoom,cv2.INTER_NEAREST)
             self.image.setPixmap(NDarray_to_QPixmap(image))
             self.mask.setPixmap(NDarray_to_QPixmap(mask))
 

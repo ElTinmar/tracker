@@ -5,7 +5,7 @@ from .overlay import EyesOverlay_opencv
 from qt_widgets import NDarray_to_QPixmap, LabeledDoubleSpinBox, LabeledSpinBox
 import cv2
 from geometry import Affine2DTransform
-
+from image_tools import im2uint8
 
 # TODO maybe group settings into collapsable blocks
 
@@ -207,8 +207,8 @@ class EyesTrackerWidget(QWidget):
             overlay = self.overlay.overlay(tracking.image, tracking, T @ S)
 
             zoom = self.zoom.value()/100.0
-            image = cv2.resize(tracking.image,None,None,zoom,zoom,cv2.INTER_NEAREST)
-            mask = cv2.resize(tracking.mask,None,None,zoom,zoom,cv2.INTER_NEAREST)
+            image = cv2.resize(im2uint8(tracking.image),None,None,zoom,zoom,cv2.INTER_NEAREST)
+            mask = cv2.resize(im2uint8(tracking.mask),None,None,zoom,zoom,cv2.INTER_NEAREST)
             overlay = cv2.resize(overlay,None,None,zoom,zoom,cv2.INTER_NEAREST)
 
             self.image.setPixmap(NDarray_to_QPixmap(image))
