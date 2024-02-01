@@ -240,10 +240,10 @@ class TailTrackerWidget(QWidget):
             tx, ty = -tracking.offset
             S = Affine2DTransform.scaling(s,s)
             T = Affine2DTransform.translation(tx, ty)
-            overlay = self.overlay.overlay(im2uint8(tracking.image), tracking, T @ S)
+            overlay = self.overlay.overlay(tracking.image, tracking, T @ S)
 
             zoom = self.zoom.value()/100.0
-            image = cv2.resize(tracking.image,None,None,zoom,zoom,cv2.INTER_NEAREST)
+            image = cv2.resize(im2uint8(tracking.image),None,None,zoom,zoom,cv2.INTER_NEAREST)
             overlay = cv2.resize(overlay,None,None,zoom,zoom,cv2.INTER_NEAREST)
 
             self.image.setPixmap(NDarray_to_QPixmap(image))
