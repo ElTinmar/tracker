@@ -172,9 +172,6 @@ class EyesTrackerWidget(QWidget):
 
     def update_tracker(self) -> None:
 
-        self.median_filter_sz_mm.setRange(1/self.target_pix_per_mm.value(), 1000)
-        self.blur_sz_mm.setRange(1/self.target_pix_per_mm.value(), 1000)
-
         tracker_param = EyesTrackerParamTracking(
             pix_per_mm = self.pix_per_mm.value(),
             target_pix_per_mm = self.target_pix_per_mm.value(),

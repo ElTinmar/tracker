@@ -5,7 +5,7 @@ from .overlay import TailOverlay_opencv
 from qt_widgets import NDarray_to_QPixmap, LabeledDoubleSpinBox, LabeledSpinBox
 import cv2
 from geometry import Affine2DTransform
-
+from image_tools import im2uint8
 
 # TODO maybe group settings into collapsable blocks
 
@@ -205,9 +205,6 @@ class TailTrackerWidget(QWidget):
         self.setLayout(mainlayout)
 
     def update_tracker(self) -> None:
-    
-        self.median_filter_sz_mm.setRange(1/self.target_pix_per_mm.value(), 1000)
-        self.blur_sz_mm.setRange(1/self.target_pix_per_mm.value(), 1000)
 
         tracker_param = TailTrackerParamTracking(
             pix_per_mm = self.pix_per_mm.value(),
@@ -243,7 +240,7 @@ class TailTrackerWidget(QWidget):
             tx, ty = -tracking.offset
             S = Affine2DTransform.scaling(s,s)
             T = Affine2DTransform.translation(tx, ty)
-            overlay = self.overlay.overlay(tracking.image, tracking, T @ S)
+            overlay = self.overlay.overlay(im2uint8(tracking.image), tracking, T @ S)
 
             zoom = self.zoom.value()/100.0
             image = cv2.resize(tracking.image,None,None,zoom,zoom,cv2.INTER_NEAREST)
