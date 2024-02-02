@@ -52,6 +52,9 @@ class MultiFishTracking:
 
         # Pad identities, indices, bodies, eyes, tails 
         # up to max_num_animals with default empty value
+
+        # NOTE: body image may change shape in the corners, needs to be padded
+        # maybe pad original image with pad_value_px/2 and don't min bboxes 
         bodies += [BodyTracking().to_numpy(im_body_shape)] * (max_num_animals - len(bodies))
         eyes += [EyesTracking().to_numpy(im_eyes_shape)] * (max_num_animals - len(eyes))
         tails += [TailTracking().to_numpy(num_tail_pts, num_tail_interp_pts, im_tail_shape)] * (max_num_animals - len(eyes))
