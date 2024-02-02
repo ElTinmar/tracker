@@ -131,20 +131,20 @@ class AnimalTracking:
         '''serialize to fixed-size structured numpy array'''
 
         dt = np.dtype([
-            ('centroid', np.single, (max_num_animals, 2)),
-            ('bounding_boxes', np.single, (max_num_animals, 4)),
-            ('bb_centroids', np.single, (max_num_animals, 2)),
-            ('mask', np.uint8, im_shape),
-            ('image', np.uint8, im_shape),
+            ('centroid', np.float32, (max_num_animals, 2)),
+            ('bounding_boxes', np.float32, (max_num_animals, 4)),
+            ('bb_centroids', np.float32, (max_num_animals, 2)),
+            ('mask', np.bool_, im_shape),
+            ('image', np.float32, im_shape),
         ])
         
         arr = np.array(
             (
-                self.centroids or np.zeros((max_num_animals, 2), np.single), 
-                self.bounding_boxes or np.zeros((max_num_animals, 4), np.single), 
-                self.bb_centroids or np.zeros((max_num_animals, 2), np.single), 
-                self.mask or np.zeros(im_shape, np.uint8), 
-                self.image or np.zeros(im_shape, np.uint8)
+                self.centroids or np.zeros((max_num_animals, 2), np.float32), 
+                self.bounding_boxes or np.zeros((max_num_animals, 4), np.float32), 
+                self.bb_centroids or np.zeros((max_num_animals, 2), np.float32), 
+                self.mask or np.zeros(im_shape, np.bool_), 
+                self.image or np.zeros(im_shape, np.float32)
             ), 
             dtype=dt
         )

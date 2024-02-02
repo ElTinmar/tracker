@@ -149,22 +149,22 @@ class EyesTracking:
         right_eye = self.right_eye.to_numpy()
 
         dt = np.dtype([
-            ('centroid', np.single, (1,2)),
-            ('offset',  np.single, (1,2)),
+            ('centroid', np.float32, (1,2)),
+            ('offset',  np.float32, (1,2)),
             ('left_eye',  left_eye.dtype, left_eye.shape),
             ('right_eye',  right_eye.dtype, right_eye.shape),
-            ('mask',  np.uint8, im_shape),
-            ('image',  np.uint8, im_shape),
+            ('mask',  np.bool_, im_shape),
+            ('image',  np.float32, im_shape),
         ])
 
         arr = np.array(
             (
-                self.centroid or np.zeros((1,2), np.single),
-                self.offset or np.zeros((1,2), np.single),
+                self.centroid or np.zeros((1,2), np.float32),
+                self.offset or np.zeros((1,2), np.float32),
                 left_eye, 
                 right_eye,                
-                self.mask or np.zeros(im_shape, np.uint8), 
-                self.image or np.zeros(im_shape, np.uint8)
+                self.mask or np.zeros(im_shape, np.bool_), 
+                self.image or np.zeros(im_shape, np.float32)
             ), 
             dtype=dt
         )

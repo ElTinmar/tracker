@@ -127,20 +127,20 @@ class BodyTracking:
         '''serialize to fixed-size structured numpy array'''
 
         dt = np.dtype([
-            ('heading', np.single, (2,2)),
-            ('centroid',  np.single, (1,2)),
-            ('angle_rad',  np.single, (1,)),
-            ('mask',  np.uint8, im_shape),
-            ('image',  np.uint8, im_shape),
+            ('heading', np.float32, (2,2)),
+            ('centroid',  np.float32, (1,2)),
+            ('angle_rad',  np.float32, (1,)),
+            ('mask',  np.bool_, im_shape),
+            ('image',  np.float32, im_shape),
         ])
 
         arr = np.array(
             (
-                self.heading or np.zeros((2,2), np.single), 
-                self.centroid or np.zeros((1,2), np.single),
+                self.heading or np.zeros((2,2), np.float32), 
+                self.centroid or np.zeros((1,2), np.float32),
                 self.angle_rad or 0.0, 
-                self.mask or np.zeros(im_shape, np.uint8), 
-                self.image or np.zeros(im_shape, np.uint8)
+                self.mask or np.zeros(im_shape, np.bool_), 
+                self.image or np.zeros(im_shape, np.float32)
             ), 
             dtype=dt
         )

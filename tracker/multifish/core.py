@@ -63,7 +63,7 @@ class MultiFishTracking:
             ('bodies',  bodies[0].dtype, (max_num_animals,)),
             ('eyes',  eyes[0].dtype, (max_num_animals,)),
             ('tails',  tails[0].dtype, (max_num_animals,)),
-            ('image',  np.uint8, im_shape)
+            ('image',  np.float32, im_shape)
         ])
 
         arr = np.array(

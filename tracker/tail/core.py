@@ -125,20 +125,20 @@ class TailTracking:
         '''serialize to fixed-size structured numpy array'''
         
         dt = np.dtype([
-            ('centroid', np.single, (1,2)),
-            ('offset',  np.single, (1,2)),
-            ('skeleton',  np.single, (num_tail_pts,2)),
-            ('skeleton_interp',  np.single, (num_tailinterp_pts,2)),
-            ('image',  np.uint8, im_shape)
+            ('centroid', np.float32, (1,2)),
+            ('offset',  np.float32, (1,2)),
+            ('skeleton',  np.float32, (num_tail_pts,2)),
+            ('skeleton_interp',  np.float32, (num_tailinterp_pts,2)),
+            ('image',  np.float32, im_shape)
         ])
 
         arr = np.array(
             (
-                self.centroid or np.zeros((1,2), np.single),
-                self.offset or np.zeros((1,2), np.single),
-                self.skeleton or np.zeros((num_tail_pts,2), np.single),
-                self.skeleton_interp or np.zeros((num_tailinterp_pts,2), np.single),
-                self.image or np.zeros(im_shape, np.uint8)
+                self.centroid or np.zeros((1,2), np.float32),
+                self.offset or np.zeros((1,2), np.float32),
+                self.skeleton or np.zeros((num_tail_pts,2), np.float32),
+                self.skeleton_interp or np.zeros((num_tailinterp_pts,2), np.float32),
+                self.image or np.zeros(im_shape, np.float32)
             ), 
             dtype=dt
         )
