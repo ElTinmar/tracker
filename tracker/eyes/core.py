@@ -109,9 +109,9 @@ class Eye:
 
         arr = np.array(
             (
-                self.direction or np.zeros((1,2), np.single), 
-                self.angle or np.zeros((1,), np.single), 
-                self.centroid or np.zeros((1,2), np.single)
+                np.zeros((1,2), np.single) if self.direction is None else self.direction, 
+                np.zeros((1,), np.single) if self.angle is None else self.angle, 
+                np.zeros((1,2), np.single) if self.centroid is None else self.centroid
             ), 
             dtype=dt
         )
@@ -159,12 +159,12 @@ class EyesTracking:
 
         arr = np.array(
             (
-                self.centroid or np.zeros((1,2), np.float32),
-                self.offset or np.zeros((1,2), np.float32),
+                np.zeros((1,2), np.float32) if self.centroid is None else self.centroid,
+                np.zeros((1,2), np.float32) if self.offset is None else self.offset,
                 left_eye, 
                 right_eye,                
-                self.mask or np.zeros(im_shape, np.bool_), 
-                self.image or np.zeros(im_shape, np.float32)
+                np.zeros(im_shape, np.bool_) if self.mask is None else self.mask, 
+                np.zeros(im_shape, np.float32) if self.image is None else self.image 
             ), 
             dtype=dt
         )

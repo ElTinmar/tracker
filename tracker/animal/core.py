@@ -140,11 +140,11 @@ class AnimalTracking:
         
         arr = np.array(
             (
-                self.centroids or np.zeros((max_num_animals, 2), np.float32), 
-                self.bounding_boxes or np.zeros((max_num_animals, 4), np.float32), 
-                self.bb_centroids or np.zeros((max_num_animals, 2), np.float32), 
-                self.mask or np.zeros(im_shape, np.bool_), 
-                self.image or np.zeros(im_shape, np.float32)
+                np.zeros((max_num_animals, 2), np.float32) if self.centroids is None else self.centroids, 
+                np.zeros((max_num_animals, 4), np.float32) if self.bounding_boxes is None else self.bounding_boxes, 
+                np.zeros((max_num_animals, 2), np.float32) if self.bb_centroids is None else self.bb_centroids, 
+                np.zeros(im_shape, np.bool_) if self.mask is None else self.mask, 
+                np.zeros(im_shape, np.float32) if self.image is None else self.image
             ), 
             dtype=dt
         )

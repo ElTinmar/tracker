@@ -134,11 +134,11 @@ class TailTracking:
 
         arr = np.array(
             (
-                self.centroid or np.zeros((1,2), np.float32),
-                self.offset or np.zeros((1,2), np.float32),
-                self.skeleton or np.zeros((num_tail_pts,2), np.float32),
-                self.skeleton_interp or np.zeros((num_tailinterp_pts,2), np.float32),
-                self.image or np.zeros(im_shape, np.float32)
+                np.zeros((1,2), np.float32) if self.centroid is None else self.centroid, 
+                np.zeros((1,2), np.float32) if self.offset is None else self.offset,
+                np.zeros((num_tail_pts,2), np.float32) if self.skeleton is None else self.skeleton,
+                np.zeros((num_tailinterp_pts,2), np.float32) if self.skeleton_interp is None else self.skeleton_interp,
+                np.zeros(im_shape, np.float32) if self.image is None else self.image
             ), 
             dtype=dt
         )
