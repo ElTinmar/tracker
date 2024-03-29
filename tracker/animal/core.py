@@ -106,6 +106,7 @@ class AnimalTracking:
             self,
             centroids: Optional[NDArray] = None,
             bounding_boxes: Optional[NDArray] = None,
+            padding: Optional[NDArray] = None,
             bb_centroids: Optional[NDArray] = None,
             mask: Optional[NDArray] = None,
             image: Optional[NDArray] = None
@@ -113,6 +114,7 @@ class AnimalTracking:
         
         self.centroids = centroids # nx2 vector. (x,y) coordinates of the n fish centroid ~ swim bladder location
         self.bounding_boxes = bounding_boxes 
+        self.padding = padding 
         self.bb_centroids = bb_centroids
         self.mask = mask
         self.image = image
@@ -133,6 +135,7 @@ class AnimalTracking:
         dt = np.dtype([
             ('centroid', np.float32, (max_num_animals, 2)),
             ('bounding_boxes', np.float32, (max_num_animals, 4)),
+            ('padding', np.float32, (max_num_animals, 4)),
             ('bb_centroids', np.float32, (max_num_animals, 2)),
             ('mask', np.bool_, im_shape),
             ('image', np.float32, im_shape),
@@ -141,7 +144,8 @@ class AnimalTracking:
         arr = np.array(
             (
                 np.zeros((max_num_animals, 2), np.float32) if self.centroids is None else self.centroids, 
-                np.zeros((max_num_animals, 4), np.float32) if self.bounding_boxes is None else self.bounding_boxes, 
+                np.zeros((max_num_animals, 4), np.float32) if self.bounding_boxes is None else self.bounding_boxes,
+                np.zeros((max_num_animals, 4), np.float32) if self.padding is None else self.padding, 
                 np.zeros((max_num_animals, 2), np.float32) if self.bb_centroids is None else self.bb_centroids, 
                 np.zeros(im_shape, np.bool_) if self.mask is None else self.mask, 
                 np.zeros(im_shape, np.float32) if self.image is None else self.image

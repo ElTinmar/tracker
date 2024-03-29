@@ -35,21 +35,23 @@ class MultiFishTracker_CPU(MultiFishTracker):
         data = np.hstack(
             (identities[np.newaxis].T, 
              animals.bb_centroids[to_keep,:], 
-             animals.bounding_boxes[to_keep,:])
+             animals.bounding_boxes[to_keep,:],
+             animals.padding[to_keep,:])
         ) 
 
         # loop over detected animals to get body, eyes and tail tracking
         body = {}
         eyes = {}
         tail = {}
-        for (id, bb_x, bb_y, left, bottom, right, top) in data.astype(np.int64): 
+        for (id, bb_x, bb_y, left, bottom, right, top, pad_left, pad_bottom, pad_right, pad_top) in data.astype(np.int64): 
             eyes[id] = None
             tail[id] = None
             body[id] = None
 
             # crop each animal's bounding box
             image_cropped = image[bottom:top, left:right] # TODO need to pad here if image was clipped on the edges
-            offset = np.array([bb_x, bb_y])
+            image_cropped = np.pad(image_cropped,((pad_bottom, pad_top),(pad_left, pad_right)))
+            offset = np.array([pad_left+bb_x, pad_bottom+bb_y])
 
             if self.body is not None:
 
