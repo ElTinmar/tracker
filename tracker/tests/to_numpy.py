@@ -123,3 +123,15 @@ frame_gray = im2single(im2gray(frame))
 tracking = tracker.track(frame_gray)
 
 tracking.body[0].to_numpy((80,51))
+
+tracking.to_numpy(
+    max_num_animals=tracker.max_num_animals,
+    num_tail_pts=tracker.tail.tracking_param.n_tail_points,
+    num_tail_interp_pts=tracker.tail.tracking_param.n_pts_interp,
+    im_shape=(94,94),
+    im_body_shape=(),
+    im_eyes_shape=(),
+    im_tail_shape=()
+)
+
+ 
