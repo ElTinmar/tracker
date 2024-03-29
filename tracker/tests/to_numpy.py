@@ -125,7 +125,7 @@ tracking = tracker.track(frame_gray)
 
 tracking.body[0].to_numpy((80,80))
 
-tracking.to_numpy(
+arr = tracking.to_numpy(
     max_num_animals=tracker.max_num_animals,
     num_tail_pts=tracker.tail.tracking_param.n_tail_points,
     num_tail_interp_pts=tracker.tail.tracking_param.n_pts_interp,
