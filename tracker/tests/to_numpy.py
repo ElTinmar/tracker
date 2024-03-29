@@ -118,11 +118,12 @@ tracker = MultiFishTracker_CPU(
     tail=tail_tracker
 )
 
+
 (rval, frame) = video_reader.next_frame()
 frame_gray = im2single(im2gray(frame))
 tracking = tracker.track(frame_gray)
 
-tracking.body[0].to_numpy((80,51))
+tracking.body[0].to_numpy((80,80))
 
 tracking.to_numpy(
     max_num_animals=tracker.max_num_animals,
@@ -130,20 +131,10 @@ tracking.to_numpy(
     num_tail_interp_pts=tracker.tail.tracking_param.n_pts_interp,
     im_shape=(500,504),
     im_animal_shape=(94,94), 
-    im_body_shape=(80,51),
+    im_body_shape=(80,80),
     im_eyes_shape=(60,40),
     im_tail_shape=(70,70)
 )
 
-tracking.to_numpy(
-    max_num_animals=tracker.max_num_animals,
-    num_tail_pts=tracker.tail.tracking_param.n_tail_points,
-    num_tail_interp_pts=tracker.tail.tracking_param.n_pts_interp,
-    im_shape=(500,504),
-    im_animal_shape=(tracker.animal.tracking_param.resize*500,tracker.animal.tracking_param.resize*504),
-    im_body_shape=(80,51),
-    im_eyes_shape=(60,40),
-    im_tail_shape=(70,70)
-)
 
  
