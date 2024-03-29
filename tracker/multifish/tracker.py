@@ -48,8 +48,9 @@ class MultiFishTracker_CPU(MultiFishTracker):
             body[id] = None
 
             # crop each animal's bounding box
-            image_cropped = image[bottom:top, left:right] 
+            image_cropped = image[bottom:top, left:right] # TODO need to pad here if image was clipped on the edges
             offset = np.array([bb_x, bb_y])
+
             if self.body is not None:
 
                 # get more precise centroid and orientation of the animals
