@@ -45,7 +45,8 @@ class MultiFishTracking:
         ) -> NDArray:
         '''serialize to fixed-size structured numpy array'''
 
-        animals = self.animals.to_numpy()
+        #
+        animals = self.animals.to_numpy(max_num_animals=max_num_animals, im_shape=im_shape) 
         bodies = [body.to_numpy() for body in self.body]
         eyes = [eyes.to_numpy() for eyes in self.eyes]
         tails = [tail.to_numpy() for tail in self.tail]
