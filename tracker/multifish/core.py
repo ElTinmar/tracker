@@ -39,6 +39,7 @@ class MultiFishTracking:
             num_tail_pts: int = 20,
             num_tail_interp_pts: int = 40,
             im_shape: Optional[ArrayLike] = None,
+            im_animal_shape: Optional[ArrayLike] = None,
             im_body_shape: Optional[ArrayLike] = None,
             im_eyes_shape: Optional[ArrayLike] = None,
             im_tail_shape: Optional[ArrayLike] = None
@@ -46,7 +47,7 @@ class MultiFishTracking:
         '''serialize to fixed-size structured numpy array'''
 
         #
-        animals = self.animals.to_numpy(max_num_animals=max_num_animals, im_shape=im_shape) 
+        animals = self.animals.to_numpy(max_num_animals=max_num_animals, im_shape=im_animal_shape) 
         bodies = [body.to_numpy(im_shape=im_body_shape) for id, body in self.body.items()]
         eyes = [eyes.to_numpy(im_shape=im_eyes_shape) for id, eyes in self.eyes.items()]
         tails = [tail.to_numpy(im_shape=im_tail_shape,num_tail_pts=num_tail_pts,num_tailinterp_pts=num_tail_interp_pts) for id, tail in self.tail.items()]
@@ -62,12 +63,12 @@ class MultiFishTracking:
         
         dt = np.dtype([
             ('identities', self.identities.dtype, (max_num_animals,)),
-            ('indices',  self.indices.dtype, (max_num_animals,)),
-            ('animals',  animals.dtype, (1,)),
-            ('bodies',  bodies[0].dtype, (max_num_animals,)),
-            ('eyes',  eyes[0].dtype, (max_num_animals,)),
-            ('tails',  tails[0].dtype, (max_num_animals,)),
-            ('image',  np.float32, im_shape)
+            ('indices', self.indices.dtype, (max_num_animals,)),
+            ('animals', animals.dtype, (1,)),
+            ('bodies', bodies[0].dtype, (max_num_animals,)),
+            ('eyes', eyes[0].dtype, (max_num_animals,)),
+            ('tails', tails[0].dtype, (max_num_animals,)),
+            ('image', np.float32, im_shape)
         ])
 
         arr = np.array(
