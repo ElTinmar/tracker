@@ -48,8 +48,8 @@ class AnimalTracker_CPU(AnimalTracker):
         bboxes = np.zeros((centroids.shape[0],4), dtype=int)
         bb_centroids = np.zeros((centroids.shape[0],2), dtype=float)
         for idx, (x,y) in enumerate(centroids):
-            left = max(int(x - self.tracking_param.pad_value_px), 0) 
-            bottom = max(int(y - self.tracking_param.pad_value_px), 0) 
+            left = max(int(x - self.tracking_param.pad_value_px), 0)
+            bottom = max(int(y - self.tracking_param.pad_value_px), 0)
             right = min(int(x + self.tracking_param.pad_value_px), width)
             top = min(int(y + self.tracking_param.pad_value_px), height)
             bboxes[idx,:] = [left,bottom,right,top]
