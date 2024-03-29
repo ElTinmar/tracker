@@ -73,7 +73,7 @@ def tail_skeleton_max(
 
         return (skeleton, skeleton_interp)
 
-@njit
+@njit(cache=True)
 def get_skeleton_ball(
         arc_rad, 
         n_pts_arc,
