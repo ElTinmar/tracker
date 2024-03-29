@@ -88,7 +88,7 @@ def get_skeleton_ball(
 
     arc = np.linspace(-arc_rad, arc_rad, n_pts_arc) + start_angle
     points = [[x, y]]
-    for j in range(n_tail_points):
+    for j in range(n_tail_points-1):
         # Find the x and y values of the arc centered around current x and y
         xs = x + spacing * np.cos(arc)
         ys = y - spacing * np.sin(arc)

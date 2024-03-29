@@ -47,9 +47,9 @@ class MultiFishTracking:
 
         #
         animals = self.animals.to_numpy(max_num_animals=max_num_animals, im_shape=im_shape) 
-        bodies = [body.to_numpy() for body in self.body]
-        eyes = [eyes.to_numpy() for eyes in self.eyes]
-        tails = [tail.to_numpy() for tail in self.tail]
+        bodies = [body.to_numpy(im_shape=im_body_shape) for id, body in self.body.items()]
+        eyes = [eyes.to_numpy(im_shape=im_eyes_shape) for id, eyes in self.eyes.items()]
+        tails = [tail.to_numpy(im_shape=im_tail_shape,num_tail_pts=num_tail_pts,num_tailinterp_pts=num_tail_interp_pts) for id, tail in self.tail.items()]
 
         # Pad identities, indices, bodies, eyes, tails 
         # up to max_num_animals with default empty value
