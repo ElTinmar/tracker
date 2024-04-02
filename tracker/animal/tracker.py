@@ -91,7 +91,7 @@ class AnimalTracker_CPU(AnimalTracker):
             indices = to_keep,
             centroids = centroids_ori,
             bounding_boxes = bboxes_ori.astype(int),
-            padding = padding_ori.astype(int), # TODO make sure that stays consistent with rounding
+            padding = padding_ori.astype(int), 
             bb_centroids = bb_centroids_ori,
             mask = mask,
             image = image
