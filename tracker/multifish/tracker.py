@@ -13,10 +13,9 @@ class MultiFishTracker_CPU(MultiFishTracker):
 
         # get animal centroids (only crude location is necessary)
         animals = self.animal.track(image)
-        centroids = animals.centroids
 
         # if nothing was detected at that stage, stop here
-        if centroids.size == 0:
+        if animals.identities.size == 0:
             res = MultiFishTracking(
                 identities =  None, 
                 indices = None,
@@ -28,22 +27,18 @@ class MultiFishTracker_CPU(MultiFishTracker):
             )
             return res
         
-        # assign identities to animals 
-        self.assignment.update(centroids)
-        identities = self.assignment.get_ID()
-        to_keep = self.assignment.get_kept_centroids()        
-        data = np.hstack(
-            (identities[np.newaxis].T, 
-             animals.bb_centroids[to_keep,:], 
-             animals.bounding_boxes[to_keep,:],
-             animals.padding[to_keep,:])
-        ) 
 
         # loop over detected animals to get body, eyes and tail tracking
         body = {}
         eyes = {}
         tail = {}
-        for (id, bb_x, bb_y, left, bottom, right, top, pad_left, pad_bottom, pad_right, pad_top) in data.astype(np.int64): 
+
+        for id in animals.identities:
+
+            bb_x, bb_y = animals.bb_centroids[id,:]
+            left, bottom, right, top = animals.bounding_boxes[id,:]
+            pad_left, pad_bottom, pad_right, pad_top = animals.padding[id,:]
+            
             eyes[id] = None
             tail[id] = None
             body[id] = None
@@ -80,8 +75,6 @@ class MultiFishTracker_CPU(MultiFishTracker):
 
         # save tracking results and return
         res = MultiFishTracking(
-            identities =  identities, 
-            indices = to_keep,
             animals = animals,
             body = body,
             eyes = eyes,

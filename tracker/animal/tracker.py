@@ -5,7 +5,6 @@ import cv2
 from typing import Optional
 from .core import AnimalTracker, AnimalTracking
 
-
 class AnimalTracker_CPU(AnimalTracker):
     
     def track(self, image: NDArray, centroid: Optional[NDArray] = None) -> Optional[AnimalTracking]:
@@ -45,6 +44,18 @@ class AnimalTracker_CPU(AnimalTracker):
             max_width = self.tracking_param.max_animal_width_px
         )
 
+        if centroids.size == 0:
+            res = AnimalTracking(
+                identities = None,
+                centroids = None,
+                bounding_boxes = None,
+                padding = None,
+                bb_centroids = None,
+                mask = mask,
+                image = image
+            )
+            return res
+
         bboxes = np.zeros((centroids.shape[0],4), dtype=int)
         padding = np.zeros((centroids.shape[0],4), dtype=int)
         bb_centroids = np.zeros((centroids.shape[0],2), dtype=float)
@@ -64,13 +75,18 @@ class AnimalTracker_CPU(AnimalTracker):
             padding[idx,:] = [pad_left,pad_bottom,pad_right,pad_top]
             bb_centroids[idx,:] = [x-left, y-bottom] 
 
+        # identity assignment
+        self.assignment.update(centroids)
+        identities = self.assignment.get_ID()
+        to_keep = self.assignment.get_kept_centroids()   
+
         res = AnimalTracking(
-            centroids = centroids/self.tracking_param.resize,
-            bounding_boxes = bboxes/self.tracking_param.resize,
-            padding = padding/self.tracking_param.resize,
-            bb_centroids = bb_centroids/self.tracking_param.resize,
+            identities = identities,
+            centroids = centroids[to_keep,:]/self.tracking_param.resize,
+            bounding_boxes = bboxes[to_keep,:]/self.tracking_param.resize,
+            padding = padding[to_keep,:]/self.tracking_param.resize,
+            bb_centroids = bb_centroids[to_keep,:]/self.tracking_param.resize,
             mask = mask,
             image = image
         )
-
         return res

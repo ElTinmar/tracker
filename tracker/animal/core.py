@@ -1,8 +1,16 @@
-from typing import Optional
+from typing import Optional, Protocol
 from numpy.typing import NDArray, ArrayLike
 from dataclasses import dataclass
 from tracker.core import Tracker, TrackingOverlay
 import numpy as np
+
+class Assignment(Protocol):
+    
+    def update(self):
+        ...
+    
+    def get_ID(self):
+        ...
 
 @dataclass
 class AnimalTrackerParamTracking:
@@ -104,6 +112,7 @@ class AnimalTrackerParamOverlay:
 class AnimalTracking:
     def __init__(
             self,
+            identities: Optional[NDArray] = None,
             centroids: Optional[NDArray] = None,
             bounding_boxes: Optional[NDArray] = None,
             padding: Optional[NDArray] = None,
@@ -112,6 +121,7 @@ class AnimalTracking:
             image: Optional[NDArray] = None
         ) -> None:
         
+        self.identities = identities
         self.centroids = centroids # nx2 vector. (x,y) coordinates of the n fish centroid ~ swim bladder location
         self.bounding_boxes = bounding_boxes 
         self.padding = padding 
@@ -133,6 +143,7 @@ class AnimalTracking:
         '''serialize to fixed-size structured numpy array'''
 
         dt = np.dtype([
+            ('identities', int, (max_num_animals, 1)),
             ('centroid', np.float32, (max_num_animals, 2)),
             ('bounding_boxes', np.float32, (max_num_animals, 4)),
             ('padding', np.float32, (max_num_animals, 4)),
@@ -143,6 +154,7 @@ class AnimalTracking:
         
         arr = np.array(
             (
+                np.zeros((max_num_animals, 1), int) if self.identities is None else self.identities, 
                 np.zeros((max_num_animals, 2), np.float32) if self.centroids is None else self.centroids, 
                 np.zeros((max_num_animals, 4), np.float32) if self.bounding_boxes is None else self.bounding_boxes,
                 np.zeros((max_num_animals, 4), np.float32) if self.padding is None else self.padding, 
@@ -158,10 +170,13 @@ class AnimalTracker(Tracker):
 
     def __init__(
             self, 
+            assignment: Assignment,
             tracking_param: AnimalTrackerParamTracking, 
         ):
 
         self.tracking_param = tracking_param
+        self.assignment = assignment
+
 
 class AnimalOverlay(TrackingOverlay):
 

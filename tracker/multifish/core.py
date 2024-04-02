@@ -12,17 +12,9 @@ class Accumulator(Protocol):
     def update(self):
         ...
 
-class Assignment(Protocol):
-    def update(self):
-        ...
-    
-    def get_ID(self):
-        ...
 
 @dataclass
 class MultiFishTracking:
-    identities: NDArray
-    indices: NDArray
     animals: AnimalTracking
     body: Optional[List[BodyTracking]]
     eyes: Optional[List[EyesTracking]]
@@ -52,18 +44,12 @@ class MultiFishTracking:
         eyes = [eyes.to_numpy(im_shape=im_eyes_shape) for id, eyes in self.eyes.items()]
         tails = [tail.to_numpy(im_shape=im_tail_shape,num_tail_pts=num_tail_pts,num_tailinterp_pts=num_tail_interp_pts) for id, tail in self.tail.items()]
 
-        # Pad identities, indices, bodies, eyes, tails 
-        # up to max_num_animals with default empty value
-
-        # NOTE: body image may change shape in the corners, needs to be padded
-        # maybe pad original image with pad_value_px/2 and don't min bboxes 
+        # pad missing data
         bodies += [BodyTracking().to_numpy(im_body_shape)] * (max_num_animals - len(bodies))
         eyes += [EyesTracking().to_numpy(im_eyes_shape)] * (max_num_animals - len(eyes))
         tails += [TailTracking().to_numpy(num_tail_pts, num_tail_interp_pts, im_tail_shape)] * (max_num_animals - len(eyes))
         
         dt = np.dtype([
-            ('identities', self.identities.dtype, (max_num_animals,)),
-            ('indices', self.indices.dtype, (max_num_animals,)),
             ('animals', animals.dtype, (1,)),
             ('bodies', bodies[0].dtype, (max_num_animals,)),
             ('eyes', eyes[0].dtype, (max_num_animals,)),
@@ -73,8 +59,6 @@ class MultiFishTracking:
 
         arr = np.array(
             (
-                self.identities, 
-                self.indices, 
                 animals, 
                 bodies, 
                 eyes, 
@@ -90,7 +74,6 @@ class MultiFishTracker(Tracker):
     def __init__(
             self, 
             max_num_animals: int,
-            assignment: Assignment,
             accumulator: Accumulator,
             animal: AnimalTracker,
             body: Optional[BodyTracker], 
@@ -98,7 +81,6 @@ class MultiFishTracker(Tracker):
             tail: Optional[TailTracker]
         ):
         self.max_num_animals = max_num_animals
-        self.assignment = assignment
         self.accumulator = accumulator
         self.animal = animal
         self.body = body
