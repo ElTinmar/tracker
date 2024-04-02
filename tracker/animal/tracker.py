@@ -80,13 +80,19 @@ class AnimalTracker_CPU(AnimalTracker):
         identities = self.assignment.get_ID()
         to_keep = self.assignment.get_kept_centroids()   
 
+        # resize to original
+        centroids_ori = centroids[to_keep,:]/self.tracking_param.resize
+        bboxes_ori = bboxes[to_keep,:]/self.tracking_param.resize
+        padding_ori = padding[to_keep,:]/self.tracking_param.resize
+        bb_centroids_ori = bb_centroids[to_keep,:]/self.tracking_param.resize
+
         res = AnimalTracking(
             identities = identities,
             indices = to_keep,
-            centroids = centroids[to_keep,:]/self.tracking_param.resize,
-            bounding_boxes = bboxes[to_keep,:]/self.tracking_param.resize,
-            padding = padding[to_keep,:]/self.tracking_param.resize,
-            bb_centroids = bb_centroids[to_keep,:]/self.tracking_param.resize,
+            centroids = centroids_ori,
+            bounding_boxes = bboxes_ori.astype(int),
+            padding = padding_ori.astype(int), # TODO make sure that stays consistent with rounding
+            bb_centroids = bb_centroids_ori,
             mask = mask,
             image = image
         )
