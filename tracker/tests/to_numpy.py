@@ -36,7 +36,8 @@ accumulator = None
 
 
 animal_tracker = AnimalTracker_CPU(
-    AnimalTrackerParamTracking(
+    assignment=assignment,
+    tracking_param=AnimalTrackerParamTracking(
         pix_per_mm=PIX_PER_MM,
         target_pix_per_mm=7.5,
         animal_intensity=0.07,
@@ -111,7 +112,6 @@ tail_tracker = TailTracker_CPU(
 
 tracker = MultiFishTracker_CPU(
     max_num_animals=1,            
-    assignment=assignment,
     accumulator=accumulator,
     animal=animal_tracker,
     body=body_tracker, 

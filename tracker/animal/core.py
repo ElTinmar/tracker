@@ -158,7 +158,8 @@ class AnimalTracking:
         
         arr = np.array(
             (
-                np.zeros((max_num_animals, 1), int) if self.identities is None else self.identities, 
+                np.zeros((max_num_animals, 1), int) if self.identities is None else self.identities,
+                np.zeros((max_num_animals, 1), int) if self.indices is None else self.indices, 
                 np.zeros((max_num_animals, 2), np.float32) if self.centroids is None else self.centroids, 
                 np.zeros((max_num_animals, 4), np.float32) if self.bounding_boxes is None else self.bounding_boxes,
                 np.zeros((max_num_animals, 4), np.float32) if self.padding is None else self.padding, 
