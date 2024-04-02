@@ -222,7 +222,7 @@ class AnimalTrackerWidget(QWidget):
         assignment = self.assignment_widget.get_assignment()
         self.tracker = self.tracker_class(
             assignment=assignment,
-            tracker_param=tracker_param
+            tracking_param=tracker_param
         )
 
         overlay_param = AnimalTrackerParamOverlay(
