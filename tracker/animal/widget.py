@@ -2,16 +2,18 @@ from PyQt5.QtWidgets import QWidget, QLabel, QHBoxLayout, QVBoxLayout
 from .core import AnimalTracker, AnimalOverlay, AnimalTrackerParamOverlay, AnimalTrackerParamTracking, AnimalTracking
 from .tracker import AnimalTracker_CPU
 from .overlay import AnimalOverlay_opencv
+from .assignment_widget import AssignmentWidget
 from qt_widgets import NDarray_to_QPixmap, LabeledDoubleSpinBox, LabeledSpinBox
 from image_tools import im2uint8
 import cv2
 from geometry import Affine2DTransform
+import numpy as np
 
-# TODO maybe group settings into collapsable block
 class AnimalTrackerWidget(QWidget):
     
     def __init__(
             self, 
+            assignment_widget: AssignmentWidget, 
             tracker_class: AnimalTracker = AnimalTracker_CPU, 
             overlay_class: AnimalOverlay = AnimalOverlay_opencv, 
             *args, **kwargs
@@ -19,8 +21,10 @@ class AnimalTrackerWidget(QWidget):
         
         super().__init__(*args, **kwargs) 
         self.tracker = None
+        self.assignment_widget = assignment_widget
         self.tracker_class = tracker_class
         self.overlay_class = overlay_class
+        self.current_id = 0
         self.declare_components()
         self.layout_components()
 
@@ -29,7 +33,8 @@ class AnimalTrackerWidget(QWidget):
         self.image = QLabel(self)
         self.mask = QLabel(self)
         self.image_overlay = QLabel(self)
-        
+        self.image_overlay.mousePressEvent = self.on_mouse_click
+
         # pix per mm
         self.pix_per_mm = LabeledDoubleSpinBox(self)
         self.pix_per_mm.setText('pixels / mm')
@@ -177,7 +182,8 @@ class AnimalTrackerWidget(QWidget):
         parameters.addWidget(self.median_filter_sz_mm)
         parameters.addStretch()
 
-        images = QVBoxLayout()
+        images = QVBoxLayout()                
+        images.addWidget(self.assignment_widget)
         images.addWidget(self.image)
         images.addWidget(self.mask)
         images.addWidget(self.image_overlay)
@@ -212,7 +218,12 @@ class AnimalTrackerWidget(QWidget):
             median_filter_sz_mm = self.median_filter_sz_mm.value(),
             pad_value_mm = self.pad_value_mm.value()
         )
-        self.tracker = self.tracker_class(tracker_param)
+
+        assignment = self.assignment_widget.get_assignment()
+        self.tracker = self.tracker_class(
+            assignment=assignment,
+            tracker_param=tracker_param
+        )
 
         overlay_param = AnimalTrackerParamOverlay(
             pix_per_mm=self.pix_per_mm.value()
@@ -237,3 +248,19 @@ class AnimalTrackerWidget(QWidget):
                 self.image_overlay.setPixmap(NDarray_to_QPixmap(overlay))
 
             self.update()
+
+    def on_mouse_click(self, event) -> None:
+
+        x = event.pos().x()
+        y = event.pos().y() 
+
+        mouse_position = np.array([[x, y]])
+        zoom = self.zoom.value()
+        mouse_position = mouse_position * 100.0/zoom
+
+        assignment = self.assignment_widget.get_assignment()
+        if assignment is not None:
+            centroids = assignment.get_centroids()
+            ID = assignment.get_ID()
+            dist = cdist(mouse_position, centroids)
+            self.current_id = ID[np.argmin(dist)]

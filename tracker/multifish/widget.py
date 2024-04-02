@@ -2,15 +2,12 @@ from tracker.animal import AnimalTrackerWidget
 from tracker.body import BodyTrackerWidget
 from tracker.eyes import EyesTrackerWidget
 from tracker.tail import TailTrackerWidget 
-from .assignment_widget import AssignmentWidget
 from .core import MultiFishTracker, MultiFishOverlay, MultiFishTracking
 from .tracker import MultiFishTracker_CPU
 from .overlay import MultiFishOverlay_opencv
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QMainWindow, QTabWidget, QDockWidget, QLabel, QVBoxLayout, QHBoxLayout, QWidget
-from typing import Protocol, Optional
-from scipy.spatial.distance import cdist
-import numpy as np
+from typing import Optional
 from qt_widgets import NDarray_to_QPixmap, LabeledSpinBox, FileSaveLabeledEditButton
 import cv2
 import json
@@ -18,14 +15,10 @@ import json
 # TODO add widget to chose accumulator method (useful when you want to actually do the tracking)
 # TODO add widget to show background subtracted image histogram 
 
-class Assignment(Protocol):
-    pass
-
 class TrackerWidget(QMainWindow):
 
     def __init__(
             self, 
-            assignment_widget: AssignmentWidget, 
             animal_tracker_widget: AnimalTrackerWidget,
             body_tracker_widget: Optional[BodyTrackerWidget],
             eyes_tracker_widget: Optional[EyesTrackerWidget],
@@ -36,7 +29,6 @@ class TrackerWidget(QMainWindow):
         ) -> None:
 
         super().__init__(*args, **kwargs)
-        self.assignment_widget = assignment_widget
         self.animal_tracker_widget = animal_tracker_widget        
         self.body_tracker_widget = body_tracker_widget
         self.eyes_tracker_widget = eyes_tracker_widget
@@ -44,14 +36,12 @@ class TrackerWidget(QMainWindow):
         self.tracker = None
         self.tracker_class = tracker_class
         self.overlay_class = overlay_class
-        self.current_id = 0
         self.declare_components()
         self.layout_components()
 
     def declare_components(self) -> None:
 
         self.image_overlay = QLabel(self)
-        self.image_overlay.mousePressEvent = self.on_mouse_click
 
         self.zoom = LabeledSpinBox(self)
         self.zoom.setText('zoom (%)')
@@ -69,7 +59,6 @@ class TrackerWidget(QMainWindow):
 
         images_and_zoom = QVBoxLayout()
         images_and_zoom.addWidget(self.save_tracking_param)
-        images_and_zoom.addWidget(self.assignment_widget)
         images_and_zoom.addWidget(self.zoom)
         images_and_zoom.addWidget(self.image_overlay)
         images_and_zoom.addStretch()
@@ -149,29 +138,24 @@ class TrackerWidget(QMainWindow):
             tail_tracker = self.tail_tracker_widget.tracker
             tail_overlay = self.tail_tracker_widget.overlay
 
-        assignment = self.assignment_widget.get_assignment()
-
         # TODO update this 
         max_num_animals = 10
 
-        if assignment is not None:
+        self.tracker = self.tracker_class(
+            max_num_animals,
+            None,
+            animal_tracker,
+            body_tracker,
+            eyes_tracker,
+            tail_tracker
+        )
 
-            self.tracker = self.tracker_class(
-                max_num_animals,
-                assignment,
-                None,
-                animal_tracker,
-                body_tracker,
-                eyes_tracker,
-                tail_tracker
-            )
-
-            self.overlay = self.overlay_class(
-                animal_overlay,
-                body_overlay,
-                eyes_overlay,
-                tail_overlay
-            )
+        self.overlay = self.overlay_class(
+            animal_overlay,
+            body_overlay,
+            eyes_overlay,
+            tail_overlay
+        )
 
     def display(self, tracking: MultiFishTracking) -> None:
 
@@ -184,28 +168,14 @@ class TrackerWidget(QMainWindow):
                 self.image_overlay.setPixmap(NDarray_to_QPixmap(overlay))
 
             self.animal_tracker_widget.display(tracking.animals)
+            current_id = self.animal_tracker_widget.current_id
             try:
                 if (self.body_tracker_widget is not None) and (tracking.body is not None):
-                    self.body_tracker_widget.display(tracking.body[self.current_id])
+                    self.body_tracker_widget.display(tracking.body[current_id])
                 if (self.eyes_tracker_widget is not None) and (tracking.eyes is not None):
-                    self.eyes_tracker_widget.display(tracking.eyes[self.current_id])
+                    self.eyes_tracker_widget.display(tracking.eyes[current_id])
                 if (self.tail_tracker_widget is not None) and (tracking.tail is not None):
-                    self.tail_tracker_widget.display(tracking.tail[self.current_id])
+                    self.tail_tracker_widget.display(tracking.tail[current_id])
             except KeyError:
                 pass
 
-    def on_mouse_click(self, event) -> None:
-
-        x = event.pos().x()
-        y = event.pos().y() 
-
-        mouse_position = np.array([[x, y]])
-        zoom = self.zoom.value()
-        mouse_position = mouse_position * 100.0/zoom
-
-        assignment = self.assignment_widget.get_assignment()
-        if assignment is not None:
-            centroids = assignment.get_centroids()
-            ID = assignment.get_ID()
-            dist = cdist(mouse_position, centroids)
-            self.current_id = ID[np.argmin(dist)]
