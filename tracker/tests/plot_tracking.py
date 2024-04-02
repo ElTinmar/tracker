@@ -132,7 +132,8 @@ if __name__ == '__main__':
 
     # tracking 
     animal_tracker = AnimalTracker_CPU(
-        AnimalTrackerParamTracking(
+        assignment=assignment,
+        tracking_param=AnimalTrackerParamTracking(
             pix_per_mm=PIX_PER_MM,
             target_pix_per_mm=7.5,
             animal_intensity=0.07,
@@ -148,8 +149,7 @@ if __name__ == '__main__':
             pad_value_mm=4.0,
             blur_sz_mm=1/7.5,
             median_filter_sz_mm=0,
-        ),
-        assignment=assignment
+        )
     )
     body_tracker = BodyTracker_CPU(
         BodyTrackerParamTracking(
