@@ -44,13 +44,15 @@ class GridAssignment:
     def get_centroids(self) -> NDArray:
         return self.centroids
     
+# TODO enforce max_num_animals
 class LinearSumAssignment:
-    def __init__(self, distance_threshold):
+    def __init__(self, distance_threshold, max_num_animals: int = 1):
         self.ID = None
         self.ID_max = 0
         self.idx_to_keep = None
         self.previous_centroids = None
         self.distance_threshold = distance_threshold
+        self.max_num_animals = max_num_animals
 
     def update(self, centroids):
             # the following events can happen:
