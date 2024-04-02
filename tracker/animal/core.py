@@ -101,6 +101,7 @@ class AnimalTrackerParamOverlay:
     bbox_color_BGR: tuple = (255, 255, 255) 
     centroid_thickness: int = -1
     bbox_thickness: int = 2
+    id_str_color_BGR: tuple = (255, 255, 255)
 
     def mm2px(self, val_mm):
         return int(val_mm * self.pix_per_mm) 

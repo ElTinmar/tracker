@@ -27,7 +27,6 @@ class MultiFishTracker_CPU(MultiFishTracker):
             )
             return res
         
-
         # loop over detected animals to get body, eyes and tail tracking
         body = {}
         eyes = {}
@@ -44,8 +43,12 @@ class MultiFishTracker_CPU(MultiFishTracker):
             body[id] = None
 
             # crop each animal's bounding box
-            image_cropped = image[bottom:top, left:right] # TODO need to pad here if image was clipped on the edges
+            image_cropped = image[bottom:top, left:right] 
+
+            # pad if image was clipped on the edges
             image_cropped = np.pad(image_cropped,((pad_bottom, pad_top),(pad_left, pad_right)))
+            
+            # bottom-left coordinate 
             offset = np.array([pad_left+bb_x, pad_bottom+bb_y])
 
             if self.body is not None:
@@ -62,8 +65,6 @@ class MultiFishTracker_CPU(MultiFishTracker):
                         body[id].centroid[0], body[id].centroid[1], 
                         np.rad2deg(body[id].angle_rad)
                     )
-
-                    # TODO: multiprocessing, track eyes and tail at the same time ?
 
                     # track eyes 
                     if self.eyes is not None:

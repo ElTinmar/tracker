@@ -19,8 +19,10 @@ class AnimalOverlay_opencv(AnimalOverlay):
 
             overlay = im2rgb(im2uint8(image))
 
-            # draw centroid
-            for x,y,_ in (transformation_matrix @ to_homogeneous(tracking.centroids).T).T:
+            for idx, id in zip(tracking.indices, tracking.identities):
+
+                # draw centroid
+                x,y,_ = transformation_matrix @ to_homogeneous(tracking.centroids[idx,:].T).T
                 overlay = cv2.circle(
                     overlay,
                     (int(x),int(y)), 
@@ -29,8 +31,8 @@ class AnimalOverlay_opencv(AnimalOverlay):
                     self.overlay_param.centroid_thickness
                 )
 
-            # draw bounding boxes
-            for (left, bottom, right, top) in tracking.bounding_boxes:
+                # draw bounding boxes
+                left, bottom, right, top = tracking.bounding_boxes[idx,:]
                 rect = np.array([[left, top],[right, bottom]])
                 bbox = (transformation_matrix @ to_homogeneous(rect).T).T
                 topleft = bbox[0,:-1].astype(int)
@@ -42,6 +44,16 @@ class AnimalOverlay_opencv(AnimalOverlay):
                     self.overlay_param.bbox_color_BGR, 
                     self.overlay_param.bbox_thickness
                 )
-
+                
+                # show ID
+                cv2.putText(
+                    overlay, 
+                    str(id), (int(left), int(bottom)), 
+                    cv2.FONT_HERSHEY_SIMPLEX, 1.5, 
+                    self.overlay_param.id_str_color_BGR, 
+                    2, 
+                    cv2.LINE_AA
+                )
+                
             return overlay
         
