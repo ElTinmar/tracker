@@ -61,15 +61,15 @@ class AnimalTracker_CPU(AnimalTracker):
         bb_centroids = np.zeros((centroids.shape[0],2), dtype=float)
         for idx, (x,y) in enumerate(centroids):
 
-            left = max(int(x - self.tracking_param.pad_value_px), 0)
-            bottom = max(int(y - self.tracking_param.pad_value_px), 0)
-            right = min(int(x + self.tracking_param.pad_value_px), width)
-            top = min(int(y + self.tracking_param.pad_value_px), height)
+            left = max(round(x - self.tracking_param.pad_value_px), 0)
+            bottom = max(round(y - self.tracking_param.pad_value_px), 0)
+            right = min(round(x + self.tracking_param.pad_value_px), width)
+            top = min(round(y + self.tracking_param.pad_value_px), height)
 
-            pad_left = -1 * min(int(x - self.tracking_param.pad_value_px), 0)
-            pad_bottom = -1 * min(int(y - self.tracking_param.pad_value_px), 0)
-            pad_right = -1 * min(width - int(x + self.tracking_param.pad_value_px), 0)
-            pad_top = -1 * min(height - int(y + self.tracking_param.pad_value_px), 0)
+            pad_left = -1 * min(round(x - self.tracking_param.pad_value_px), 0)
+            pad_bottom = -1 * min(round(y - self.tracking_param.pad_value_px), 0)
+            pad_right = -1 * min(width - round(x + self.tracking_param.pad_value_px), 0)
+            pad_top = -1 * min(height - round(y + self.tracking_param.pad_value_px), 0)
 
             bboxes[idx,:] = [left,bottom,right,top]
             padding[idx,:] = [pad_left,pad_bottom,pad_right,pad_top]
