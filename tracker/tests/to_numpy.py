@@ -8,6 +8,7 @@ from tracker import (
     TailTracker_CPU, TailTrackerParamTracking
 )
 import numpy as np
+from tqdm import tqdm
 
 VIDEOS = [
     ('toy_data/multi_freelyswimming_1800x1800px_nobckg.avi', 40),
@@ -118,23 +119,30 @@ tracker = MultiFishTracker_CPU(
     tail=tail_tracker
 )
 
+for i in tqdm(range(num_frames)):
+    (rval, frame) = video_reader.next_frame()
+    if not rval:
+        raise RuntimeError('VideoReader was unable to read the whole video')
 
-(rval, frame) = video_reader.next_frame()
-frame_gray = im2single(im2gray(frame))
-tracking = tracker.track(frame_gray)
+    frame_gray = im2single(im2gray(frame))
+    tracking = tracker.track(frame_gray)
 
-tracking.body[0].to_numpy((80,80))
+    pad_px = 2*animal_tracker.tracking_param.pad_value_mm*body_tracker.tracking_param.pix_per_mm
+    animal_shape = (round(animal_tracker.tracking_param.resize*height),round(animal_tracker.tracking_param.resize*width))
+    body_shape = (round(pad_px * body_tracker.tracking_param.resize), round(pad_px * body_tracker.tracking_param.resize)) 
+    eyes_shape = eyes_tracker.tracking_param.crop_dimension_px[::-1]
+    tail_shape = tail_tracker.tracking_param.crop_dimension_px[::-1]
 
-arr = tracking.to_numpy(
-    max_num_animals=tracker.max_num_animals,
-    num_tail_pts=tracker.tail.tracking_param.n_tail_points,
-    num_tail_interp_pts=tracker.tail.tracking_param.n_pts_interp,
-    im_shape=(500,504),
-    im_animal_shape=(94,94), 
-    im_body_shape=(80,80),
-    im_eyes_shape=(60,40),
-    im_tail_shape=(70,70)
-)
+    arr = tracking.to_numpy(
+        max_num_animals=tracker.max_num_animals,
+        num_tail_pts=tracker.tail.tracking_param.n_tail_points,
+        num_tail_interp_pts=tracker.tail.tracking_param.n_pts_interp,
+        im_shape=(height,width),
+        im_animal_shape=animal_shape, 
+        im_body_shape=body_shape,
+        im_eyes_shape=eyes_shape,
+        im_tail_shape=tail_shape
+    )
 
 
  
