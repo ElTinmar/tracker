@@ -148,7 +148,8 @@ if __name__ == '__main__':
             pad_value_mm=4.0,
             blur_sz_mm=1/7.5,
             median_filter_sz_mm=0,
-        )
+        ),
+        assignment=assignment
     )
     body_tracker = BodyTracker_CPU(
         BodyTrackerParamTracking(
@@ -213,7 +214,6 @@ if __name__ == '__main__':
 
     tracker = MultiFishTracker_CPU(
         max_num_animals=1,            
-        assignment=assignment,
         accumulator=accumulator,
         animal=animal_tracker,
         body=body_tracker, 
