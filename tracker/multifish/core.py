@@ -40,14 +40,14 @@ class MultiFishTracking:
 
         #
         animals = self.animals.to_numpy(max_num_animals=max_num_animals, im_shape=im_animal_shape) 
-        bodies = [body.to_numpy(im_shape=im_body_shape) for id, body in self.body.items()]
-        eyes = [eyes.to_numpy(im_shape=im_eyes_shape) for id, eyes in self.eyes.items()]
-        tails = [tail.to_numpy(im_shape=im_tail_shape,num_tail_pts=num_tail_pts,num_tailinterp_pts=num_tail_interp_pts) for id, tail in self.tail.items()]
+        bodies = [body.to_numpy(im_shape=im_body_shape) for id, body in self.body.items() if body is not None]
+        eyes = [eyes.to_numpy(im_shape=im_eyes_shape) for id, eyes in self.eyes.items() if eyes is not None]
+        tails = [tail.to_numpy(im_shape=im_tail_shape,num_tail_pts=num_tail_pts,num_tailinterp_pts=num_tail_interp_pts) for id, tail in self.tail.items() if tail is not None]
 
         # pad missing data
         bodies += [BodyTracking().to_numpy(im_body_shape)] * (max_num_animals - len(bodies))
         eyes += [EyesTracking().to_numpy(im_eyes_shape)] * (max_num_animals - len(eyes))
-        tails += [TailTracking().to_numpy(num_tail_pts, num_tail_interp_pts, im_tail_shape)] * (max_num_animals - len(eyes))
+        tails += [TailTracking().to_numpy(num_tail_pts, num_tail_interp_pts, im_tail_shape)] * (max_num_animals - len(tails))
         
         dt = np.dtype([
             ('animals', animals.dtype, (1,)),

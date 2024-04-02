@@ -145,8 +145,8 @@ class EyesTracking:
         ) -> NDArray:
         '''serialize to fixed-size structured numpy array'''
 
-        left_eye = self.left_eye.to_numpy()
-        right_eye = self.right_eye.to_numpy()
+        left_eye = self.left_eye.to_numpy() if self.left_eye is not None else Eye().to_numpy()
+        right_eye = self.right_eye.to_numpy() if self.right_eye is not None else Eye().to_numpy()
 
         dt = np.dtype([
             ('centroid', np.float32, (1,2)),
