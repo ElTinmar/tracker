@@ -82,6 +82,7 @@ class AnimalTracker_CPU(AnimalTracker):
 
         res = AnimalTracking(
             identities = identities,
+            indices = to_keep,
             centroids = centroids[to_keep,:]/self.tracking_param.resize,
             bounding_boxes = bboxes[to_keep,:]/self.tracking_param.resize,
             padding = padding[to_keep,:]/self.tracking_param.resize,

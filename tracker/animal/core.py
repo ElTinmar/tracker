@@ -5,7 +5,7 @@ from tracker.core import Tracker, TrackingOverlay
 import numpy as np
 
 class Assignment(Protocol):
-    
+
     def update(self):
         ...
     
@@ -113,6 +113,7 @@ class AnimalTracking:
     def __init__(
             self,
             identities: Optional[NDArray] = None,
+            indices: Optional[NDArray] = None,
             centroids: Optional[NDArray] = None,
             bounding_boxes: Optional[NDArray] = None,
             padding: Optional[NDArray] = None,
@@ -122,6 +123,7 @@ class AnimalTracking:
         ) -> None:
         
         self.identities = identities
+        self.indices = indices
         self.centroids = centroids # nx2 vector. (x,y) coordinates of the n fish centroid ~ swim bladder location
         self.bounding_boxes = bounding_boxes 
         self.padding = padding 
@@ -144,6 +146,7 @@ class AnimalTracking:
 
         dt = np.dtype([
             ('identities', int, (max_num_animals, 1)),
+            ('indices', int, (max_num_animals, 1)),
             ('centroid', np.float32, (max_num_animals, 2)),
             ('bounding_boxes', np.float32, (max_num_animals, 4)),
             ('padding', np.float32, (max_num_animals, 4)),
