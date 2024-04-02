@@ -12,7 +12,7 @@ class GridAssignment:
         self.ID = None
         self.LUT = LUT
         self.centroids = None
-        self.idx_to_keep = None
+        self.indices = None
 
     def update(self, centroids: NDArray):
         IDs = []
@@ -33,13 +33,13 @@ class GridAssignment:
 
         self.ID = np.array(unique_ids)
         self.centroids = centroids[idx_to_keep,:]
-        self.idx_to_keep = np.asarray(idx_to_keep)
+        self.indices = np.arange(len(idx_to_keep))
 
     def get_ID(self) -> NDArray:
         return self.ID
     
     def get_kept_centroids(self) -> NDArray:
-        return self.idx_to_keep
+        return self.indices
     
     def get_centroids(self) -> NDArray:
         return self.centroids
@@ -49,7 +49,7 @@ class LinearSumAssignment:
     def __init__(self, distance_threshold, max_num_animals: int = 1):
         self.ID = None
         self.ID_max = 0
-        self.idx_to_keep = None
+        self.indices = None
         self.previous_centroids = None
         self.distance_threshold = distance_threshold
         self.max_num_animals = max_num_animals
@@ -93,14 +93,14 @@ class LinearSumAssignment:
             self.ID = final_id
 
         self.previous_centroids = centroids
-        self.idx_to_keep = np.arange(centroids.shape[0])
+        self.indices = np.arange(centroids.shape[0])
             
     def get_ID(self) -> NDArray:
         return self.ID
     
     def get_kept_centroids(self) -> NDArray:
         '''for compatibility with grid assignment'''
-        return self.idx_to_keep
+        return self.indices
     
     def get_centroids(self) -> NDArray:
         return self.previous_centroids
