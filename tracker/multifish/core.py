@@ -69,7 +69,7 @@ class MultiFishTracking:
         dt_tuples.append(('image', np.float32, self.im_shape))
         array_content.append(self.image)
 
-        arr = np.array(tuple(array_content), dtype= np.dtype(dt_tuples))
+        arr = np.array(tuple(array_content), dtype= np.dtype(dt_tuples, align=True))
         return arr
 
 class MultiFishTracker(Tracker):
