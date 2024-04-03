@@ -115,8 +115,8 @@ tracker = MultiFishTracker_CPU(
     accumulator=accumulator,
     animal=animal_tracker,
     body=body_tracker, 
-    eyes=eyes_tracker, 
-    tail=tail_tracker
+    eyes=None, 
+    tail=None
 )
 
 for i in tqdm(range(num_frames)):

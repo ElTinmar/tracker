@@ -16,9 +16,9 @@ class MultiFishTracker_CPU(MultiFishTracker):
             'im_shape': image.shape,
             'im_animal_shape': (animal_im_height, animal_im_width),
             'animals': animals,
-            'body': body,
-            'eyes': eyes,
-            'tail':  tail,
+            'body': body if body != {} else None,
+            'eyes': eyes if eyes != {} else None,
+            'tail':  tail if tail != {} else None,
             'image': image
         } 
 
@@ -54,31 +54,32 @@ class MultiFishTracker_CPU(MultiFishTracker):
             res = MultiFishTracking(**kwargs)
             return res
         
-        # loop over detected animals to get body, eyes and tail tracking
-        body = {}
+        body = {} 
         eyes = {}
         tail = {}
+        
+        if self.body is not None:
 
-        for id in animals.identities:
+            # loop over detected animals to get body, eyes and tail tracking
+            for id in animals.identities:
 
-            bb_x, bb_y = animals.bb_centroids[id,:]
-            left, bottom, right, top = animals.bounding_boxes[id,:]
-            pad_left, pad_bottom, pad_right, pad_top = animals.padding[id,:]
-            
-            eyes[id] = None
-            tail[id] = None
-            body[id] = None
+                bb_x, bb_y = animals.bb_centroids[id,:]
+                left, bottom, right, top = animals.bounding_boxes[id,:]
+                pad_left, pad_bottom, pad_right, pad_top = animals.padding[id,:]
+                
+                # Commenting this out to export to numpy. may break things
+                #eyes[id] = None
+                #tail[id] = None
+                #body[id] = None
 
-            # crop each animal's bounding box
-            image_cropped = image[bottom:top, left:right] 
+                # crop each animal's bounding box
+                image_cropped = image[bottom:top, left:right] 
 
-            # pad if image was clipped on the edges
-            image_cropped = np.pad(image_cropped,((pad_bottom, pad_top),(pad_left, pad_right)))
-            
-            # bottom-left coordinate 
-            offset = np.array([pad_left+bb_x, pad_bottom+bb_y])
-
-            if self.body is not None:
+                # pad if image was clipped on the edges
+                image_cropped = np.pad(image_cropped,((pad_bottom, pad_top),(pad_left, pad_right)))
+                
+                # bottom-left coordinate 
+                offset = np.array([pad_left+bb_x, pad_bottom+bb_y])
 
                 # get more precise centroid and orientation of the animals
                 body[id] = self.body.track(image_cropped, centroid=offset)
