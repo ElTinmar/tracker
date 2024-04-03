@@ -43,7 +43,7 @@ class MultiFishTracker_CPU(MultiFishTracker):
         animals = self.animal.track(image)
 
         # if nothing was detected at that stage, stop here
-        if animals.identities.size == 0:
+        if animals.identities is None:
             kwargs = self.get_kwargs(image, animals, None, None, None)
             res = MultiFishTracking(**kwargs)
             return res
