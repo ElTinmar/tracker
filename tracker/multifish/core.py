@@ -16,7 +16,6 @@ class Accumulator(Protocol):
 @dataclass
 class MultiFishTracking:
     max_num_animals: int
-    im_shape: tuple
     image: NDArray
     animals: AnimalTracking
     im_body_shape: Optional[tuple] = None
@@ -65,7 +64,7 @@ class MultiFishTracking:
             dt_tuples.append(('tails', tails[0].dtype, (self.max_num_animals,)))
             array_content.append(tails)
         
-        dt_tuples.append(('image', np.float32, self.im_shape))
+        dt_tuples.append(('image', np.float32, self.image.shape))
         array_content.append(self.image)
 
         arr = np.array(tuple(array_content), dtype= np.dtype(dt_tuples, align=True))

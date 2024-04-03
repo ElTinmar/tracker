@@ -9,12 +9,11 @@ class MultiFishTracker_CPU(MultiFishTracker):
 
         kwargs = {
             'max_num_animals': self.max_num_animals,
-            'im_shape': image.shape,
             'animals': animals,
+            'image': image,
             'body': body if body != {} else None,
             'eyes': eyes if eyes != {} else None,
-            'tail':  tail if tail != {} else None,
-            'image': image
+            'tail':  tail if tail != {} else None
         } 
 
         if self.body is not None:
