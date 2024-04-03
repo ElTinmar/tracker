@@ -126,23 +126,7 @@ for i in tqdm(range(num_frames)):
 
     frame_gray = im2single(im2gray(frame))
     tracking = tracker.track(frame_gray)
-
-    pad_px = 2*animal_tracker.tracking_param.pad_value_mm*body_tracker.tracking_param.pix_per_mm
-    animal_shape = (round(animal_tracker.tracking_param.resize*height),round(animal_tracker.tracking_param.resize*width))
-    body_shape = (round(pad_px * body_tracker.tracking_param.resize), round(pad_px * body_tracker.tracking_param.resize)) 
-    eyes_shape = eyes_tracker.tracking_param.crop_dimension_px[::-1]
-    tail_shape = tail_tracker.tracking_param.crop_dimension_px[::-1]
-
-    arr = tracking.to_numpy(
-        max_num_animals=tracker.max_num_animals,
-        num_tail_pts=tracker.tail.tracking_param.n_tail_points,
-        num_tail_interp_pts=tracker.tail.tracking_param.n_pts_interp,
-        im_shape=(height,width),
-        im_animal_shape=animal_shape, 
-        im_body_shape=body_shape,
-        im_eyes_shape=eyes_shape,
-        im_tail_shape=tail_shape
-    )
+    arr = tracking.to_numpy()
 
 
  

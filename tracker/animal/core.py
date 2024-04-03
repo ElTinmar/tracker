@@ -113,6 +113,8 @@ class AnimalTrackerParamOverlay:
 class AnimalTracking:
     def __init__(
             self,
+            im_animals_shape: tuple,
+            max_num_animals: int,
             identities: Optional[NDArray] = None,
             indices: Optional[NDArray] = None,
             centroids: Optional[NDArray] = None,
@@ -123,6 +125,8 @@ class AnimalTracking:
             image: Optional[NDArray] = None
         ) -> None:
         
+        self.im_animals_shape = im_animals_shape
+        self.max_num_animals = max_num_animals
         self.identities = identities
         self.indices = indices
         self.centroids = centroids # nx2 vector. (x,y) coordinates of the n fish centroid ~ swim bladder location
@@ -138,34 +142,30 @@ class AnimalTracking:
         '''
         pass    
 
-    def to_numpy(
-            self,
-            im_shape: Optional[ArrayLike] = None,
-            max_num_animals: Optional[int] = None
-        ) -> NDArray:
+    def to_numpy(self) -> NDArray:
         '''serialize to fixed-size structured numpy array'''
 
         dt = np.dtype([
-            ('identities', int, (max_num_animals, 1)),
-            ('indices', int, (max_num_animals, 1)),
-            ('centroid', np.float32, (max_num_animals, 2)),
-            ('bounding_boxes', np.float32, (max_num_animals, 4)),
-            ('padding', np.float32, (max_num_animals, 4)),
-            ('bb_centroids', np.float32, (max_num_animals, 2)),
-            ('mask', np.bool_, im_shape),
-            ('image', np.float32, im_shape),
+            ('identities', int, (self.max_num_animals, 1)),
+            ('indices', int, (self.max_num_animals, 1)),
+            ('centroid', np.float32, (self.max_num_animals, 2)),
+            ('bounding_boxes', np.float32, (self.max_num_animals, 4)),
+            ('padding', np.float32, (self.max_num_animals, 4)),
+            ('bb_centroids', np.float32, (self.max_num_animals, 2)),
+            ('mask', np.bool_, self.im_animals_shape),
+            ('image', np.float32, self.im_animals_shape),
         ])
         
         arr = np.array(
             (
-                np.zeros((max_num_animals, 1), int) if self.identities is None else self.identities,
-                np.zeros((max_num_animals, 1), int) if self.indices is None else self.indices, 
-                np.zeros((max_num_animals, 2), np.float32) if self.centroids is None else self.centroids, 
-                np.zeros((max_num_animals, 4), np.float32) if self.bounding_boxes is None else self.bounding_boxes,
-                np.zeros((max_num_animals, 4), np.float32) if self.padding is None else self.padding, 
-                np.zeros((max_num_animals, 2), np.float32) if self.bb_centroids is None else self.bb_centroids, 
-                np.zeros(im_shape, np.bool_) if self.mask is None else self.mask, 
-                np.zeros(im_shape, np.float32) if self.image is None else self.image
+                np.zeros((self.max_num_animals, 1), int) if self.identities is None else self.identities,
+                np.zeros((self.max_num_animals, 1), int) if self.indices is None else self.indices, 
+                np.zeros((self.max_num_animals, 2), np.float32) if self.centroids is None else self.centroids, 
+                np.zeros((self.max_num_animals, 4), np.float32) if self.bounding_boxes is None else self.bounding_boxes,
+                np.zeros((self.max_num_animals, 4), np.float32) if self.padding is None else self.padding, 
+                np.zeros((self.max_num_animals, 2), np.float32) if self.bb_centroids is None else self.bb_centroids, 
+                np.zeros(self.im_animals_shape, np.bool_) if self.mask is None else self.mask, 
+                np.zeros(self.im_animals_shape, np.float32) if self.image is None else self.image
             ), 
             dtype=dt
         )

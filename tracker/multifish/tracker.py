@@ -3,8 +3,42 @@ from typing import Optional
 from numpy.typing import NDArray
 from image_tools import imrotate, im2uint8
 from .core import MultiFishTracker, MultiFishTracking
-
 class MultiFishTracker_CPU(MultiFishTracker):
+
+    def get_kwargs(self, image: NDArray, animals, body, eyes, tail) -> dict:
+
+        height, width = image.shape
+        animal_im_height = round(self.animal.tracking_param.resize*height)
+        animal_im_width = round(self.animal.tracking_param.resize*width)
+
+        kwargs = {
+            'max_num_animals': self.max_num_animals,
+            'im_shape': image.shape,
+            'im_animal_shape': (animal_im_height, animal_im_width),
+            'animals': animals,
+            'body': body,
+            'eyes': eyes,
+            'tail':  tail,
+            'image': image
+        } 
+
+        if self.body is not None:
+            resize = self.body.tracking_param.resize
+            pad_px = 2*self.animal.tracking_param.pad_value_mm*self.body.tracking_param.pix_per_mm
+            sz = round(pad_px * resize)
+            kwargs['im_body_shape'] = (sz, sz)             
+
+        if self.eyes is not None:
+            eyes_shape = self.eyes.tracking_param.crop_dimension_px[::-1]
+            kwargs['im_eyes_shape'] = eyes_shape
+
+        if self.tail is not None:
+            tail_shape = self.tail.tracking_param.crop_dimension_px[::-1]
+            kwargs['num_tail_pts'] = self.tail.tracking_param.n_tail_points
+            kwargs['num_tail_interp_pts'] = self.tail.tracking_param.n_pts_interp
+            kwargs['im_tail_shape'] = tail_shape
+
+        return kwargs
 
     def track(self, image: NDArray, centroid: Optional[NDArray] = None) -> Optional[MultiFishTracking]:
 
@@ -16,15 +50,8 @@ class MultiFishTracker_CPU(MultiFishTracker):
 
         # if nothing was detected at that stage, stop here
         if animals.identities.size == 0:
-            res = MultiFishTracking(
-                identities =  None, 
-                indices = None,
-                animals = animals,
-                body = None,
-                eyes = None,
-                tail =  None,
-                image = image
-            )
+            kwargs = self.get_kwargs(image, animals, None, None, None)
+            res = MultiFishTracking(**kwargs)
             return res
         
         # loop over detected animals to get body, eyes and tail tracking
@@ -75,13 +102,8 @@ class MultiFishTracker_CPU(MultiFishTracker):
                         tail[id] = self.tail.track(image_rot, centroid=centroid_rot)
 
         # save tracking results and return
-        res = MultiFishTracking(
-            animals = animals,
-            body = body,
-            eyes = eyes,
-            tail =  tail,
-            image = image 
-        )
+        kwargs = self.get_kwargs(image, animals, body, eyes, tail)
+        res = MultiFishTracking(**kwargs)
 
         # compute additional features based on tracking
         if self.accumulator is not None:

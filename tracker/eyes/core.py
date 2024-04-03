@@ -120,6 +120,7 @@ class Eye:
 class EyesTracking:
     def __init__(
             self,
+            im_eyes_shape: tuple,
             mask: Optional[NDArray] = None,
             image: Optional[NDArray] = None,
             centroid: Optional[NDArray] = None,
@@ -128,6 +129,7 @@ class EyesTracking:
             right_eye: Eye = Eye(),
         ) -> None:
     
+        self.im_eyes_shape = im_eyes_shape 
         self.centroid = centroid
         self.offset = offset # position of centroid in cropped image
         self.left_eye =  left_eye
@@ -139,10 +141,7 @@ class EyesTracking:
         '''export data as csv'''
         pass
 
-    def to_numpy(
-            self,
-            im_shape: Optional[ArrayLike] = None
-        ) -> NDArray:
+    def to_numpy(self) -> NDArray:
         '''serialize to fixed-size structured numpy array'''
 
         left_eye = self.left_eye.to_numpy() if self.left_eye is not None else Eye().to_numpy()
@@ -153,8 +152,8 @@ class EyesTracking:
             ('offset',  np.float32, (1,2)),
             ('left_eye',  left_eye.dtype, left_eye.shape),
             ('right_eye',  right_eye.dtype, right_eye.shape),
-            ('mask',  np.bool_, im_shape),
-            ('image',  np.float32, im_shape),
+            ('mask',  np.bool_, self.im_eyes_shape),
+            ('image',  np.float32, self.im_eyes_shape),
         ])
 
         arr = np.array(
@@ -163,8 +162,8 @@ class EyesTracking:
                 np.zeros((1,2), np.float32) if self.offset is None else self.offset,
                 left_eye, 
                 right_eye,                
-                np.zeros(im_shape, np.bool_) if self.mask is None else self.mask, 
-                np.zeros(im_shape, np.float32) if self.image is None else self.image 
+                np.zeros(self.im_eyes_shape, np.bool_) if self.mask is None else self.mask, 
+                np.zeros(self.im_eyes_shape, np.float32) if self.image is None else self.image 
             ), 
             dtype=dt
         )

@@ -68,6 +68,9 @@ class TailTracker_CPU(TailTracker):
         )
 
         res = TailTracking(
+            num_tail_pts = self.tracking_param.n_tail_points,
+            num_tail_interp_pts = self.tracking_param.n_pts_interp,
+            im_tail_shape = image_crop.shape,
             centroid = centroid,
             offset = offset,
             skeleton = skeleton,

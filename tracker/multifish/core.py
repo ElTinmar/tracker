@@ -15,6 +15,14 @@ class Accumulator(Protocol):
 
 @dataclass
 class MultiFishTracking:
+    max_num_animals: int
+    im_shape: tuple
+    im_animal_shape: tuple
+    im_body_shape: Optional[tuple]
+    im_eyes_shape: Optional[tuple]
+    im_tail_shape: Optional[tuple]
+    num_tail_pts: Optional[int]
+    num_tail_interp_pts: Optional[int] 
     animals: AnimalTracking
     body: Optional[List[BodyTracking]]
     eyes: Optional[List[EyesTracking]]
@@ -25,48 +33,43 @@ class MultiFishTracking:
         '''export data as csv'''
         pass
 
-    def to_numpy(
-            self,
-            max_num_animals: int = 1,
-            num_tail_pts: int = 20,
-            num_tail_interp_pts: int = 40,
-            im_shape: Optional[ArrayLike] = None,
-            im_animal_shape: Optional[ArrayLike] = None,
-            im_body_shape: Optional[ArrayLike] = None,
-            im_eyes_shape: Optional[ArrayLike] = None,
-            im_tail_shape: Optional[ArrayLike] = None
-        ) -> NDArray:
+    def to_numpy(self) -> NDArray:
         '''serialize to fixed-size structured numpy array'''
 
-        #
-        animals = self.animals.to_numpy(max_num_animals=max_num_animals, im_shape=im_animal_shape) 
-        bodies = [body.to_numpy(im_shape=im_body_shape) for id, body in self.body.items() if body is not None]
-        eyes = [eyes.to_numpy(im_shape=im_eyes_shape) for id, eyes in self.eyes.items() if eyes is not None]
-        tails = [tail.to_numpy(im_shape=im_tail_shape,num_tail_pts=num_tail_pts,num_tailinterp_pts=num_tail_interp_pts) for id, tail in self.tail.items() if tail is not None]
+        dt_tuples = []
+        array_content = []
 
-        # pad missing data
-        bodies += [BodyTracking().to_numpy(im_body_shape)] * (max_num_animals - len(bodies))
-        eyes += [EyesTracking().to_numpy(im_eyes_shape)] * (max_num_animals - len(eyes))
-        tails += [TailTracking().to_numpy(num_tail_pts, num_tail_interp_pts, im_tail_shape)] * (max_num_animals - len(tails))
+        animals = self.animals.to_numpy() 
+        dt_tuples.append(('animals', animals.dtype, (1,)))
+        array_content.append(animals)
+
+        if self.body is not None:
+            bodies = [body.to_numpy() for id, body in self.body.items() if body is not None]
+            bodies += [BodyTracking(self.im_body_shape).to_numpy()] * (self.max_num_animals - len(bodies))
+            dt_tuples.append(('bodies', bodies[0].dtype, (self.max_num_animals,)))
+            array_content.append(bodies)
         
-        dt = np.dtype([
-            ('animals', animals.dtype, (1,)),
-            ('bodies', bodies[0].dtype, (max_num_animals,)),
-            ('eyes', eyes[0].dtype, (max_num_animals,)),
-            ('tails', tails[0].dtype, (max_num_animals,)),
-            ('image', np.float32, im_shape)
-        ])
+        if self.eyes is not None:
+            eyes = [eyes.to_numpy() for id, eyes in self.eyes.items() if eyes is not None]
+            eyes += [EyesTracking(self.im_eyes_shape).to_numpy()] * (self.max_num_animals - len(eyes))
+            dt_tuples.append(('eyes', eyes[0].dtype, (self.max_num_animals,)))
+            array_content.append(eyes)
 
-        arr = np.array(
-            (
-                animals, 
-                bodies, 
-                eyes, 
-                tails, 
-                self.image
-            ), 
-            dtype=dt
-        )
+        if self.tail is not None:
+            tails = [tail.to_numpy() for id, tail in self.tail.items() if tail is not None]
+            tails += [TailTracking(
+                    num_tail_pts=self.num_tail_pts,
+                    num_tail_interp_pts=self.num_tail_interp_pts,
+                    im_tail_shape=self.im_tail_shape
+                ).to_numpy()
+            ] * (self.max_num_animals - len(tails))
+            dt_tuples.append(('tails', tails[0].dtype, (self.max_num_animals,)))
+            array_content.append(tails)
+        
+        dt_tuples.append(('image', np.float32, self.im_shape))
+        array_content.append(self.image)
+
+        arr = np.array(tuple(array_content), dtype= np.dtype(dt_tuples))
         return arr
 
 class MultiFishTracker(Tracker):
@@ -86,7 +89,6 @@ class MultiFishTracker(Tracker):
         self.body = body
         self.eyes = eyes
         self.tail = tail
-
     
 class MultiFishOverlay(TrackingOverlay):
 

@@ -55,6 +55,7 @@ class BodyTracker_CPU(BodyTracker):
         if props == []:
 
             res = BodyTracking(
+                im_body_shape = image.shape,
                 heading = None,
                 centroid = None,
                 angle_rad = None,
@@ -81,6 +82,7 @@ class BodyTracker_CPU(BodyTracker):
             
             if track_coords.shape[0] < 2:
                 res = BodyTracking(
+                    im_body_shape = image.shape,
                     heading = None,
                     centroid = None,
                     angle_rad = None,
@@ -92,6 +94,7 @@ class BodyTracker_CPU(BodyTracker):
             (principal_components, centroid_coords) = get_orientation(track_coords)
 
             res = BodyTracking(
+                im_body_shape = image.shape,
                 heading = principal_components,
                 centroid = centroid_coords / self.tracking_param.resize,
                 angle_rad = np.arctan2(principal_components[1,1], principal_components[0,1]),

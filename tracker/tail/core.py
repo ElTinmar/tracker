@@ -100,6 +100,9 @@ class TailTrackerParamOverlay:
 class TailTracking:
     def __init__(
             self,
+            num_tail_pts: int,
+            num_tail_interp_pts: int,
+            im_tail_shape: tuple,
             centroid: Optional[NDArray] = None,
             offset: Optional[NDArray] = None,
             skeleton: Optional[NDArray] = None,
@@ -107,6 +110,9 @@ class TailTracking:
             image: Optional[NDArray] = None
         ) -> None:
                 
+            self.num_tail_pts = num_tail_pts
+            self.num_tail_interp_pts = num_tail_interp_pts
+            self.im_tail_shape = im_tail_shape
             self.centroid = centroid 
             self.offset = offset
             self.skeleton = skeleton
@@ -117,28 +123,24 @@ class TailTracking:
         '''export data as csv'''
         pass
 
-    def to_numpy(self,
-            num_tail_pts: Optional[int] = None,
-            num_tailinterp_pts: Optional[int] = None,
-            im_shape: Optional[ArrayLike] = None
-        ) -> NDArray:
+    def to_numpy(self) -> NDArray:
         '''serialize to fixed-size structured numpy array'''
         
         dt = np.dtype([
             ('centroid', np.float32, (1,2)),
             ('offset',  np.float32, (1,2)),
-            ('skeleton',  np.float32, (num_tail_pts,2)),
-            ('skeleton_interp',  np.float32, (num_tailinterp_pts,2)),
-            ('image',  np.float32, im_shape)
+            ('skeleton',  np.float32, (self.num_tail_pts,2)),
+            ('skeleton_interp',  np.float32, (self.num_tail_interp_pts,2)),
+            ('image',  np.float32, self.im_tail_shape)
         ])
 
         arr = np.array(
             (
                 np.zeros((1,2), np.float32) if self.centroid is None else self.centroid, 
                 np.zeros((1,2), np.float32) if self.offset is None else self.offset,
-                np.zeros((num_tail_pts,2), np.float32) if self.skeleton is None else self.skeleton,
-                np.zeros((num_tailinterp_pts,2), np.float32) if self.skeleton_interp is None else self.skeleton_interp,
-                np.zeros(im_shape, np.float32) if self.image is None else self.image
+                np.zeros((self.num_tail_pts,2), np.float32) if self.skeleton is None else self.skeleton,
+                np.zeros((self.num_tail_interp_pts,2), np.float32) if self.skeleton_interp is None else self.skeleton_interp,
+                np.zeros(self.im_tail_shape, np.float32) if self.image is None else self.image
             ), 
             dtype=dt
         )

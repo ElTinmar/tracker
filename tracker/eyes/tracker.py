@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 from numpy.typing import NDArray
 from typing import Optional
-from image_tools import enhance, im2uint8
+from image_tools import enhance
 from .core import EyesTracker, EyesTracking
 from .utils import get_eye_prop, find_eyes_and_swimbladder, assign_features
 
@@ -86,6 +86,7 @@ class EyesTracker_CPU(EyesTracker):
             #new_heading = new_heading / np.linalg.norm(new_heading)
 
         res = EyesTracking(
+            im_eyes_shape = image_crop.shape,
             centroid = centroid,
             offset = offset,
             left_eye = left_eye,

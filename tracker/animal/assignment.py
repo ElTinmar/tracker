@@ -8,11 +8,12 @@ Assign identity to tracked objects frame after frame
 '''
 
 class GridAssignment:
-    def __init__(self, LUT):
+    def __init__(self, LUT, max_num_animals: int = 1):
         self.ID = None
         self.LUT = LUT
         self.centroids = None
         self.indices = None
+        self.max_num_animals = max_num_animals
 
     def update(self, centroids: NDArray):
         IDs = []

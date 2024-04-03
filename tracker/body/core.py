@@ -101,6 +101,7 @@ class BodyTrackerParamOverlay:
 class BodyTracking:
 
     def __init__(self,
+            im_body_shape: tuple,
             heading: Optional[NDArray] = None,
             centroid: Optional[NDArray] = None,
             angle_rad: Optional[float] = None,
@@ -108,6 +109,7 @@ class BodyTracking:
             image: Optional[NDArray] = None,
         ) -> None:
     
+            self.im_body_shape = im_body_shape
             self.heading = heading # 2x2 matrix, column 1 = fish heading, column 2 = fish right direction
             self.centroid = centroid # 1x2 vector. (x,y) coordinates of the fish centroid ~ swim bladder location
             self.angle_rad = angle_rad 
@@ -120,18 +122,15 @@ class BodyTracking:
         '''
         pass    
 
-    def to_numpy(
-            self,           
-            im_shape: Optional[ArrayLike] = None
-        ) -> NDArray:
+    def to_numpy(self) -> NDArray:
         '''serialize to fixed-size structured numpy array'''
 
         dt = np.dtype([
             ('heading', np.float32, (2,2)),
             ('centroid',  np.float32, (1,2)),
             ('angle_rad',  np.float32, (1,)),
-            ('mask',  np.bool_, im_shape),
-            ('image',  np.float32, im_shape),
+            ('mask',  np.bool_, self.im_body_shape),
+            ('image',  np.float32, self.im_body_shape),
         ])
 
         arr = np.array(
@@ -139,8 +138,8 @@ class BodyTracking:
                 np.zeros((2,2), np.float32) if self.heading is None else self.heading, 
                 np.zeros((1,2), np.float32) if self.centroid is None else self.centroid,
                 0.0 if self.angle_rad is None else self.angle_rad, 
-                np.zeros(im_shape, np.bool_) if self.mask is None else self.mask, 
-                np.zeros(im_shape, np.float32) if self.image is None else self.image
+                np.zeros(self.im_body_shape, np.bool_) if self.mask is None else self.mask, 
+                np.zeros(self.im_body_shape, np.float32) if self.image is None else self.image
             ), 
             dtype=dt
         )

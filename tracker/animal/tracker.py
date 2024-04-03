@@ -46,6 +46,8 @@ class AnimalTracker_CPU(AnimalTracker):
 
         if centroids.size == 0:
             res = AnimalTracking(
+                im_animals_shape = image.shape,
+                max_num_animals = self.assignment.max_num_animals,
                 identities = None,
                 centroids = None,
                 bounding_boxes = None,
@@ -87,6 +89,8 @@ class AnimalTracker_CPU(AnimalTracker):
         bb_centroids_ori = bb_centroids[to_keep,:]/self.tracking_param.resize
 
         res = AnimalTracking(
+            im_animals_shape = image.shape,
+            max_num_animals = self.assignment.max_num_animals,
             identities = identities,
             indices = to_keep,
             centroids = centroids_ori,
