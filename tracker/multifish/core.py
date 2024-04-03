@@ -18,16 +18,16 @@ class MultiFishTracking:
     max_num_animals: int
     im_shape: tuple
     im_animal_shape: tuple
-    im_body_shape: Optional[tuple]
-    im_eyes_shape: Optional[tuple]
-    im_tail_shape: Optional[tuple]
-    num_tail_pts: Optional[int]
-    num_tail_interp_pts: Optional[int] 
-    animals: AnimalTracking
-    body: Optional[List[BodyTracking]]
-    eyes: Optional[List[EyesTracking]]
-    tail: Optional[List[TailTracking]]
     image: NDArray
+    animals: AnimalTracking
+    im_body_shape: Optional[tuple] = None
+    im_eyes_shape: Optional[tuple] = None
+    im_tail_shape: Optional[tuple] = None
+    num_tail_pts: Optional[int] = None
+    num_tail_interp_pts: Optional[int] = None 
+    body: Optional[List[BodyTracking]] = None
+    eyes: Optional[List[EyesTracking]] = None
+    tail: Optional[List[TailTracking]] = None
     
     def to_csv(self):
         '''export data as csv'''
