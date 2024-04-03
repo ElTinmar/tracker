@@ -17,7 +17,6 @@ class Accumulator(Protocol):
 class MultiFishTracking:
     max_num_animals: int
     im_shape: tuple
-    im_animal_shape: tuple
     image: NDArray
     animals: AnimalTracking
     im_body_shape: Optional[tuple] = None

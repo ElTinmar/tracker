@@ -7,14 +7,9 @@ class MultiFishTracker_CPU(MultiFishTracker):
 
     def get_kwargs(self, image: NDArray, animals, body, eyes, tail) -> dict:
 
-        height, width = image.shape
-        animal_im_height = round(self.animal.tracking_param.resize*height)
-        animal_im_width = round(self.animal.tracking_param.resize*width)
-
         kwargs = {
             'max_num_animals': self.max_num_animals,
             'im_shape': image.shape,
-            'im_animal_shape': (animal_im_height, animal_im_width),
             'animals': animals,
             'body': body if body != {} else None,
             'eyes': eyes if eyes != {} else None,
