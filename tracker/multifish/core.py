@@ -59,6 +59,7 @@ class MultiFishTracking:
         dt_tuples.append(('tail_tracked', np.bool_, (1,)))
         array_content.append(self.tail_tracked)
 
+        # TODO: this is mostly repeated 3 times, write a function 
         if self.body_tracked:
             bodies = [body.to_numpy() for id, body in self.body.items() if body is not None]
             pad_len = (self.max_num_animals - len(bodies))
