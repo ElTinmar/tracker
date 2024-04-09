@@ -33,7 +33,7 @@ class GridAssignment:
                 idx_to_keep.append(indices[0])
 
         self.ID = np.array(unique_ids)
-        self.centroids = centroids[idx_to_keep,:]
+        self.centroids = centroids[idx_to_keep,:] if idx_to_keep != [] else np.array([])
         self.indices = np.arange(len(idx_to_keep))
 
     def get_ID(self) -> NDArray:

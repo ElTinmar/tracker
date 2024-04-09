@@ -115,7 +115,7 @@ class AnimalTracking:
             self,
             im_animals_shape: tuple,
             max_num_animals: int,
-            identities: Optional[NDArray] = None,
+            identities: dict = {},
             indices: Optional[NDArray] = None,
             centroids: Optional[NDArray] = None,
             bounding_boxes: Optional[NDArray] = None,
@@ -158,7 +158,7 @@ class AnimalTracking:
         
         arr = np.array(
             (
-                np.zeros((self.max_num_animals, 1), int) if self.identities is None else self.identities,
+                np.zeros((self.max_num_animals, 1), int) if self.identities == {} else self.identities,
                 np.zeros((self.max_num_animals, 1), int) if self.indices is None else self.indices, 
                 np.zeros((self.max_num_animals, 2), np.float32) if self.centroids is None else self.centroids, 
                 np.zeros((self.max_num_animals, 4), np.float32) if self.bounding_boxes is None else self.bounding_boxes,

@@ -23,8 +23,8 @@ class MultiFishTracking:
     im_tail_shape: Optional[tuple] = None
     num_tail_pts: Optional[int] = None
     num_tail_interp_pts: Optional[int] = None 
-    body_tracked: bool = False,
-    eyes_tracked: bool = False,
+    body_tracked: bool = False
+    eyes_tracked: bool = False
     tail_tracked: bool = False
     body: Optional[List[BodyTracking]] = None
     eyes: Optional[List[EyesTracking]] = None

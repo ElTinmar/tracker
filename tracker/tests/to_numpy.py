@@ -119,6 +119,11 @@ tracker = MultiFishTracker_CPU(
     tail=tail_tracker
 )
 
+# get dtype 
+tracking = tracker.track(np.zeros((500,504), dtype=np.float32))
+arr = tracking.to_numpy()
+print(arr.itemsize, arr.dtype)
+
 for i in tqdm(range(num_frames)):
     (rval, frame) = video_reader.next_frame()
     if not rval:
@@ -129,4 +134,3 @@ for i in tqdm(range(num_frames)):
     arr = tracking.to_numpy()
 
 
- 

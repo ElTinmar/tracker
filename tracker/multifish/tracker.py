@@ -11,9 +11,9 @@ class MultiFishTracker_CPU(MultiFishTracker):
             'max_num_animals': self.max_num_animals,
             'animals': animals,
             'image': image,
-            'body': body if body != {} else None,
-            'eyes': eyes if eyes != {} else None,
-            'tail':  tail if tail != {} else None
+            'body': body,
+            'eyes': eyes,
+            'tail': tail
         } 
 
         if self.body is not None:
@@ -45,12 +45,6 @@ class MultiFishTracker_CPU(MultiFishTracker):
         # get animal centroids (only crude location is necessary)
         animals = self.animal.track(image)
 
-        # if nothing was detected at that stage, stop here
-        if animals.identities is None:
-            kwargs = self.get_kwargs(image, animals, None, None, None)
-            res = MultiFishTracking(**kwargs)
-            return res
-        
         body = {} 
         eyes = {}
         tail = {}
