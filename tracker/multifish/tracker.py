@@ -20,14 +20,17 @@ class MultiFishTracker_CPU(MultiFishTracker):
             resize = self.body.tracking_param.resize
             pad_px = 2*self.animal.tracking_param.pad_value_mm*self.body.tracking_param.pix_per_mm
             sz = round(pad_px * resize)
+            kwargs['body_tracked'] = True
             kwargs['im_body_shape'] = (sz, sz)             
 
         if self.eyes is not None:
             eyes_shape = self.eyes.tracking_param.crop_dimension_px[::-1]
+            kwargs['eyes_tracked'] = True
             kwargs['im_eyes_shape'] = eyes_shape
 
         if self.tail is not None:
             tail_shape = self.tail.tracking_param.crop_dimension_px[::-1]
+            kwargs['tail_tracked'] = True
             kwargs['num_tail_pts'] = self.tail.tracking_param.n_tail_points
             kwargs['num_tail_interp_pts'] = self.tail.tracking_param.n_pts_interp
             kwargs['im_tail_shape'] = tail_shape
@@ -51,21 +54,20 @@ class MultiFishTracker_CPU(MultiFishTracker):
         body = {} 
         eyes = {}
         tail = {}
-        
-        if self.body is not None:
 
-            # loop over detected animals to get body, eyes and tail tracking
-            for id in animals.identities:
+        # loop over detected animals to get body, eyes and tail tracking
+        for id in animals.identities:
+
+            eyes[id] = None
+            tail[id] = None
+            body[id] = None
+
+            if self.body is not None:
 
                 bb_x, bb_y = animals.bb_centroids[id,:]
                 left, bottom, right, top = animals.bounding_boxes[id,:]
                 pad_left, pad_bottom, pad_right, pad_top = animals.padding[id,:]
                 
-                # Commenting this out to export to numpy. may break things
-                #eyes[id] = None
-                #tail[id] = None
-                #body[id] = None
-
                 # crop each animal's bounding box
                 image_cropped = image[bottom:top, left:right] 
 

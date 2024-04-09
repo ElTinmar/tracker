@@ -23,6 +23,9 @@ class MultiFishTracking:
     im_tail_shape: Optional[tuple] = None
     num_tail_pts: Optional[int] = None
     num_tail_interp_pts: Optional[int] = None 
+    body_tracked: bool = False,
+    eyes_tracked: bool = False,
+    tail_tracked: bool = False
     body: Optional[List[BodyTracking]] = None
     eyes: Optional[List[EyesTracking]] = None
     tail: Optional[List[TailTracking]] = None
@@ -41,19 +44,22 @@ class MultiFishTracking:
         dt_tuples.append(('animals', animals.dtype, (1,)))
         array_content.append(animals)
 
-        if self.body is not None:
+        dt_tuples.append(('image', np.float32, self.image.shape))
+        array_content.append(self.image)
+
+        if self.body_tracked:
             bodies = [body.to_numpy() for id, body in self.body.items() if body is not None]
             bodies += [BodyTracking(self.im_body_shape).to_numpy()] * (self.max_num_animals - len(bodies))
             dt_tuples.append(('bodies', bodies[0].dtype, (self.max_num_animals,)))
             array_content.append(bodies)
         
-        if self.eyes is not None:
+        if self.eyes_tracked:
             eyes = [eyes.to_numpy() for id, eyes in self.eyes.items() if eyes is not None]
             eyes += [EyesTracking(self.im_eyes_shape).to_numpy()] * (self.max_num_animals - len(eyes))
             dt_tuples.append(('eyes', eyes[0].dtype, (self.max_num_animals,)))
             array_content.append(eyes)
 
-        if self.tail is not None:
+        if self.tail_tracked:
             tails = [tail.to_numpy() for id, tail in self.tail.items() if tail is not None]
             tails += [TailTracking(
                     num_tail_pts=self.num_tail_pts,
@@ -63,9 +69,6 @@ class MultiFishTracking:
             ] * (self.max_num_animals - len(tails))
             dt_tuples.append(('tails', tails[0].dtype, (self.max_num_animals,)))
             array_content.append(tails)
-        
-        dt_tuples.append(('image', np.float32, self.image.shape))
-        array_content.append(self.image)
 
         arr = np.array(tuple(array_content), dtype= np.dtype(dt_tuples, align=True))
         return arr
