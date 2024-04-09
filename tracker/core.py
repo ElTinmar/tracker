@@ -1,4 +1,4 @@
-from abc import ABC, abstractclassmethod
+from abc import ABC, abstractmethod
 from numpy.typing import NDArray 
 from typing import Any, Optional
 
@@ -7,7 +7,7 @@ from typing import Any, Optional
 
 class Tracker(ABC):
     
-    @abstractclassmethod
+    @abstractmethod
     def track(
             self, 
             image: NDArray,
@@ -21,7 +21,7 @@ class Tracker(ABC):
 
 class TrackingOverlay(ABC):
 
-    @abstractclassmethod
+    @abstractmethod
     def overlay(
             self, 
             image: NDArray, 
