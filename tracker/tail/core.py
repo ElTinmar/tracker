@@ -103,11 +103,11 @@ class TailTracking:
             num_tail_pts: int,
             num_tail_interp_pts: int,
             im_tail_shape: tuple,
+            image: NDArray,
             centroid: Optional[NDArray] = None,
             offset: Optional[NDArray] = None,
             skeleton: Optional[NDArray] = None,
-            skeleton_interp: Optional[NDArray] = None,
-            image: Optional[NDArray] = None
+            skeleton_interp: Optional[NDArray] = None
         ) -> None:
                 
             self.num_tail_pts = num_tail_pts
@@ -127,6 +127,9 @@ class TailTracking:
         '''serialize to fixed-size structured numpy array'''
         
         dt = np.dtype([
+            ('empty', bool, (1,)),
+            ('num_tail_pts', int, (1,)),
+            ('num_tail_interp_pts', int, (1,)),
             ('centroid', np.float32, (1,2)),
             ('offset',  np.float32, (1,2)),
             ('skeleton',  np.float32, (self.num_tail_pts,2)),
@@ -136,6 +139,9 @@ class TailTracking:
 
         arr = np.array(
             (
+                self.skeleton is None,
+                self.num_tail_pts,
+                self.num_tail_interp_pts,
                 np.zeros((1,2), np.float32) if self.centroid is None else self.centroid, 
                 np.zeros((1,2), np.float32) if self.offset is None else self.offset,
                 np.zeros((self.num_tail_pts,2), np.float32) if self.skeleton is None else self.skeleton,
@@ -145,6 +151,20 @@ class TailTracking:
             dtype=dt
         )
         return arr
+
+    @classmethod
+    def from_numpy(cls, array):
+        instance = cls(
+            num_tail_pts = array['num_tail_pts'],
+            num_tail_interp_pts = array['num_tail_interp_pts'],
+            im_tail_shape = array['image'].shape,
+            image = array['image'],
+            centroid = None if array['empty'] else array['centroid'],
+            offset = None if array['empty'] else array['offset'],
+            skeleton = None if array['empty'] else array['skeleton'],
+            skeleton_interp = None if array['empty'] else array['skeleton_interp'],
+        )
+        return instance
 
 class TailTracker(Tracker):
 

@@ -48,7 +48,7 @@ class AnimalTracker_CPU(AnimalTracker):
             res = AnimalTracking(
                 im_animals_shape = image.shape,
                 max_num_animals = self.assignment.max_num_animals,
-                identities = {},
+                identities = None,
                 centroids = None,
                 bounding_boxes = None,
                 padding = None,

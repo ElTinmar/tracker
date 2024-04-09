@@ -102,11 +102,11 @@ class BodyTracking:
 
     def __init__(self,
             im_body_shape: tuple,
+            mask: NDArray,
+            image: NDArray,
             heading: Optional[NDArray] = None,
             centroid: Optional[NDArray] = None,
             angle_rad: Optional[float] = None,
-            mask: Optional[NDArray] = None,
-            image: Optional[NDArray] = None,
         ) -> None:
     
             self.im_body_shape = im_body_shape
@@ -126,6 +126,7 @@ class BodyTracking:
         '''serialize to fixed-size structured numpy array'''
 
         dt = np.dtype([
+            ('empty', bool, (1,)),
             ('heading', np.float32, (2,2)),
             ('centroid',  np.float32, (1,2)),
             ('angle_rad',  np.float32, (1,)),
@@ -135,15 +136,28 @@ class BodyTracking:
 
         arr = np.array(
             (
+                self.heading is None,
                 np.zeros((2,2), np.float32) if self.heading is None else self.heading, 
                 np.zeros((1,2), np.float32) if self.centroid is None else self.centroid,
                 0.0 if self.angle_rad is None else self.angle_rad, 
-                np.zeros(self.im_body_shape, np.bool_) if self.mask is None else self.mask, 
-                np.zeros(self.im_body_shape, np.float32) if self.image is None else self.image
+                self.mask, 
+                self.image
             ), 
             dtype=dt
         )
         return arr
+    
+    @classmethod
+    def from_numpy(cls, array):
+        instance = cls(
+            im_body_shape = array['image'].shape,
+            heading = None if array['empty'] else array['heading'],
+            centroid = None if array['empty'] else array['centroid'],
+            angle_rad = None if array['empty'] else array['angle_rad'],
+            mask = array['mask'],
+            image = array['image']
+        )
+        return instance
 
 class BodyTracker(Tracker):
 

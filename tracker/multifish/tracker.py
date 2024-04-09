@@ -50,47 +50,49 @@ class MultiFishTracker_CPU(MultiFishTracker):
         tail = {}
 
         # loop over detected animals to get body, eyes and tail tracking
-        for id in animals.identities:
+        if animals.identities is not None:
+            
+            for id in animals.identities:
 
-            eyes[id] = None
-            tail[id] = None
-            body[id] = None
+                eyes[id] = None
+                tail[id] = None
+                body[id] = None
 
-            if self.body is not None:
+                if self.body is not None:
 
-                bb_x, bb_y = animals.bb_centroids[id,:]
-                left, bottom, right, top = animals.bounding_boxes[id,:]
-                pad_left, pad_bottom, pad_right, pad_top = animals.padding[id,:]
-                
-                # crop each animal's bounding box
-                image_cropped = image[bottom:top, left:right] 
-
-                # pad if image was clipped on the edges
-                image_cropped = np.pad(image_cropped,((pad_bottom, pad_top),(pad_left, pad_right)))
-                
-                # bottom-left coordinate 
-                offset = np.array([pad_left+bb_x, pad_bottom+bb_y])
-
-                # get more precise centroid and orientation of the animals
-                body[id] = self.body.track(image_cropped, centroid=offset)
-
-                # if body was found, track eyes and tail
-                if (body[id] is not None) and (body[id].centroid is not None):
+                    bb_x, bb_y = animals.bb_centroids[id,:]
+                    left, bottom, right, top = animals.bounding_boxes[id,:]
+                    pad_left, pad_bottom, pad_right, pad_top = animals.padding[id,:]
                     
-                    # rotate the animal so that it's vertical head up
-                    image_rot, centroid_rot = imrotate(
-                        image_cropped, 
-                        body[id].centroid[0], body[id].centroid[1], 
-                        np.rad2deg(body[id].angle_rad)
-                    )
+                    # crop each animal's bounding box
+                    image_cropped = image[bottom:top, left:right] 
 
-                    # track eyes 
-                    if self.eyes is not None:
-                        eyes[id] = self.eyes.track(image_rot, centroid=centroid_rot)
+                    # pad if image was clipped on the edges
+                    image_cropped = np.pad(image_cropped,((pad_bottom, pad_top),(pad_left, pad_right)))
+                    
+                    # bottom-left coordinate 
+                    offset = np.array([pad_left+bb_x, pad_bottom+bb_y])
 
-                    # track tail
-                    if self.tail is not None:
-                        tail[id] = self.tail.track(image_rot, centroid=centroid_rot)
+                    # get more precise centroid and orientation of the animals
+                    body[id] = self.body.track(image_cropped, centroid=offset)
+
+                    # if body was found, track eyes and tail
+                    if (body[id] is not None) and (body[id].centroid is not None):
+                        
+                        # rotate the animal so that it's vertical head up
+                        image_rot, centroid_rot = imrotate(
+                            image_cropped, 
+                            body[id].centroid[0], body[id].centroid[1], 
+                            np.rad2deg(body[id].angle_rad)
+                        )
+
+                        # track eyes 
+                        if self.eyes is not None:
+                            eyes[id] = self.eyes.track(image_rot, centroid=centroid_rot)
+
+                        # track tail
+                        if self.tail is not None:
+                            tail[id] = self.tail.track(image_rot, centroid=centroid_rot)
 
         # save tracking results and return
         kwargs = self.get_kwargs(image, animals, body, eyes, tail)
