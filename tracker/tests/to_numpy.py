@@ -1,7 +1,7 @@
 from video_tools import OpenCV_VideoReader
 from image_tools import im2single, im2gray
 from tracker import (
-    GridAssignment, MultiFishTracker_CPU,
+    GridAssignment, MultiFishTracker_CPU, MultiFishTracking,
     AnimalTracker_CPU, AnimalTrackerParamTracking,
     BodyTracker_CPU, BodyTrackerParamTracking,
     EyesTracker_CPU, EyesTrackerParamTracking,
@@ -131,6 +131,11 @@ for i in tqdm(range(num_frames)):
 
     frame_gray = im2single(im2gray(frame))
     tracking = tracker.track(frame_gray)
+
+    # transform to numpy array
     arr = tracking.to_numpy()
+
+    # transform back
+    tracking_rec = MultiFishTracking(arr)
 
 
