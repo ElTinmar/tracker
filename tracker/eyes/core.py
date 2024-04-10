@@ -181,7 +181,7 @@ class EyesTracking:
             centroid = None if array['empty'][0] else array['centroid'][0],
             offset = None if array['empty'][0] else array['offset'][0],
             left_eye = Eye.from_numpy(array['left_eye']),
-            right_eye = Eye.from_numpy(array['left_eye'])
+            right_eye = Eye.from_numpy(array['right_eye'])
         )
         return instance
     
