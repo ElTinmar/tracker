@@ -109,32 +109,19 @@ class AnimalTrackerParamOverlay:
     @property
     def radius_px(self):
         return self.mm2px(self.radius_mm)
-    
+
+@dataclass
 class AnimalTracking:
-    def __init__(
-            self,
-            im_animals_shape: tuple,
-            max_num_animals: int,
-            mask: NDArray,
-            image: NDArray,
-            identities: Optional[NDArray] = None,
-            indices: Optional[NDArray] = None,
-            centroids: Optional[NDArray] = None,
-            bounding_boxes: Optional[NDArray] = None,
-            padding: Optional[NDArray] = None,
-            bb_centroids: Optional[NDArray] = None
-        ) -> None:
-        
-        self.im_animals_shape = im_animals_shape
-        self.max_num_animals = max_num_animals
-        self.identities = identities
-        self.indices = indices
-        self.centroids = centroids # nx2 vector. (x,y) coordinates of the n fish centroid ~ swim bladder location
-        self.bounding_boxes = bounding_boxes 
-        self.padding = padding 
-        self.bb_centroids = bb_centroids
-        self.mask = mask
-        self.image = image
+    im_animals_shape: tuple
+    max_num_animals: int
+    mask: NDArray
+    image: NDArray
+    identities: Optional[NDArray] = None
+    indices: Optional[NDArray] = None
+    centroids: Optional[NDArray] = None
+    bounding_boxes: Optional[NDArray] = None
+    padding: Optional[NDArray] = None
+    bb_centroids: Optional[NDArray] = None
 
     def to_csv(self):
         '''
