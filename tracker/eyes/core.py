@@ -151,7 +151,7 @@ class EyesTracking:
         dt = np.dtype([
             ('empty', bool, (1,)),
             ('centroid', np.float32, (1,2)),
-            ('offset',  np.float32, (1,2)),
+            ('offset',  np.int32, (1,2)),
             ('left_eye',  left_eye.dtype, left_eye.shape),
             ('right_eye',  right_eye.dtype, right_eye.shape),
             ('mask',  np.bool_, self.im_eyes_shape),
@@ -162,7 +162,7 @@ class EyesTracking:
             (
                 self.centroid is None,
                 np.zeros((1,2), np.float32) if self.centroid is None else self.centroid,
-                np.zeros((1,2), np.float32) if self.offset is None else self.offset,
+                np.zeros((1,2), np.int32) if self.offset is None else self.offset,
                 left_eye, 
                 right_eye,                
                 self.mask, 
