@@ -136,6 +136,6 @@ for i in tqdm(range(num_frames)):
     arr = tracking.to_numpy()
 
     # transform back
-    tracking_rec = MultiFishTracking(arr)
+    tracking_rec = MultiFishTracking.from_numpy(arr)
 
 

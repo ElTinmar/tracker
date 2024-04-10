@@ -98,23 +98,14 @@ class BodyTrackerParamOverlay:
     def arrow_radius_px(self):
         return self.mm2px(self.arrow_radius_mm)        
 
+@dataclass
 class BodyTracking:
-
-    def __init__(self,
-            im_body_shape: tuple,
-            mask: NDArray,
-            image: NDArray,
-            heading: Optional[NDArray] = None,
-            centroid: Optional[NDArray] = None,
-            angle_rad: Optional[float] = None,
-        ) -> None:
-    
-            self.im_body_shape = im_body_shape
-            self.heading = heading # 2x2 matrix, column 1 = fish heading, column 2 = fish right direction
-            self.centroid = centroid # 1x2 vector. (x,y) coordinates of the fish centroid ~ swim bladder location
-            self.angle_rad = angle_rad 
-            self.mask = mask
-            self.image = image 
+    im_body_shape: tuple
+    mask: NDArray
+    image: NDArray
+    heading: Optional[NDArray] = None
+    centroid: Optional[NDArray] = None
+    angle_rad: Optional[float] = None
 
     def to_csv(self):
         '''

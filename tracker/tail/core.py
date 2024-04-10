@@ -97,27 +97,16 @@ class TailTrackerParamOverlay:
     def ball_radius_px(self):
         return self.mm2px(self.ball_radius_mm) 
         
+@dataclass
 class TailTracking:
-    def __init__(
-            self,
-            num_tail_pts: int,
-            num_tail_interp_pts: int,
-            im_tail_shape: tuple,
-            image: NDArray,
-            centroid: Optional[NDArray] = None,
-            offset: Optional[NDArray] = None,
-            skeleton: Optional[NDArray] = None,
-            skeleton_interp: Optional[NDArray] = None
-        ) -> None:
-                
-            self.num_tail_pts = num_tail_pts
-            self.num_tail_interp_pts = num_tail_interp_pts
-            self.im_tail_shape = im_tail_shape
-            self.centroid = centroid 
-            self.offset = offset
-            self.skeleton = skeleton
-            self.skeleton_interp = skeleton_interp
-            self.image = image
+    num_tail_pts: int
+    num_tail_interp_pts: int
+    im_tail_shape: tuple
+    image: NDArray
+    centroid: Optional[NDArray] = None
+    offset: Optional[NDArray] = None
+    skeleton: Optional[NDArray] = None
+    skeleton_interp: Optional[NDArray] = None
 
     def to_csv(self):
         '''export data as csv'''

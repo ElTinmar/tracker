@@ -127,26 +127,16 @@ class Eye:
             centroid = None if array['empty'] else array['centroid'],
         )
         return instance
-    
+
+@dataclass    
 class EyesTracking:
-    def __init__(
-            self,
-            im_eyes_shape: tuple,
-            mask: NDArray,
-            image: NDArray,
-            centroid: Optional[NDArray] = None,
-            offset: Optional[NDArray] = None,
-            left_eye: Eye = Eye(),
-            right_eye: Eye = Eye(),
-        ) -> None:
-    
-        self.im_eyes_shape = im_eyes_shape 
-        self.centroid = centroid
-        self.offset = offset # position of centroid in cropped image
-        self.left_eye =  left_eye
-        self.right_eye = right_eye
-        self.mask = mask
-        self.image = image
+    im_eyes_shape: tuple
+    mask: NDArray
+    image: NDArray
+    centroid: Optional[NDArray] = None
+    offset: Optional[NDArray] = None
+    left_eye: Eye = Eye()
+    right_eye: Eye = Eye()
     
     def to_csv(self):
         '''export data as csv'''
