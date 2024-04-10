@@ -127,9 +127,9 @@ class MultiFishTracking:
             body_tracked = array['body_tracked'][0],
             eyes_tracked = array['eyes_tracked'][0],
             tail_tracked = array['tail_tracked'][0],
-            body = None if not array['body_tracked'] else {id: BodyTracking.from_numpy(tracking) for id, tracking in zip(array['bodies_id'],array['bodies'])},
-            eyes = None if not array['eyes_tracked'] else {id: EyesTracking.from_numpy(tracking) for id, tracking in zip(array['eyes_id'],array['eyes'])},
-            tail = None if not array['tail_tracked'] else {id: TailTracking.from_numpy(tracking) for id, tracking in zip(array['tails_id'],array['tails'])}
+            body = None if not array['body_tracked'][0] else {id: BodyTracking.from_numpy(tracking) for id, tracking in zip(array['bodies_id'],array['bodies'])},
+            eyes = None if not array['eyes_tracked'][0] else {id: EyesTracking.from_numpy(tracking) for id, tracking in zip(array['eyes_id'],array['eyes'])},
+            tail = None if not array['tail_tracked'][0] else {id: TailTracking.from_numpy(tracking) for id, tracking in zip(array['tails_id'],array['tails'])}
         )
         return instance
     

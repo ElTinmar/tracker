@@ -166,15 +166,15 @@ class AnimalTracking:
     def from_numpy(cls, array):
         instance = cls(
             im_animals_shape = array['image'].shape,
-            max_num_animals = array['max_num_animals'],
+            max_num_animals = array['max_num_animals'][0],
             mask = array['mask'],
             image = array['image'],
-            identities = None if array['empty'] else array['identities'],
-            indices = None if array['empty'] else array['indices'],
-            centroids = None if array['empty'] else array['centroids'],
-            bounding_boxes = None if array['empty'] else array['bounding_boxes'],
-            padding = None if array['empty'] else array['padding'],
-            bb_centroids = None if array['empty'] else array['bb_centroids'],
+            identities = None if array['empty'][0] else array['identities'][0],
+            indices = None if array['empty'][0] else array['indices'][0],
+            centroids = None if array['empty'][0] else array['centroids'][0],
+            bounding_boxes = None if array['empty'][0] else array['bounding_boxes'][0],
+            padding = None if array['empty'][0] else array['padding'][0],
+            bb_centroids = None if array['empty'][0] else array['bb_centroids'][0],
         )
         return instance
     

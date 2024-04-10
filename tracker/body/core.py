@@ -142,9 +142,9 @@ class BodyTracking:
     def from_numpy(cls, array):
         instance = cls(
             im_body_shape = array['image'].shape,
-            heading = None if array['empty'] else array['heading'],
-            centroid = None if array['empty'] else array['centroid'],
-            angle_rad = None if array['empty'] else array['angle_rad'],
+            heading = None if array['empty'][0] else array['heading'],
+            centroid = None if array['empty'][0] else array['centroid'][0],
+            angle_rad = None if array['empty'][0] else array['angle_rad'][0],
             mask = array['mask'],
             image = array['image']
         )

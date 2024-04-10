@@ -122,9 +122,9 @@ class Eye:
     @classmethod
     def from_numpy(cls, array):
         instance = cls(
-            direction = None if array['empty'] else array['direction'],
-            angle = None if array['empty'] else array['angle'],
-            centroid = None if array['empty'] else array['centroid'],
+            direction = None if array['empty'][0] else array['direction'][0],
+            angle = None if array['empty'][0] else array['angle'][0],
+            centroid = None if array['empty'][0] else array['centroid'][0],
         )
         return instance
 
@@ -178,8 +178,8 @@ class EyesTracking:
             im_eyes_shape = array['image'].shape,
             mask = array['mask'],
             image = array['image'],
-            centroid = None if array['empty'] else array['centroid'],
-            offset = None if array['empty'] else array['offset'],
+            centroid = None if array['empty'][0] else array['centroid'][0],
+            offset = None if array['empty'][0] else array['offset'][0],
             left_eye = Eye.from_numpy(array['left_eye']),
             right_eye = Eye.from_numpy(array['left_eye'])
         )

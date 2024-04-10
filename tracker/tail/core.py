@@ -144,14 +144,14 @@ class TailTracking:
     @classmethod
     def from_numpy(cls, array):
         instance = cls(
-            num_tail_pts = array['num_tail_pts'],
-            num_tail_interp_pts = array['num_tail_interp_pts'],
+            num_tail_pts = array['num_tail_pts'][0],
+            num_tail_interp_pts = array['num_tail_interp_pts'][0],
             im_tail_shape = array['image'].shape,
             image = array['image'],
-            centroid = None if array['empty'] else array['centroid'],
-            offset = None if array['empty'] else array['offset'],
-            skeleton = None if array['empty'] else array['skeleton'],
-            skeleton_interp = None if array['empty'] else array['skeleton_interp'],
+            centroid = None if array['empty'][0] else array['centroid'][0],
+            offset = None if array['empty'][0] else array['offset'][0],
+            skeleton = None if array['empty'][0] else array['skeleton'],
+            skeleton_interp = None if array['empty'][0] else array['skeleton_interp'],
         )
         return instance
 
