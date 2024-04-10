@@ -120,6 +120,7 @@ class MultiFishTracking:
 
     @classmethod
     def from_numpy(cls, array):
+        print(array['bodies_id'],array['bodies'])
         instance = cls(
             max_num_animals = array['max_num_animals'][0],
             image = array['image'],
