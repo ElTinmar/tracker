@@ -123,7 +123,7 @@ class MultiFishTracking:
         instance = cls(
             max_num_animals = array['max_num_animals'][0],
             image = array['image'],
-            animals = AnimalTracking.from_numpy(array['animals']),
+            animals = AnimalTracking.from_numpy(array['animals'][0]),
             body_tracked = array['body_tracked'][0],
             eyes_tracked = array['eyes_tracked'][0],
             tail_tracked = array['tail_tracked'][0],
