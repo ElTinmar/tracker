@@ -75,7 +75,7 @@ class EyesOverlay_opencv(EyesOverlay):
             overlay = im2rgb(im2uint8(image))
             
             # left eye
-            if tracking.left_eye is not None:
+            if tracking.left_eye is not None and tracking.left_eye.direction is not None:
 
                 overlay = disp_eye(
                     overlay, 
@@ -89,7 +89,7 @@ class EyesOverlay_opencv(EyesOverlay):
                 )
 
             # right eye
-            if tracking.right_eye is not None:   
+            if tracking.right_eye is not None and tracking.right_eye.direction is not None:   
 
                 overlay = disp_eye(
                     overlay, 
