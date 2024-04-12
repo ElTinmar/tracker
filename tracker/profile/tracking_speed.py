@@ -15,13 +15,13 @@ import pstats
 from pstats import SortKey
 
 VIDEOS = [
-    ('toy_data/multi_freelyswimming_1800x1800px_nobckg.avi', 40),
-    ('toy_data/single_freelyswimming_504x500px_nobckg.avi', 40),
-    ('toy_data/single_headembedded_544x380px_noparam_nobckg.avi', 100),
-    ('toy_data/single_headembedded_544x380px_param_nobckg.avi', 100)
+    ('../toy_data/multi_freelyswimming_1800x1800px_nobckg.avi', 40),
+    ('../toy_data/single_freelyswimming_504x500px_nobckg.avi', 40),
+    ('../toy_data/single_headembedded_544x380px_noparam_nobckg.avi', 100),
+    ('../toy_data/single_headembedded_544x380px_param_nobckg.avi', 100)
 ]
 # background subtracted video
-INPUT_VIDEO, PIX_PER_MM = VIDEOS[1]
+INPUT_VIDEO, PIX_PER_MM = VIDEOS[2]
 
 video_reader = InMemory_OpenCV_VideoReader()
 video_reader.open_file(
@@ -52,7 +52,7 @@ animal_tracker = AnimalTracker_CPU(
     assignment=assignment,
     tracking_param = AnimalTrackerParamTracking(
         pix_per_mm=PIX_PER_MM,
-        target_pix_per_mm=7.5,
+        target_pix_per_mm=5,
         animal_intensity=0.07,
         animal_brightness=0.0,
         animal_gamma=1.0,
@@ -63,8 +63,8 @@ animal_tracker = AnimalTracker_CPU(
         max_animal_length_mm=0,
         min_animal_width_mm=0,
         max_animal_width_mm=0,
-        pad_value_mm=4.0,
-        blur_sz_mm=1/7.5,
+        pad_value_mm=2.5,
+        blur_sz_mm=1/5,
         median_filter_sz_mm=0,
     )
 )
