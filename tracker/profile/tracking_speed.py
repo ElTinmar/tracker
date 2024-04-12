@@ -129,7 +129,8 @@ tracker = MultiFishTracker_CPU(
     animal=animal_tracker,
     body=body_tracker, 
     eyes=eyes_tracker, 
-    tail=tail_tracker
+    tail=tail_tracker,
+    export_fullres_image=False
 )
 
 with cProfile.Profile() as pr:

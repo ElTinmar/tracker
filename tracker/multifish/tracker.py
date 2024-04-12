@@ -10,11 +10,14 @@ class MultiFishTracker_CPU(MultiFishTracker):
         kwargs = {
             'max_num_animals': self.max_num_animals,
             'animals': animals,
-            'image': image,
             'body': body,
             'eyes': eyes,
             'tail': tail
         } 
+
+        if self.export_fullres_image:
+            kwargs['image_exported'] = True
+            kwargs['image'] = image
 
         if self.body is not None:
             resize = self.body.tracking_param.resize

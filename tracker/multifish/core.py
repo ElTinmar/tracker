@@ -15,11 +15,12 @@ class Accumulator(Protocol):
 @dataclass
 class MultiFishTracking:
     max_num_animals: int
-    image: NDArray
     animals: AnimalTracking
     body_tracked: bool = False
     eyes_tracked: bool = False
     tail_tracked: bool = False
+    image_exported: bool = False
+    image: Optional[NDArray] = None
     im_body_shape: Optional[tuple] = None
     im_eyes_shape: Optional[tuple] = None
     im_tail_shape: Optional[tuple] = None
@@ -43,12 +44,12 @@ class MultiFishTracking:
         dt_tuples.append(('max_num_animals', int, (1,)))
         array_content.append(self.max_num_animals)
 
-        dt_tuples.append(('image', np.float32, self.image.shape))
-        array_content.append(self.image)
-
         animals = self.animals.to_numpy() 
         dt_tuples.append(('animals', animals.dtype, (1,)))
         array_content.append(animals)
+
+        dt_tuples.append(('image_exported', np.bool_, (1,)))
+        array_content.append(self.image_exported)
 
         dt_tuples.append(('body_tracked', np.bool_, (1,)))
         array_content.append(self.body_tracked)
@@ -58,6 +59,10 @@ class MultiFishTracking:
 
         dt_tuples.append(('tail_tracked', np.bool_, (1,)))
         array_content.append(self.tail_tracked)
+
+        if self.image_exported:
+            dt_tuples.append(('image', np.float32, self.image.shape))
+            array_content.append(self.image)
 
         # TODO: this is mostly repeated 3 times, write a function 
         if self.body_tracked:
@@ -122,11 +127,12 @@ class MultiFishTracking:
     def from_numpy(cls, array):
         instance = cls(
             max_num_animals = array['max_num_animals'][0],
-            image = array['image'],
             animals = AnimalTracking.from_numpy(array['animals'][0]),
+            image_exported = array['image_exported'][0],
             body_tracked = array['body_tracked'][0],
             eyes_tracked = array['eyes_tracked'][0],
             tail_tracked = array['tail_tracked'][0],
+            image = None if not array['image_exported'][0] else array['image'],
             body = None if not array['body_tracked'][0] else {id: BodyTracking.from_numpy(tracking) for id, tracking in zip(array['bodies_id'],array['bodies'])},
             eyes = None if not array['eyes_tracked'][0] else {id: EyesTracking.from_numpy(tracking) for id, tracking in zip(array['eyes_id'],array['eyes'])},
             tail = None if not array['tail_tracked'][0] else {id: TailTracking.from_numpy(tracking) for id, tracking in zip(array['tails_id'],array['tails'])}
@@ -142,11 +148,13 @@ class MultiFishTracker(Tracker):
             animal: AnimalTracker,
             body: Optional[BodyTracker], 
             eyes: Optional[EyesTracker], 
-            tail: Optional[TailTracker]
+            tail: Optional[TailTracker],
+            export_fullres_image: bool = True
         ):
         self.max_num_animals = max_num_animals
         self.accumulator = accumulator
         self.animal = animal
+        self.export_fullres_image = export_fullres_image
         self.body = body
         self.eyes = eyes
         self.tail = tail
