@@ -27,14 +27,13 @@ class BodyTracker_CPU(BodyTracker):
           
         # crop image
         w, h = self.tracking_param.source_crop_dimension_px
+        pad_width = np.max(self.tracking_param.source_crop_dimension_px)
         offset = np.asarray((-w//2, -h//2))
-        left, bottom = centroid.astype(np.int32) + offset 
+        left, bottom = centroid.astype(np.int32) + offset + np.array([pad_width,pad_width])
         right, top = left+w, bottom+h 
 
         # pad image then crop to get fixed image size 
-        pad_width = np.max(self.tracking_param.source_crop_dimension_px)
-        image_padded = np.pad(image, (0,pad_width))
-        
+        image_padded = np.pad(image, (pad_width,pad_width))
         image_crop = image_padded[bottom:top, left:right]
         if image_crop.size == 0:
             return None
