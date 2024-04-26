@@ -39,7 +39,7 @@ class BodyTracker_CPU(BodyTracker):
             return None
 
         if self.tracking_param.resize != 1:
-            image = cv2.resize(
+            image_processed = cv2.resize(
                 image_crop, 
                 self.tracking_param.crop_dimension_px[::-1], 
                 interpolation=cv2.INTER_NEAREST
