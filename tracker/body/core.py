@@ -113,30 +113,39 @@ class BodyTracking:
         '''
         pass    
 
-    def to_numpy(self) -> NDArray:
+    def to_numpy(self, out: Optional[NDArray]) -> Optional[NDArray]:
         '''serialize to fixed-size structured numpy array'''
 
-        dt = np.dtype([
-            ('empty', bool, (1,)),
-            ('heading', np.float32, (2,2)),
-            ('centroid',  np.float32, (1,2)),
-            ('angle_rad',  np.float32, (1,)),
-            ('mask',  np.bool_, self.im_body_shape),
-            ('image',  np.float32, self.im_body_shape),
-        ])
+        if out is not None:
+            out['empty'] = self.heading is None
+            out['heading'] = np.zeros((2,2), np.float32) if self.heading is None else self.heading
+            out['centroid'] = np.zeros((1,2), np.float32) if self.centroid is None else self.centroid
+            out['angle_rad'] = 0.0 if self.angle_rad is None else self.angle_rad
+            out['mask'] = self.mask
+            out['image'] = self.image
 
-        arr = np.array(
-            (
-                self.heading is None,
-                np.zeros((2,2), np.float32) if self.heading is None else self.heading, 
-                np.zeros((1,2), np.float32) if self.centroid is None else self.centroid,
-                0.0 if self.angle_rad is None else self.angle_rad, 
-                self.mask, 
-                self.image
-            ), 
-            dtype=dt
-        )
-        return arr
+        else:
+            dt = np.dtype([
+                ('empty', bool, (1,)),
+                ('heading', np.float32, (2,2)),
+                ('centroid',  np.float32, (1,2)),
+                ('angle_rad',  np.float32, (1,)),
+                ('mask',  np.bool_, self.im_body_shape),
+                ('image',  np.float32, self.im_body_shape),
+            ])
+
+            arr = np.array(
+                (
+                    self.heading is None,
+                    np.zeros((2,2), np.float32) if self.heading is None else self.heading, 
+                    np.zeros((1,2), np.float32) if self.centroid is None else self.centroid,
+                    0.0 if self.angle_rad is None else self.angle_rad, 
+                    self.mask, 
+                    self.image
+                ), 
+                dtype=dt
+            )
+            return arr
     
     @classmethod
     def from_numpy(cls, array):

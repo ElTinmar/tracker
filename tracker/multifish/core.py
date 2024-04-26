@@ -34,94 +34,125 @@ class MultiFishTracking:
         '''export data as csv'''
         pass
 
-    def to_numpy(self) -> NDArray:
+    def to_numpy(self, out: Optional[NDArray]) -> Optional[NDArray]:
         # TODO duplicated code, write functions
         '''serialize to fixed-size structured numpy array'''
 
-        dt_tuples = []
-        array_content = []
+        if out is not None:
+            out['max_num_animals'] = self.max_num_animals
+            out['image_exported'] = self.image_exported
+            out['body_tracked'] = self.body_tracked
+            out['eyes_tracked'] = self.eyes_tracked
+            out['tail_tracked'] = self.tail_tracked
+            
+            self.animals.to_numpy(out['animals'])
 
-        dt_tuples.append(('max_num_animals', int, (1,)))
-        array_content.append(self.max_num_animals)
+            if self.image_exported:
+                out['image'] = self.image
 
-        animals = self.animals.to_numpy() 
-        dt_tuples.append(('animals', animals.dtype, (1,)))
-        array_content.append(animals)
+            if self.body_tracked:
+                for idx, element in enumerate(self.body.items()):
+                    id, body = element
+                    body.to_numpy(out['bodies'][idx])
+                    out['bodies_id'][idx] = id
 
-        dt_tuples.append(('image_exported', np.bool_, (1,)))
-        array_content.append(self.image_exported)
+            if self.eyes_tracked:
+                for idx, element in enumerate(self.eyes.items()):
+                    id, eyes = element
+                    eyes.to_numpy(out['eyes'][idx])
+                    out['eyes_id'][idx] = id
 
-        dt_tuples.append(('body_tracked', np.bool_, (1,)))
-        array_content.append(self.body_tracked)
+            if self.tail_tracked:
+                for idx, element in enumerate(self.tail.items()):
+                    id, tail = element
+                    tail.to_numpy(out['tails'][idx]) 
+                    out['tails_id'][idx] = id
 
-        dt_tuples.append(('eyes_tracked', np.bool_, (1,)))
-        array_content.append(self.eyes_tracked)
+        else:
+            dt_tuples = []
+            array_content = []
 
-        dt_tuples.append(('tail_tracked', np.bool_, (1,)))
-        array_content.append(self.tail_tracked)
+            dt_tuples.append(('max_num_animals', int, (1,)))
+            array_content.append(self.max_num_animals)
 
-        if self.image_exported:
-            dt_tuples.append(('image', np.float32, self.image.shape))
-            array_content.append(self.image)
+            animals = self.animals.to_numpy() 
+            dt_tuples.append(('animals', animals.dtype, (1,)))
+            array_content.append(animals)
 
-        # TODO: this is mostly repeated 3 times, write a function 
-        if self.body_tracked:
-            bodies = [body.to_numpy() for id, body in self.body.items() if body is not None]
-            pad_len = (self.max_num_animals - len(bodies))
-            bodies += [
-                BodyTracking(
-                    im_body_shape = self.im_body_shape, 
-                    image = np.zeros(self.im_body_shape, dtype=np.float32), 
-                    mask = np.zeros(self.im_body_shape, dtype=np.bool_)
-                ).to_numpy()
-            ] * (self.max_num_animals - len(bodies))
-            dt_tuples.append(('bodies', bodies[0].dtype, (self.max_num_animals,)))
-            array_content.append(bodies)
+            dt_tuples.append(('image_exported', np.bool_, (1,)))
+            array_content.append(self.image_exported)
 
-            bodies_ids = [id for id, body in self.body.items() if body is not None]
-            bodies_ids += [-1] * pad_len
-            dt_tuples.append(('bodies_id', int, (self.max_num_animals,)))
-            array_content.append(bodies_ids)
-        
-        if self.eyes_tracked:
-            eyes = [eyes.to_numpy() for id, eyes in self.eyes.items() if eyes is not None]
-            pad_len = (self.max_num_animals - len(eyes))
-            eyes += [
-                EyesTracking(
-                    im_eyes_shape = self.im_eyes_shape,
-                    image = np.zeros(self.im_eyes_shape, dtype=np.float32),
-                    mask = np.zeros(self.im_eyes_shape, dtype=np.bool_)
-                ).to_numpy()
-            ] * pad_len
-            dt_tuples.append(('eyes', eyes[0].dtype, (self.max_num_animals,)))
-            array_content.append(eyes)
+            dt_tuples.append(('body_tracked', np.bool_, (1,)))
+            array_content.append(self.body_tracked)
 
-            eyes_ids = [id for id, eyes in self.eyes.items() if eyes is not None]
-            eyes_ids += [-1] * pad_len
-            dt_tuples.append(('eyes_id', int, (self.max_num_animals,)))
-            array_content.append(eyes_ids)
+            dt_tuples.append(('eyes_tracked', np.bool_, (1,)))
+            array_content.append(self.eyes_tracked)
 
-        if self.tail_tracked:
-            tails = [tail.to_numpy() for id, tail in self.tail.items() if tail is not None]
-            pad_len = (self.max_num_animals - len(tails))
-            tails += [
-                TailTracking(
-                    num_tail_pts = self.num_tail_pts,
-                    num_tail_interp_pts = self.num_tail_interp_pts,
-                    im_tail_shape = self.im_tail_shape,
-                    image = np.zeros(self.im_tail_shape, dtype=np.float32),
-                ).to_numpy()
-            ] * pad_len
-            dt_tuples.append(('tails', tails[0].dtype, (self.max_num_animals,)))
-            array_content.append(tails)
+            dt_tuples.append(('tail_tracked', np.bool_, (1,)))
+            array_content.append(self.tail_tracked)
 
-            tails_ids = [id for id, tail in self.tail.items() if tail is not None]
-            tails_ids += [-1] * pad_len
-            dt_tuples.append(('tails_id', int, (self.max_num_animals,)))
-            array_content.append(tails_ids)
+            if self.image_exported:
+                dt_tuples.append(('image', np.float32, self.image.shape))
+                array_content.append(self.image)
 
-        arr = np.array(tuple(array_content), dtype= np.dtype(dt_tuples, align=True))
-        return arr
+            # TODO: this is mostly repeated 3 times, write a function 
+            if self.body_tracked:
+                bodies = [body.to_numpy() for id, body in self.body.items() if body is not None]
+                pad_len = (self.max_num_animals - len(bodies))
+                bodies += [
+                    BodyTracking(
+                        im_body_shape = self.im_body_shape, 
+                        image = np.zeros(self.im_body_shape, dtype=np.float32), 
+                        mask = np.zeros(self.im_body_shape, dtype=np.bool_)
+                    ).to_numpy()
+                ] * (self.max_num_animals - len(bodies))
+                dt_tuples.append(('bodies', bodies[0].dtype, (self.max_num_animals,)))
+                array_content.append(bodies)
+
+                bodies_ids = [id for id, body in self.body.items() if body is not None]
+                bodies_ids += [-1] * pad_len
+                dt_tuples.append(('bodies_id', int, (self.max_num_animals,)))
+                array_content.append(bodies_ids)
+            
+            if self.eyes_tracked:
+                eyes = [eyes.to_numpy() for id, eyes in self.eyes.items() if eyes is not None]
+                pad_len = (self.max_num_animals - len(eyes))
+                eyes += [
+                    EyesTracking(
+                        im_eyes_shape = self.im_eyes_shape,
+                        image = np.zeros(self.im_eyes_shape, dtype=np.float32),
+                        mask = np.zeros(self.im_eyes_shape, dtype=np.bool_)
+                    ).to_numpy()
+                ] * pad_len
+                dt_tuples.append(('eyes', eyes[0].dtype, (self.max_num_animals,)))
+                array_content.append(eyes)
+
+                eyes_ids = [id for id, eyes in self.eyes.items() if eyes is not None]
+                eyes_ids += [-1] * pad_len
+                dt_tuples.append(('eyes_id', int, (self.max_num_animals,)))
+                array_content.append(eyes_ids)
+
+            if self.tail_tracked:
+                tails = [tail.to_numpy() for id, tail in self.tail.items() if tail is not None]
+                pad_len = (self.max_num_animals - len(tails))
+                tails += [
+                    TailTracking(
+                        num_tail_pts = self.num_tail_pts,
+                        num_tail_interp_pts = self.num_tail_interp_pts,
+                        im_tail_shape = self.im_tail_shape,
+                        image = np.zeros(self.im_tail_shape, dtype=np.float32),
+                    ).to_numpy()
+                ] * pad_len
+                dt_tuples.append(('tails', tails[0].dtype, (self.max_num_animals,)))
+                array_content.append(tails)
+
+                tails_ids = [id for id, tail in self.tail.items() if tail is not None]
+                tails_ids += [-1] * pad_len
+                dt_tuples.append(('tails_id', int, (self.max_num_animals,)))
+                array_content.append(tails_ids)
+
+            arr = np.array(tuple(array_content), dtype= np.dtype(dt_tuples, align=True))
+            return arr
 
     @classmethod
     def from_numpy(cls, array):

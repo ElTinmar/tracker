@@ -98,26 +98,33 @@ class Eye:
     angle: Optional[float] = None
     centroid: Optional[NDArray] = None
 
-    def to_numpy(self) -> NDArray:
+    def to_numpy(self, out: Optional[NDArray]) -> Optional[NDArray]:
         '''serialize to structured numpy array'''
 
-        dt = np.dtype([
-            ('empty', bool, (1,)),
-            ('direction', np.single, (1,2)),
-            ('angle', np.single, (1,)),
-            ('centroid', np.single, (1,2))
-        ])
+        if out is not None:
+            out['empty'] = self.direction is None
+            out['direction'] = np.zeros((1,2), np.single) if self.direction is None else self.direction
+            out['angle'] = np.zeros((1,), np.single) if self.angle is None else self.angle
+            out['centroid'] = np.zeros((1,2), np.single) if self.centroid is None else self.centroid
 
-        arr = np.array(
-            (
-                self.direction is None,
-                np.zeros((1,2), np.single) if self.direction is None else self.direction, 
-                np.zeros((1,), np.single) if self.angle is None else self.angle, 
-                np.zeros((1,2), np.single) if self.centroid is None else self.centroid
-            ), 
-            dtype=dt
-        )
-        return arr
+        else:
+            dt = np.dtype([
+                ('empty', bool, (1,)),
+                ('direction', np.single, (1,2)),
+                ('angle', np.single, (1,)),
+                ('centroid', np.single, (1,2))
+            ])
+                        
+            arr = np.array(
+                (
+                    self.direction is None,
+                    np.zeros((1,2), np.single) if self.direction is None else self.direction, 
+                    np.zeros((1,), np.single) if self.angle is None else self.angle, 
+                    np.zeros((1,2), np.single) if self.centroid is None else self.centroid
+                ), 
+                dtype=dt
+            )
+            return arr
     
     @classmethod
     def from_numpy(cls, array):
@@ -142,36 +149,46 @@ class EyesTracking:
         '''export data as csv'''
         pass
 
-    def to_numpy(self) -> NDArray:
+    def to_numpy(self, out: Optional[NDArray]) -> Optional[NDArray]:
         '''serialize to fixed-size structured numpy array'''
 
-        left_eye = self.left_eye.to_numpy() if self.left_eye is not None else Eye().to_numpy()
-        right_eye = self.right_eye.to_numpy() if self.right_eye is not None else Eye().to_numpy()
+        if out is not None:
+            out['empty'] = self.centroid is None
+            out['centroid'] = np.zeros((1,2), np.float32) if self.centroid is None else self.centroid
+            out['offset'] = np.zeros((1,2), np.int32) if self.offset is None else self.offset
+            self.left_eye.to_numpy(out['left_eye'])
+            self.right_eye.to_numpy(out['right_eye'])
+            out['mask'] = self.mask
+            out['image'] = self.image 
 
-        dt = np.dtype([
-            ('empty', bool, (1,)),
-            ('centroid', np.float32, (1,2)),
-            ('offset',  np.int32, (1,2)),
-            ('left_eye',  left_eye.dtype, left_eye.shape),
-            ('right_eye',  right_eye.dtype, right_eye.shape),
-            ('mask',  np.bool_, self.im_eyes_shape),
-            ('image',  np.float32, self.im_eyes_shape),
-        ])
+        else:
+            left_eye = self.left_eye.to_numpy() if self.left_eye is not None else Eye().to_numpy()
+            right_eye = self.right_eye.to_numpy() if self.right_eye is not None else Eye().to_numpy()
 
-        arr = np.array(
-            (
-                self.centroid is None,
-                np.zeros((1,2), np.float32) if self.centroid is None else self.centroid,
-                np.zeros((1,2), np.int32) if self.offset is None else self.offset,
-                left_eye, 
-                right_eye,                
-                self.mask, 
-                self.image 
-            ), 
-            dtype=dt
-        )
-        return arr
-    
+            dt = np.dtype([
+                ('empty', bool, (1,)),
+                ('centroid', np.float32, (1,2)),
+                ('offset',  np.int32, (1,2)),
+                ('left_eye',  left_eye.dtype, left_eye.shape),
+                ('right_eye',  right_eye.dtype, right_eye.shape),
+                ('mask',  np.bool_, self.im_eyes_shape),
+                ('image',  np.float32, self.im_eyes_shape),
+            ])
+
+            arr = np.array(
+                (
+                    self.centroid is None,
+                    np.zeros((1,2), np.float32) if self.centroid is None else self.centroid,
+                    np.zeros((1,2), np.int32) if self.offset is None else self.offset,
+                    left_eye, 
+                    right_eye,                
+                    self.mask, 
+                    self.image 
+                ), 
+                dtype=dt
+            )
+            return arr
+        
     @classmethod
     def from_numpy(cls, array):
         instance = cls(

@@ -129,38 +129,51 @@ class AnimalTracking:
         '''
         pass    
 
-    def to_numpy(self) -> NDArray:
+    def to_numpy(self, out: Optional[NDArray]) -> Optional[NDArray]:
         '''serialize to fixed-size structured numpy array'''
 
-        dt = np.dtype([
-            ('empty', bool, (1,)),
-            ('max_num_animals', int, (1,)),
-            ('identities', int, (self.max_num_animals, 1)),
-            ('indices', int, (self.max_num_animals, 1)),
-            ('centroids', np.float32, (self.max_num_animals, 2)),
-            ('bounding_boxes', int, (self.max_num_animals, 4)),
-            ('padding', int, (self.max_num_animals, 4)),
-            ('bb_centroids', np.float32, (self.max_num_animals, 2)),
-            ('mask', np.bool_, self.im_animals_shape),
-            ('image', np.float32, self.im_animals_shape),
-        ])
-        
-        arr = np.array(
-            (
-                self.identities is None,
-                self.max_num_animals,
-                np.zeros((self.max_num_animals, 1), int) if self.identities is None else self.identities,
-                np.zeros((self.max_num_animals, 1), int) if self.indices is None else self.indices, 
-                np.zeros((self.max_num_animals, 2), np.float32) if self.centroids is None else self.centroids, 
-                np.zeros((self.max_num_animals, 4), int) if self.bounding_boxes is None else self.bounding_boxes,
-                np.zeros((self.max_num_animals, 4), int) if self.padding is None else self.padding, 
-                np.zeros((self.max_num_animals, 2), np.float32) if self.bb_centroids is None else self.bb_centroids, 
-                self.mask, 
-                self.image
-            ), 
-            dtype=dt
-        )
-        return arr
+        if out is not None:
+            out['empty'] = self.identities is None
+            out['max_num_animals'] = self.max_num_animals
+            out['identities'] = np.zeros((self.max_num_animals, 1), int) if self.identities is None else self.identities
+            out['indices'] = np.zeros((self.max_num_animals, 1), int) if self.indices is None else self.indices
+            out['centroids'] = np.zeros((self.max_num_animals, 2), np.float32) if self.centroids is None else self.centroids
+            out['bounding_boxes'] = np.zeros((self.max_num_animals, 4), int) if self.bounding_boxes is None else self.bounding_boxes
+            out['padding'] = np.zeros((self.max_num_animals, 4), int) if self.padding is None else self.padding
+            out['bb_centroids'] = np.zeros((self.max_num_animals, 2), np.float32) if self.bb_centroids is None else self.bb_centroids
+            out['mask'] = self.mask
+            out['image'] = self.image
+
+        else:
+            dt = np.dtype([
+                ('empty', bool, (1,)),
+                ('max_num_animals', int, (1,)),
+                ('identities', int, (self.max_num_animals, 1)),
+                ('indices', int, (self.max_num_animals, 1)),
+                ('centroids', np.float32, (self.max_num_animals, 2)),
+                ('bounding_boxes', int, (self.max_num_animals, 4)),
+                ('padding', int, (self.max_num_animals, 4)),
+                ('bb_centroids', np.float32, (self.max_num_animals, 2)),
+                ('mask', np.bool_, self.im_animals_shape),
+                ('image', np.float32, self.im_animals_shape),
+            ])
+            
+            arr = np.array(
+                (
+                    self.identities is None,
+                    self.max_num_animals,
+                    np.zeros((self.max_num_animals, 1), int) if self.identities is None else self.identities,
+                    np.zeros((self.max_num_animals, 1), int) if self.indices is None else self.indices, 
+                    np.zeros((self.max_num_animals, 2), np.float32) if self.centroids is None else self.centroids, 
+                    np.zeros((self.max_num_animals, 4), int) if self.bounding_boxes is None else self.bounding_boxes,
+                    np.zeros((self.max_num_animals, 4), int) if self.padding is None else self.padding, 
+                    np.zeros((self.max_num_animals, 2), np.float32) if self.bb_centroids is None else self.bb_centroids, 
+                    self.mask, 
+                    self.image
+                ), 
+                dtype=dt
+            )
+            return arr
     
     @classmethod
     def from_numpy(cls, array):

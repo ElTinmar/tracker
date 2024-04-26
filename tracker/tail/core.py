@@ -112,34 +112,45 @@ class TailTracking:
         '''export data as csv'''
         pass
 
-    def to_numpy(self) -> NDArray:
+    def to_numpy(self, out: Optional[NDArray]) -> Optional[NDArray]:
         '''serialize to fixed-size structured numpy array'''
-        
-        dt = np.dtype([
-            ('empty', bool, (1,)),
-            ('num_tail_pts', int, (1,)),
-            ('num_tail_interp_pts', int, (1,)),
-            ('centroid', np.float32, (1,2)),
-            ('offset',  np.float32, (1,2)),
-            ('skeleton',  np.float32, (self.num_tail_pts,2)),
-            ('skeleton_interp',  np.float32, (self.num_tail_interp_pts,2)),
-            ('image',  np.float32, self.im_tail_shape)
-        ])
 
-        arr = np.array(
-            (
-                self.skeleton is None,
-                self.num_tail_pts,
-                self.num_tail_interp_pts,
-                np.zeros((1,2), np.float32) if self.centroid is None else self.centroid, 
-                np.zeros((1,2), np.float32) if self.offset is None else self.offset,
-                np.zeros((self.num_tail_pts,2), np.float32) if self.skeleton is None else self.skeleton,
-                np.zeros((self.num_tail_interp_pts,2), np.float32) if self.skeleton_interp is None else self.skeleton_interp,
-                np.zeros(self.im_tail_shape, np.float32) if self.image is None else self.image
-            ), 
-            dtype=dt
-        )
-        return arr
+        if out is not None:
+            out['empty'] = self.skeleton is None
+            out['num_tail_pts'] = self.num_tail_pts
+            out['num_tail_interp_pts'] = self.num_tail_interp_pts
+            out['centroid'] = np.zeros((1,2), np.float32) if self.centroid is None else self.centroid
+            out['offset'] = np.zeros((1,2), np.float32) if self.offset is None else self.offset
+            out['skeleton'] = np.zeros((self.num_tail_pts,2), np.float32) if self.skeleton is None else self.skeleton
+            out['skeleton_interp'] = np.zeros((self.num_tail_interp_pts,2), np.float32) if self.skeleton_interp is None else self.skeleton_interp
+            out['image'] = np.zeros(self.im_tail_shape, np.float32) if self.image is None else self.image
+
+        else:            
+            dt = np.dtype([
+                ('empty', bool, (1,)),
+                ('num_tail_pts', int, (1,)),
+                ('num_tail_interp_pts', int, (1,)),
+                ('centroid', np.float32, (1,2)),
+                ('offset',  np.float32, (1,2)),
+                ('skeleton',  np.float32, (self.num_tail_pts,2)),
+                ('skeleton_interp',  np.float32, (self.num_tail_interp_pts,2)),
+                ('image',  np.float32, self.im_tail_shape)
+            ])
+            
+            arr = np.array(
+                (
+                    self.skeleton is None,
+                    self.num_tail_pts,
+                    self.num_tail_interp_pts,
+                    np.zeros((1,2), np.float32) if self.centroid is None else self.centroid, 
+                    np.zeros((1,2), np.float32) if self.offset is None else self.offset,
+                    np.zeros((self.num_tail_pts,2), np.float32) if self.skeleton is None else self.skeleton,
+                    np.zeros((self.num_tail_interp_pts,2), np.float32) if self.skeleton_interp is None else self.skeleton_interp,
+                    np.zeros(self.im_tail_shape, np.float32) if self.image is None else self.image
+                ), 
+                dtype=dt
+            )
+            return arr
 
     @classmethod
     def from_numpy(cls, array):
