@@ -67,7 +67,7 @@ body_tracker = BodyTracker_CPU(
         max_body_length_mm=0,
         min_body_width_mm=0,
         max_body_width_mm=0,
-        crop_dimension_mm=(2.75, 2.75),
+        crop_dimension_mm=(5.5, 5.5),
         blur_sz_mm=1/7.5,
         median_filter_sz_mm=0,
     )

@@ -1,5 +1,5 @@
-import cv2
 from typing import Optional
+import numpy as np
 from numpy.typing import NDArray
 from image_tools import im2uint8, im2rgb
 from geometry import Affine2DTransform
@@ -31,7 +31,7 @@ class MultiFishOverlay_opencv(MultiFishOverlay):
             for idx, id in zip(tracking.animals.indices, tracking.animals.identities):
 
                 # transformation matrix from coord system 1. to coord system 2., just a translation  
-                tx, ty = tracking.animals.centroids[idx,:]
+                tx, ty = tracking.animals.centroids[idx,:] - np.asarray(tracking.im_body_fullres_shape)//2
                 T_bbox_to_image = Affine2DTransform.translation(tx,ty)
 
                 if (self.body is not None) and (tracking.body[id] is not None) and (tracking.body[id].centroid is not None):
