@@ -1,5 +1,5 @@
 from typing import Optional, Protocol
-from numpy.typing import NDArray, ArrayLike
+from numpy.typing import NDArray
 from dataclasses import dataclass
 from tracker.core import Tracker, TrackingOverlay
 import numpy as np

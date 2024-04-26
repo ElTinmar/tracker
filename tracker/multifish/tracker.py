@@ -62,7 +62,7 @@ class MultiFishTracker_CPU(MultiFishTracker):
                 if self.body is not None:
 
                     # get more precise centroid and orientation of the animals
-                    body[id] = self.body.track(image, centroid=animals.centroid[id,:])
+                    body[id] = self.body.track(image, centroid=animals.centroids[id,:])
 
                     # if body was found, track eyes and tail
                     if (body[id] is not None) and (body[id].centroid is not None):
