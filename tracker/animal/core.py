@@ -94,6 +94,7 @@ class AnimalTrackerParamOverlay:
     centroid_color_BGR: tuple = (128, 255, 128)
     centroid_thickness: int = -1
     id_str_color_BGR: tuple = (255, 255, 255)
+    label_offset: int = 10
 
     def mm2px(self, val_mm):
         return int(val_mm * self.pix_per_mm) 

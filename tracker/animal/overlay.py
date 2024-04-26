@@ -34,7 +34,7 @@ class AnimalOverlay_opencv(AnimalOverlay):
                 # show ID
                 cv2.putText(
                     overlay, 
-                    str(id), (int(x), int(y)), 
+                    str(id), (int(x+self.overlay_param.label_offset), int(y-self.overlay_param.label_offset)), 
                     cv2.FONT_HERSHEY_SIMPLEX, 1.5, 
                     self.overlay_param.id_str_color_BGR, 
                     2, 
