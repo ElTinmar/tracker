@@ -20,7 +20,7 @@ class BodyTrackerParamTracking:
     max_body_length_mm: float = 6.0
     min_body_width_mm: float = 1.0
     max_body_width_mm: float = 3.0
-    crop_dimension_mm: Tuple[float, float] = (2.75, 2.75) 
+    crop_dimension_mm: Tuple[float, float] = (5.5, 5.5) 
 
     def mm2px(self, val_mm):
         return int(val_mm * self.target_pix_per_mm) 
