@@ -28,7 +28,6 @@ class AnimalTrackerParamTracking:
     max_animal_length_mm: float = 6.0
     min_animal_width_mm: float = 1.0
     max_animal_width_mm: float = 3.0
-    pad_value_mm: float = 3.0
 
     def mm2px(self, val_mm):
         val_px = int(val_mm * self.target_pix_per_mm) 
@@ -61,10 +60,6 @@ class AnimalTrackerParamTracking:
     @property
     def max_animal_width_px(self):
         return self.mm2px(self.max_animal_width_mm)
-    
-    @property
-    def pad_value_px(self):
-        return self.mm2px(self.pad_value_mm)
 
     @property
     def blur_sz_px(self):
@@ -90,7 +85,6 @@ class AnimalTrackerParamTracking:
         res['max_animal_length_mm'] = self.max_animal_length_mm
         res['min_animal_width_mm'] = self.min_animal_width_mm
         res['max_animal_width_mm'] = self.max_animal_width_mm
-        res['pad_value_mm'] = self.pad_value_mm
         return res
 
 @dataclass
@@ -98,9 +92,7 @@ class AnimalTrackerParamOverlay:
     pix_per_mm: float = 40.0
     radius_mm: float = 0.1
     centroid_color_BGR: tuple = (128, 255, 128)
-    bbox_color_BGR: tuple = (255, 255, 255) 
     centroid_thickness: int = -1
-    bbox_thickness: int = 2
     id_str_color_BGR: tuple = (255, 255, 255)
 
     def mm2px(self, val_mm):
@@ -119,9 +111,6 @@ class AnimalTracking:
     identities: Optional[NDArray] = None
     indices: Optional[NDArray] = None
     centroids: Optional[NDArray] = None
-    bounding_boxes: Optional[NDArray] = None
-    padding: Optional[NDArray] = None
-    bb_centroids: Optional[NDArray] = None
 
     def to_csv(self):
         '''
@@ -138,9 +127,6 @@ class AnimalTracking:
             out[0]['identities'] = np.zeros((self.max_num_animals, 1), int) if self.identities is None else self.identities
             out[0]['indices'] = np.zeros((self.max_num_animals, 1), int) if self.indices is None else self.indices
             out[0]['centroids'] = np.zeros((self.max_num_animals, 2), np.float32) if self.centroids is None else self.centroids
-            out[0]['bounding_boxes'] = np.zeros((self.max_num_animals, 4), int) if self.bounding_boxes is None else self.bounding_boxes
-            out[0]['padding'] = np.zeros((self.max_num_animals, 4), int) if self.padding is None else self.padding
-            out[0]['bb_centroids'] = np.zeros((self.max_num_animals, 2), np.float32) if self.bb_centroids is None else self.bb_centroids
             out[0]['mask'] = self.mask
             out[0]['image'] = self.image
 
@@ -151,9 +137,6 @@ class AnimalTracking:
                 ('identities', int, (self.max_num_animals, 1)),
                 ('indices', int, (self.max_num_animals, 1)),
                 ('centroids', np.float32, (self.max_num_animals, 2)),
-                ('bounding_boxes', int, (self.max_num_animals, 4)),
-                ('padding', int, (self.max_num_animals, 4)),
-                ('bb_centroids', np.float32, (self.max_num_animals, 2)),
                 ('mask', np.bool_, self.im_animals_shape),
                 ('image', np.float32, self.im_animals_shape),
             ])
@@ -165,9 +148,6 @@ class AnimalTracking:
                     np.zeros((self.max_num_animals, 1), int) if self.identities is None else self.identities,
                     np.zeros((self.max_num_animals, 1), int) if self.indices is None else self.indices, 
                     np.zeros((self.max_num_animals, 2), np.float32) if self.centroids is None else self.centroids, 
-                    np.zeros((self.max_num_animals, 4), int) if self.bounding_boxes is None else self.bounding_boxes,
-                    np.zeros((self.max_num_animals, 4), int) if self.padding is None else self.padding, 
-                    np.zeros((self.max_num_animals, 2), np.float32) if self.bb_centroids is None else self.bb_centroids, 
                     self.mask, 
                     self.image
                 ), 
@@ -185,9 +165,6 @@ class AnimalTracking:
             identities = None if array['empty'][0] else array['identities'][0],
             indices = None if array['empty'][0] else array['indices'][0],
             centroids = None if array['empty'][0] else array['centroids'],
-            bounding_boxes = None if array['empty'][0] else array['bounding_boxes'],
-            padding = None if array['empty'][0] else array['padding'],
-            bb_centroids = None if array['empty'][0] else array['bb_centroids'],
         )
         return instance
     

@@ -20,11 +20,9 @@ class MultiFishTracker_CPU(MultiFishTracker):
             kwargs['image'] = image
 
         if self.body is not None:
-            resize = self.body.tracking_param.resize
-            pad_px = 2*self.animal.tracking_param.pad_value_mm*self.body.tracking_param.pix_per_mm
-            sz = round(pad_px * resize)
+            body_shape = self.body.tracking_param.crop_dimension_px[::-1]
             kwargs['body_tracked'] = True
-            kwargs['im_body_shape'] = (sz, sz)             
+            kwargs['im_body_shape'] = body_shape      
 
         if self.eyes is not None:
             eyes_shape = self.eyes.tracking_param.crop_dimension_px[::-1]
@@ -63,28 +61,15 @@ class MultiFishTracker_CPU(MultiFishTracker):
 
                 if self.body is not None:
 
-                    bb_x, bb_y = animals.bb_centroids[id,:]
-                    left, bottom, right, top = animals.bounding_boxes[id,:]
-                    pad_left, pad_bottom, pad_right, pad_top = animals.padding[id,:]
-                    
-                    # crop each animal's bounding box
-                    image_cropped = image[bottom:top, left:right] 
-
-                    # pad if image was clipped on the edges
-                    image_cropped = np.pad(image_cropped,((pad_bottom, pad_top),(pad_left, pad_right)))
-                    
-                    # bottom-left coordinate 
-                    offset = np.array([pad_left+bb_x, pad_bottom+bb_y])
-
                     # get more precise centroid and orientation of the animals
-                    body[id] = self.body.track(image_cropped, centroid=offset)
+                    body[id] = self.body.track(image, centroid=animals.centroid[id,:])
 
                     # if body was found, track eyes and tail
                     if (body[id] is not None) and (body[id].centroid is not None):
                         
                         # rotate the animal so that it's vertical head up
                         image_rot, centroid_rot = imrotate(
-                            image_cropped, 
+                            body[id].image, 
                             body[id].centroid[0], body[id].centroid[1], 
                             np.rad2deg(body[id].angle_rad)
                         )

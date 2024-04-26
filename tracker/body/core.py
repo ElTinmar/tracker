@@ -1,5 +1,5 @@
-from numpy.typing import NDArray, ArrayLike
-from typing import Optional
+from numpy.typing import NDArray
+from typing import Optional, Tuple
 import numpy as np
 from dataclasses import dataclass
 from tracker.core import Tracker, TrackingOverlay
@@ -20,6 +20,7 @@ class BodyTrackerParamTracking:
     max_body_length_mm: float = 6.0
     min_body_width_mm: float = 1.0
     max_body_width_mm: float = 3.0
+    crop_dimension_mm: Tuple[float, float] = (1.2, 1.2) 
 
     def mm2px(self, val_mm):
         return int(val_mm * self.target_pix_per_mm) 
@@ -59,6 +60,14 @@ class BodyTrackerParamTracking:
     @property
     def median_filter_sz_px(self):
         return self.mm2px(self.median_filter_sz_mm)
+    
+    @property
+    def crop_dimension_px(self):
+        # some video codec require height, width to be divisible by 2
+        return (
+            2* (self.mm2px(self.crop_dimension_mm[0])//2),
+            2* (self.mm2px(self.crop_dimension_mm[1])//2)
+        ) 
 
     def to_dict(self):
         res = {}
@@ -76,6 +85,7 @@ class BodyTrackerParamTracking:
         res['max_body_length_mm'] = self.max_body_length_mm
         res['min_body_width_mm'] = self.min_body_width_mm
         res['max_body_width_mm'] = self.max_body_width_mm
+        res['crop_dimension_mm'] = self.crop_dimension_mm
         return res
     
 @dataclass

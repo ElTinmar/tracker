@@ -50,53 +50,22 @@ class AnimalTracker_CPU(AnimalTracker):
                 max_num_animals = self.assignment.max_num_animals,
                 identities = None,
                 centroids = None,
-                bounding_boxes = None,
-                padding = None,
-                bb_centroids = None,
                 mask = mask,
                 image = image
             )
             return res
-
-        bboxes = np.zeros((centroids.shape[0],4), dtype=int)
-        padding = np.zeros((centroids.shape[0],4), dtype=int)
-        bb_centroids = np.zeros((centroids.shape[0],2), dtype=float)
-        for idx, (x,y) in enumerate(centroids):
-
-            left = max(round(x - self.tracking_param.pad_value_px), 0)
-            bottom = max(round(y - self.tracking_param.pad_value_px), 0)
-            right = min(round(x + self.tracking_param.pad_value_px), width)
-            top = min(round(y + self.tracking_param.pad_value_px), height)
-
-            pad_left = -1 * min(round(x - self.tracking_param.pad_value_px), 0)
-            pad_bottom = -1 * min(round(y - self.tracking_param.pad_value_px), 0)
-            pad_right = -1 * min(width - round(x + self.tracking_param.pad_value_px), 0)
-            pad_top = -1 * min(height - round(y + self.tracking_param.pad_value_px), 0)
-
-            bboxes[idx,:] = [left,bottom,right,top]
-            padding[idx,:] = [pad_left,pad_bottom,pad_right,pad_top]
-            bb_centroids[idx,:] = [x-left, y-bottom] 
 
         # identity assignment
         self.assignment.update(centroids)
         identities = self.assignment.get_ID()
         to_keep = self.assignment.get_kept_centroids()   
 
-        # resize to original
-        centroids_ori = centroids[to_keep,:]/self.tracking_param.resize
-        bboxes_ori = bboxes[to_keep,:]/self.tracking_param.resize
-        padding_ori = padding[to_keep,:]/self.tracking_param.resize
-        bb_centroids_ori = bb_centroids[to_keep,:]/self.tracking_param.resize
-
         res = AnimalTracking(
             im_animals_shape = image.shape,
             max_num_animals = self.assignment.max_num_animals,
             identities = identities,
             indices = to_keep,
-            centroids = centroids_ori,
-            bounding_boxes = bboxes_ori.astype(int),
-            padding = padding_ori.astype(int), 
-            bb_centroids = bb_centroids_ori,
+            centroids = centroids[to_keep,:]/self.tracking_param.resize,
             mask = mask,
             image = image
         )
