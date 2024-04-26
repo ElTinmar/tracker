@@ -20,11 +20,8 @@ class EyesTracker_CPU(EyesTracker):
         if self.tracking_param.resize != 1:
             image = cv2.resize(
                 image, 
-                None, 
-                None,
-                self.tracking_param.resize,
-                self.tracking_param.resize,
-                cv2.INTER_NEAREST
+                self.tracking_param.crop_dimension_px[::-1], 
+                interpolation=cv2.INTER_NEAREST
             )
 
         # crop image

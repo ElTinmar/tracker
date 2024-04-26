@@ -39,13 +39,10 @@ class BodyTracker_CPU(BodyTracker):
             return None
 
         if self.tracking_param.resize != 1:
-            image_processed = cv2.resize(
+            image = cv2.resize(
                 image_crop, 
-                None, 
-                None,
-                self.tracking_param.resize,
-                self.tracking_param.resize,
-                cv2.INTER_NEAREST
+                self.tracking_param.crop_dimension_px[::-1], 
+                interpolation=cv2.INTER_NEAREST
             )
 
         # tune image contrast and gamma
@@ -57,8 +54,9 @@ class BodyTracker_CPU(BodyTracker):
             self.tracking_param.blur_sz_px,
             self.tracking_param.median_filter_sz_px
         )
-
+    
         mask = (image_processed >= self.tracking_param.body_intensity)
+
         props = bwareafilter_props(
             mask, 
             min_size = self.tracking_param.min_body_size_px,
