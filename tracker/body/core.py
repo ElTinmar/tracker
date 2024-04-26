@@ -152,11 +152,11 @@ class BodyTracking:
             dt = np.dtype([
                 ('empty', bool, (1,)),
                 ('heading', np.float32, (2,2)),
-                ('centroid',  np.float32, (1,2)),
-                ('angle_rad',  np.float32, (1,)),
-                ('mask',  np.bool_, self.im_body_shape),
-                ('image',  np.float32, self.im_body_shape),
-                ('image_fullres',  np.float32, self.im_body_fullres_shape),
+                ('centroid', np.float32, (1,2)),
+                ('angle_rad', np.float32, (1,)),
+                ('mask', np.bool_, self.im_body_shape),
+                ('image', np.float32, self.im_body_shape),
+                ('image_fullres', np.float32, self.im_body_fullres_shape),
             ])
 
             arr = np.array(
