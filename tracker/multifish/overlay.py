@@ -33,7 +33,7 @@ class MultiFishOverlay_opencv(MultiFishOverlay):
                 if (self.body is not None) and (tracking.body[id] is not None) and (tracking.body[id].centroid is not None):
 
                     # transformation matrix from coord system 1. to coord system 2., just a translation  
-                    tx, ty = tracking.animals.centroids[idx,:] - np.asarray(tracking.body[id].image_fullres.shape)//2 # dirty fix?
+                    tx, ty = tracking.body[id].centroid  - np.asarray(tracking.body[id].image_fullres.shape)//2 # dirty fix?
                     T_bbox_to_image = Affine2DTransform.translation(tx,ty)
 
                     # overlay body, coord. system 2.
@@ -46,7 +46,7 @@ class MultiFishOverlay_opencv(MultiFishOverlay):
                     # transformation matrix from coord system 1. to coord system 3., rotation + translation
                     angle = tracking.body[id].angle_rad
                     rotation = Affine2DTransform.rotation(angle)
-                    tx, ty = tracking.body[id].centroid 
+                    tx, ty = tracking.body[id].centroid
                     T_fish_centroid_to_bbox = Affine2DTransform.translation(tx, ty)
                     T_egocentric_to_image = T_bbox_to_image @ T_fish_centroid_to_bbox @ rotation
                     
