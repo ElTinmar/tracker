@@ -129,7 +129,7 @@ class AnimalTracking:
         '''
         pass    
 
-    def to_numpy(self, out: Optional[NDArray]) -> Optional[NDArray]:
+    def to_numpy(self, out: Optional[NDArray] = None) -> Optional[NDArray]:
         '''serialize to fixed-size structured numpy array'''
 
         if out is not None:

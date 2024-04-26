@@ -34,7 +34,7 @@ class MultiFishTracking:
         '''export data as csv'''
         pass
 
-    def to_numpy(self, out: Optional[NDArray]) -> Optional[NDArray]:
+    def to_numpy(self, out: Optional[NDArray] = None) -> Optional[NDArray]:
         # TODO duplicated code, write functions
         '''serialize to fixed-size structured numpy array'''
 

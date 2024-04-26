@@ -98,7 +98,7 @@ class Eye:
     angle: Optional[float] = None
     centroid: Optional[NDArray] = None
 
-    def to_numpy(self, out: Optional[NDArray]) -> Optional[NDArray]:
+    def to_numpy(self, out: Optional[NDArray] = None) -> Optional[NDArray]:
         '''serialize to structured numpy array'''
 
         if out is not None:
@@ -149,7 +149,7 @@ class EyesTracking:
         '''export data as csv'''
         pass
 
-    def to_numpy(self, out: Optional[NDArray]) -> Optional[NDArray]:
+    def to_numpy(self, out: Optional[NDArray] = None) -> Optional[NDArray]:
         '''serialize to fixed-size structured numpy array'''
 
         if out is not None:
