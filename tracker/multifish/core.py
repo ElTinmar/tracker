@@ -53,6 +53,7 @@ class MultiFishTracking:
             if self.body_tracked:
                 for idx, element in enumerate(self.body.items()):
                     id, body = element
+                    print(out['bodies'],out['bodies'][idx],out['bodies'][idx].shape)
                     body.to_numpy(out['bodies'][idx])
                     out['bodies_id'][idx] = id
 
