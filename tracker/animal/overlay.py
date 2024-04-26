@@ -30,25 +30,11 @@ class AnimalOverlay_opencv(AnimalOverlay):
                     self.overlay_param.centroid_color_BGR, 
                     self.overlay_param.centroid_thickness
                 )
-
-                # draw bounding boxes
-                left, bottom, right, top = tracking.bounding_boxes[idx,:]
-                rect = np.array([[left, top],[right, bottom]])
-                bbox = (transformation_matrix @ to_homogeneous(rect).T).T
-                topleft = bbox[0,:-1].astype(int)
-                bottomright = bbox[1,:-1].astype(int)
-                overlay = cv2.rectangle(
-                    overlay, 
-                    topleft,
-                    bottomright, 
-                    self.overlay_param.bbox_color_BGR, 
-                    self.overlay_param.bbox_thickness
-                )
                 
                 # show ID
                 cv2.putText(
                     overlay, 
-                    str(id), (int(left), int(bottom)), 
+                    str(id), (int(x), int(y)), 
                     cv2.FONT_HERSHEY_SIMPLEX, 1.5, 
                     self.overlay_param.id_str_color_BGR, 
                     2, 
