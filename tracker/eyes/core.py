@@ -156,8 +156,10 @@ class EyesTracking:
             out[0]['empty'] = self.centroid is None
             out[0]['centroid'] = np.zeros((1,2), np.float32) if self.centroid is None else self.centroid
             out[0]['offset'] = np.zeros((1,2), np.int32) if self.offset is None else self.offset
-            self.left_eye.to_numpy(out[0]['left_eye'])
-            self.right_eye.to_numpy(out[0]['right_eye'])
+            if self.left_eye is not None:
+                self.left_eye.to_numpy(out[0]['left_eye'])
+            if self.right_eye is not None:
+                self.right_eye.to_numpy(out[0]['right_eye'])
             out[0]['mask'] = self.mask
             out[0]['image'] = self.image 
 

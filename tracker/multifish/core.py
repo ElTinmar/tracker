@@ -54,20 +54,23 @@ class MultiFishTracking:
             if self.body_tracked:
                 for idx, element in enumerate(self.body.items()):
                     id, body = element
-                    body.to_numpy(out[0]['bodies'][idx])
-                    out[0]['bodies_id'][idx] = id
+                    if body is not None:
+                        body.to_numpy(out[0]['bodies'][idx])
+                        out[0]['bodies_id'][idx] = id
 
             if self.eyes_tracked:
                 for idx, element in enumerate(self.eyes.items()):
                     id, eyes = element
-                    eyes.to_numpy(out[0]['eyes'][idx])
-                    out[0]['eyes_id'][idx] = id
+                    if eyes is not None:
+                        eyes.to_numpy(out[0]['eyes'][idx])
+                        out[0]['eyes_id'][idx] = id
 
             if self.tail_tracked:
                 for idx, element in enumerate(self.tail.items()):
                     id, tail = element
-                    tail.to_numpy(out[0]['tails'][idx]) 
-                    out[0]['tails_id'][idx] = id
+                    if tail is not None:
+                        tail.to_numpy(out[0]['tails'][idx]) 
+                        out[0]['tails_id'][idx] = id
 
         else:
             dt_tuples = []
