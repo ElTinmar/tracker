@@ -34,7 +34,6 @@ LUT = np.zeros((height, width))
 assignment = GridAssignment(LUT)
 accumulator = None
 
-
 animal_tracker = AnimalTracker_CPU(
     assignment=assignment,
     tracking_param=AnimalTrackerParamTracking(

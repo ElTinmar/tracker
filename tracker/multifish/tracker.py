@@ -66,13 +66,11 @@ class MultiFishTracker_CPU(MultiFishTracker):
 
                     # if body was found, track eyes and tail
                     if (body[id] is not None) and (body[id].centroid is not None):
-
-                        tx, ty = body[id].centroid * self.body.tracking_param.resize
                         
                         # rotate the animal so that it's vertical head up
                         image_rot, centroid_rot = imrotate(
-                            body[id].image, 
-                            tx, ty, 
+                            body[id].image_cropped, 
+                            body[id].centroid[0], body[id].centroid[1], 
                             np.rad2deg(body[id].angle_rad)
                         )
 

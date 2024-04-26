@@ -20,10 +20,28 @@ class BodyTracker_CPU(BodyTracker):
 
         if (image is None) or (image.size == 0):
             return None
+        
+        ## TODO 
+        ## <----------
+        ## this is repeated in body/eyes/tail, write a function instead
+          
+        # crop image
+        w, h = self.tracking_param.source_crop_dimension_px
+        offset = np.asarray((-w//2, -h//2))
+        left, bottom = centroid.astype(np.int32) + offset 
+        right, top = left+w, bottom+h 
+
+        # pad image then crop to get fixed image size 
+        pad_width = np.max(self.tracking_param.source_crop_dimension_px)
+        image_padded = np.pad(image, (0,pad_width))
+        
+        image_crop = image_padded[bottom:top, left:right]
+        if image_crop.size == 0:
+            return None
 
         if self.tracking_param.resize != 1:
-            image = cv2.resize(
-                image, 
+            image_processed = cv2.resize(
+                image_crop, 
                 None, 
                 None,
                 self.tracking_param.resize,
@@ -31,27 +49,9 @@ class BodyTracker_CPU(BodyTracker):
                 cv2.INTER_NEAREST
             )
 
-        ## TODO 
-        ## <----------
-        ## this is repeated in body/eyes/tail, write a function instead
-          
-        # crop image
-        w, h = self.tracking_param.crop_dimension_px
-        offset = np.array((-w//2, -h//2))
-        left, bottom = (centroid * self.tracking_param.resize).astype(np.int32) + offset 
-        right, top = left+w, bottom+h 
-
-        # pad image then crop to get fixed image size 
-        pad_width = np.max(self.tracking_param.crop_dimension_px)
-        image_padded = np.pad(image, (0,pad_width))
-        
-        image_crop = image_padded[bottom:top, left:right]
-        if image_crop.size == 0:
-            return None
-        
         # tune image contrast and gamma
-        image_crop = enhance(
-            image_crop,
+        image_processed = enhance(
+            image_processed,
             self.tracking_param.body_contrast,
             self.tracking_param.body_gamma,
             self.tracking_param.body_brightness,
@@ -59,9 +59,7 @@ class BodyTracker_CPU(BodyTracker):
             self.tracking_param.median_filter_sz_px
         )
 
-        ## ------------------>
-
-        mask = (image_crop >= self.tracking_param.body_intensity)
+        mask = (image_processed >= self.tracking_param.body_intensity)
         props = bwareafilter_props(
             mask, 
             min_size = self.tracking_param.min_body_size_px,
@@ -75,12 +73,13 @@ class BodyTracker_CPU(BodyTracker):
         if props == []:
 
             res = BodyTracking(
-                im_body_shape = image_crop.shape,
+                im_body_shape = image_processed.shape,
                 heading = None,
                 centroid = None,
                 angle_rad = None,
                 mask = mask,
-                image = image_crop
+                image_cropped = image_crop,
+                image = image_processed
             )
             return res
         
@@ -102,23 +101,25 @@ class BodyTracker_CPU(BodyTracker):
             
             if track_coords.shape[0] < 2:
                 res = BodyTracking(
-                    im_body_shape = image_crop.shape,
+                    im_body_shape = image_processed.shape,
                     heading = None,
                     centroid = None,
                     angle_rad = None,
                     mask = mask,
-                    image = image_crop
+                    image_cropped = image_crop,
+                    image = image_processed
                 )
                 return res
                     
             (principal_components, centroid_coords) = get_orientation(track_coords)
 
             res = BodyTracking(
-                im_body_shape = image_crop.shape,
+                im_body_shape = image_processed.shape,
                 heading = principal_components,
                 centroid = centroid_coords / self.tracking_param.resize,
                 angle_rad = np.arctan2(principal_components[1,1], principal_components[0,1]),
                 mask = mask,
-                image = image_crop
+                image_cropped = image_crop,
+                image = image_processed
             )
             return res

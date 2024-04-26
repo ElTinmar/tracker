@@ -25,6 +25,9 @@ class BodyTrackerParamTracking:
     def mm2px(self, val_mm):
         return int(val_mm * self.target_pix_per_mm) 
 
+    def source_mm2px(self, val_mm):
+        return int(val_mm * self.pix_per_mm) 
+    
     @property
     def resize(self):
         return self.target_pix_per_mm/self.pix_per_mm
@@ -67,6 +70,14 @@ class BodyTrackerParamTracking:
         return (
             2* (self.mm2px(self.crop_dimension_mm[0])//2),
             2* (self.mm2px(self.crop_dimension_mm[1])//2)
+        ) 
+
+    @property
+    def source_crop_dimension_px(self):
+        # some video codec require height, width to be divisible by 2
+        return (
+            2* (self.source_mm2px(self.crop_dimension_mm[0])//2),
+            2* (self.source_mm2px(self.crop_dimension_mm[1])//2)
         ) 
 
     def to_dict(self):
@@ -113,6 +124,7 @@ class BodyTracking:
     im_body_shape: tuple
     mask: NDArray
     image: NDArray
+    image_cropped: NDArray
     heading: Optional[NDArray] = None
     centroid: Optional[NDArray] = None
     angle_rad: Optional[float] = None
