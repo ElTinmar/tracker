@@ -116,14 +116,14 @@ class TailTracking:
         '''serialize to fixed-size structured numpy array'''
 
         if out is not None:
-            out['empty'] = self.skeleton is None
-            out['num_tail_pts'] = self.num_tail_pts
-            out['num_tail_interp_pts'] = self.num_tail_interp_pts
-            out['centroid'] = np.zeros((1,2), np.float32) if self.centroid is None else self.centroid
-            out['offset'] = np.zeros((1,2), np.float32) if self.offset is None else self.offset
-            out['skeleton'] = np.zeros((self.num_tail_pts,2), np.float32) if self.skeleton is None else self.skeleton
-            out['skeleton_interp'] = np.zeros((self.num_tail_interp_pts,2), np.float32) if self.skeleton_interp is None else self.skeleton_interp
-            out['image'] = np.zeros(self.im_tail_shape, np.float32) if self.image is None else self.image
+            out[0]['empty'] = self.skeleton is None
+            out[0]['num_tail_pts'] = self.num_tail_pts
+            out[0]['num_tail_interp_pts'] = self.num_tail_interp_pts
+            out[0]['centroid'] = np.zeros((1,2), np.float32) if self.centroid is None else self.centroid
+            out[0]['offset'] = np.zeros((1,2), np.float32) if self.offset is None else self.offset
+            out[0]['skeleton'] = np.zeros((self.num_tail_pts,2), np.float32) if self.skeleton is None else self.skeleton
+            out[0]['skeleton_interp'] = np.zeros((self.num_tail_interp_pts,2), np.float32) if self.skeleton_interp is None else self.skeleton_interp
+            out[0]['image'] = np.zeros(self.im_tail_shape, np.float32) if self.image is None else self.image
 
         else:            
             dt = np.dtype([

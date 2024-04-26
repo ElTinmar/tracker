@@ -102,10 +102,10 @@ class Eye:
         '''serialize to structured numpy array'''
 
         if out is not None:
-            out['empty'] = self.direction is None
-            out['direction'] = np.zeros((1,2), np.single) if self.direction is None else self.direction
-            out['angle'] = np.zeros((1,), np.single) if self.angle is None else self.angle
-            out['centroid'] = np.zeros((1,2), np.single) if self.centroid is None else self.centroid
+            out[0]['empty'] = self.direction is None
+            out[0]['direction'] = np.zeros((1,2), np.single) if self.direction is None else self.direction
+            out[0]['angle'] = np.zeros((1,), np.single) if self.angle is None else self.angle
+            out[0]['centroid'] = np.zeros((1,2), np.single) if self.centroid is None else self.centroid
 
         else:
             dt = np.dtype([
@@ -153,13 +153,13 @@ class EyesTracking:
         '''serialize to fixed-size structured numpy array'''
 
         if out is not None:
-            out['empty'] = self.centroid is None
-            out['centroid'] = np.zeros((1,2), np.float32) if self.centroid is None else self.centroid
-            out['offset'] = np.zeros((1,2), np.int32) if self.offset is None else self.offset
-            self.left_eye.to_numpy(out['left_eye'])
-            self.right_eye.to_numpy(out['right_eye'])
-            out['mask'] = self.mask
-            out['image'] = self.image 
+            out[0]['empty'] = self.centroid is None
+            out[0]['centroid'] = np.zeros((1,2), np.float32) if self.centroid is None else self.centroid
+            out[0]['offset'] = np.zeros((1,2), np.int32) if self.offset is None else self.offset
+            self.left_eye.to_numpy(out[0]['left_eye'])
+            self.right_eye.to_numpy(out[0]['right_eye'])
+            out[0]['mask'] = self.mask
+            out[0]['image'] = self.image 
 
         else:
             left_eye = self.left_eye.to_numpy() if self.left_eye is not None else Eye().to_numpy()

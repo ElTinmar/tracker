@@ -39,35 +39,34 @@ class MultiFishTracking:
         '''serialize to fixed-size structured numpy array'''
 
         if out is not None:
-            out['max_num_animals'] = self.max_num_animals
-            out['image_exported'] = self.image_exported
-            out['body_tracked'] = self.body_tracked
-            out['eyes_tracked'] = self.eyes_tracked
-            out['tail_tracked'] = self.tail_tracked
+            out[0]['max_num_animals'] = self.max_num_animals
+            out[0]['image_exported'] = self.image_exported
+            out[0]['body_tracked'] = self.body_tracked
+            out[0]['eyes_tracked'] = self.eyes_tracked
+            out[0]['tail_tracked'] = self.tail_tracked
             
-            self.animals.to_numpy(out['animals'])
+            self.animals.to_numpy(out[0]['animals'])
 
             if self.image_exported:
-                out['image'] = self.image
+                out[0]['image'] = self.image
 
             if self.body_tracked:
                 for idx, element in enumerate(self.body.items()):
                     id, body = element
-                    print(out[0]['bodies'][idx,].shape, out[0]['bodies'][idx,].dtype)
-                    body.to_numpy(out[0]['bodies'][idx,])
-                    out['bodies_id'][idx] = id
+                    body.to_numpy(out[0]['bodies'][idx])
+                    out[0]['bodies_id'][idx] = id
 
             if self.eyes_tracked:
                 for idx, element in enumerate(self.eyes.items()):
                     id, eyes = element
-                    eyes.to_numpy(out['eyes'][idx])
-                    out['eyes_id'][idx] = id
+                    eyes.to_numpy(out[0]['eyes'][idx])
+                    out[0]['eyes_id'][idx] = id
 
             if self.tail_tracked:
                 for idx, element in enumerate(self.tail.items()):
                     id, tail = element
-                    tail.to_numpy(out['tails'][idx]) 
-                    out['tails_id'][idx] = id
+                    tail.to_numpy(out[0]['tails'][idx]) 
+                    out[0]['tails_id'][idx] = id
 
         else:
             dt_tuples = []

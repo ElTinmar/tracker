@@ -117,12 +117,12 @@ class BodyTracking:
         '''serialize to fixed-size structured numpy array'''
 
         if out is not None:
-            out['empty'] = self.heading is None
-            out['heading'] = np.zeros((2,2), np.float32) if self.heading is None else self.heading
-            out['centroid'] = np.zeros((1,2), np.float32) if self.centroid is None else self.centroid
-            out['angle_rad'] = 0.0 if self.angle_rad is None else self.angle_rad
-            out['mask'] = self.mask
-            out['image'] = self.image
+            out[0]['empty'] = self.heading is None
+            out[0]['heading'] = np.zeros((2,2), np.float32) if self.heading is None else self.heading
+            out[0]['centroid'] = np.zeros((1,2), np.float32) if self.centroid is None else self.centroid
+            out[0]['angle_rad'] = 0.0 if self.angle_rad is None else self.angle_rad
+            out[0]['mask'] = self.mask
+            out[0]['image'] = self.image
 
         else:
             dt = np.dtype([
