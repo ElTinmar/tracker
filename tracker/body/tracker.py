@@ -74,11 +74,12 @@ class BodyTracker_CPU(BodyTracker):
 
             res = BodyTracking(
                 im_body_shape = image_processed.shape,
+                im_body_fullres_shape = image_crop.shape,
                 heading = None,
                 centroid = None,
                 angle_rad = None,
                 mask = mask,
-                image_cropped = image_crop,
+                image_fullres = image_crop,
                 image = image_processed
             )
             return res
@@ -102,11 +103,12 @@ class BodyTracker_CPU(BodyTracker):
             if track_coords.shape[0] < 2:
                 res = BodyTracking(
                     im_body_shape = image_processed.shape,
+                    im_body_fullres_shape = image_crop.shape,
                     heading = None,
                     centroid = None,
                     angle_rad = None,
                     mask = mask,
-                    image_cropped = image_crop,
+                    image_fullres = image_crop,
                     image = image_processed
                 )
                 return res
@@ -115,11 +117,12 @@ class BodyTracker_CPU(BodyTracker):
 
             res = BodyTracking(
                 im_body_shape = image_processed.shape,
+                im_body_fullres_shape = image_crop.shape,
                 heading = principal_components,
                 centroid = centroid_coords / self.tracking_param.resize,
                 angle_rad = np.arctan2(principal_components[1,1], principal_components[0,1]),
                 mask = mask,
-                image_cropped = image_crop,
+                image_fullres = image_crop,
                 image = image_processed
             )
             return res

@@ -22,6 +22,7 @@ class MultiFishTracking:
     image_exported: bool = False
     image: Optional[NDArray] = None
     im_body_shape: Optional[tuple] = None
+    im_body_fullres_shape: Optional[tuple] = None
     im_eyes_shape: Optional[tuple] = None
     im_tail_shape: Optional[tuple] = None
     num_tail_pts: Optional[int] = None
@@ -102,7 +103,9 @@ class MultiFishTracking:
                 bodies += [
                     BodyTracking(
                         im_body_shape = self.im_body_shape, 
+                        im_body_fullres_shape = self.im_body_fullres_shape,
                         image = np.zeros(self.im_body_shape, dtype=np.float32), 
+                        image_fullres = np.zeros(self.im_body_fullres_shape, dtype=np.float32), 
                         mask = np.zeros(self.im_body_shape, dtype=np.bool_)
                     ).to_numpy()
                 ] * (self.max_num_animals - len(bodies))

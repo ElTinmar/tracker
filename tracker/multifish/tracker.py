@@ -21,8 +21,10 @@ class MultiFishTracker_CPU(MultiFishTracker):
 
         if self.body is not None:
             body_shape = self.body.tracking_param.crop_dimension_px[::-1]
+            body_fullres_shape = self.body.tracking_param.source_crop_dimension_px[::-1]
             kwargs['body_tracked'] = True
-            kwargs['im_body_shape'] = body_shape      
+            kwargs['im_body_shape'] = body_shape
+            kwargs['im_body_fullres_shape'] = body_fullres_shape      
 
         if self.eyes is not None:
             eyes_shape = self.eyes.tracking_param.crop_dimension_px[::-1]
@@ -69,7 +71,7 @@ class MultiFishTracker_CPU(MultiFishTracker):
                         
                         # rotate the animal so that it's vertical head up
                         image_rot, centroid_rot = imrotate(
-                            body[id].image_cropped, 
+                            body[id].image_fullres, 
                             body[id].centroid[0], body[id].centroid[1], 
                             np.rad2deg(body[id].angle_rad)
                         )
