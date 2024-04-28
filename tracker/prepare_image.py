@@ -19,6 +19,7 @@ def prepare_image(
     '''Pad, crop, resize and enhance image before tracking'''
     
     # pad image with zeros then crop to get fixed image size 
+
     # NOTE: this may affect the distribution of pixel values on the edges
     w, h = source_crop_dimension_px
     origin = np.asarray((-w//2, -h//2+vertical_offset_px))
@@ -30,8 +31,8 @@ def prepare_image(
     pad_bottom = 0 if bottom>=0 else -bottom
     pad_top = top-image.shape[0] if top>=image.shape[0] else 0
     
-    image_padded = np.pad(image, ((pad_bottom,pad_top), (pad_left,pad_right)))
-    image_crop = image_padded[bottom+pad_bottom:top+pad_bottom, left+pad_left:right+pad_left]
+    image_crop = np.zeros((h,w), dtype=image.dtype)
+    image_crop[pad_bottom:h-pad_top, pad_left:w-pad_right] = image[bottom+pad_bottom:top-pad_top, left+pad_left:right-pad_right]
     if image_crop.size == 0:
         return None
 
