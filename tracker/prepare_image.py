@@ -21,7 +21,7 @@ def prepare_image(
     # pad image with zeros then crop to get fixed image size 
     w, h = source_crop_dimension_px
     pad_width = np.max(source_crop_dimension_px)
-    image_padded = np.pad(image, (pad_width,pad_width))
+    image_padded = np.pad(image, (pad_width,pad_width), constant_values=np.nan) # NOTE: should I pad with NaNs instead?
 
     # crop image: put centroid in the middle
     origin = np.asarray((-w//2, -h//2+vertical_offset_px))
