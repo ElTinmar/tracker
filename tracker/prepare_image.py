@@ -21,14 +21,17 @@ def prepare_image(
     # pad image with zeros then crop to get fixed image size 
     # NOTE: this may affect the distribution of pixel values on the edges
     w, h = source_crop_dimension_px
-    pad_width = np.max(source_crop_dimension_px)
-    image_padded = np.pad(image, (pad_width,pad_width))
-
-    # crop image: put centroid in the middle
     origin = np.asarray((-w//2, -h//2+vertical_offset_px))
-    left, bottom = centroid.astype(np.int32) + origin + np.array([pad_width,pad_width])
-    right, top = left+w, bottom+h 
-    image_crop = image_padded[bottom:top, left:right]
+    left, bottom = centroid.astype(np.int32) + origin 
+    right, top = left+w, bottom+h
+
+    pad_left = 0 if left>=0 else -left
+    pad_right = right-image.shape[1] if right>=image.shape[1] else 0
+    pad_bottom = 0 if bottom>=0 else -bottom
+    pad_top = top-image.shape[0] if top>=image.shape[0] else 0
+    
+    image_padded = np.pad(image, ((pad_bottom,pad_top), (pad_left,pad_right)))
+    image_crop = image_padded[bottom+pad_bottom:top+pad_bottom, left+pad_left:right+pad_left]
     if image_crop.size == 0:
         return None
 
