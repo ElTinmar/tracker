@@ -13,7 +13,7 @@ from .core import Eye
 def get_eye_prop(
         centroid: NDArray, 
         inertia_tensor: NDArray, 
-        offset: NDArray, 
+        origin: NDArray, 
         resize: float
     ) -> Eye:
 
@@ -24,7 +24,7 @@ def get_eye_prop(
     eye_angle = angle_between_vectors(eye_dir, heading)
     # (row,col) to (x,y) coordinates 
     y, x = centroid 
-    eye_centroid = np.array([x, y], dtype = np.single) + offset
+    eye_centroid = np.array([x, y], dtype = np.single) + origin
     return Eye(direction=eye_dir, angle=eye_angle, centroid=eye_centroid/resize)
 
 

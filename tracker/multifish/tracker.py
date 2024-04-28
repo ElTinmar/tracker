@@ -28,15 +28,19 @@ class MultiFishTracker_CPU(MultiFishTracker):
 
         if self.eyes is not None:
             eyes_shape = self.eyes.tracking_param.crop_dimension_px[::-1]
+            eyes_fullres_shape = self.eyes.tracking_param.source_crop_dimension_px[::-1]
             kwargs['eyes_tracked'] = True
             kwargs['im_eyes_shape'] = eyes_shape
+            kwargs['im_eyes_fullres_shape'] = eyes_fullres_shape
 
         if self.tail is not None:
             tail_shape = self.tail.tracking_param.crop_dimension_px[::-1]
+            tail_fullres_shape = self.tail.tracking_param.source_crop_dimension_px[::-1]
             kwargs['tail_tracked'] = True
             kwargs['num_tail_pts'] = self.tail.tracking_param.n_tail_points
             kwargs['num_tail_interp_pts'] = self.tail.tracking_param.n_pts_interp
             kwargs['im_tail_shape'] = tail_shape
+            kwargs['im_tail_fullres_shape'] = tail_fullres_shape
 
         return kwargs
 

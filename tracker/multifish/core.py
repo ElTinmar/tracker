@@ -24,7 +24,9 @@ class MultiFishTracking:
     im_body_shape: Optional[tuple] = None
     im_body_fullres_shape: Optional[tuple] = None
     im_eyes_shape: Optional[tuple] = None
+    im_eyes_fullres_shape: Optional[tuple] = None
     im_tail_shape: Optional[tuple] = None
+    im_tail_fullres_shape: Optional[tuple] = None
     num_tail_pts: Optional[int] = None
     num_tail_interp_pts: Optional[int] = None 
     body: Optional[Dict[int, BodyTracking]] = None
@@ -40,37 +42,37 @@ class MultiFishTracking:
         '''serialize to fixed-size structured numpy array'''
 
         if out is not None:
-            out[0]['max_num_animals'] = self.max_num_animals
-            out[0]['image_exported'] = self.image_exported
-            out[0]['body_tracked'] = self.body_tracked
-            out[0]['eyes_tracked'] = self.eyes_tracked
-            out[0]['tail_tracked'] = self.tail_tracked
+            out['max_num_animals'] = self.max_num_animals
+            out['image_exported'] = self.image_exported
+            out['body_tracked'] = self.body_tracked
+            out['eyes_tracked'] = self.eyes_tracked
+            out['tail_tracked'] = self.tail_tracked
             
-            self.animals.to_numpy(out[0]['animals'])
+            self.animals.to_numpy(out['animals'])
 
             if self.image_exported:
-                out[0]['image'] = self.image
+                out['image'] = self.image
 
             if self.body_tracked:
                 for idx, element in enumerate(self.body.items()):
                     id, body = element
                     if body is not None:
-                        body.to_numpy(out[0]['bodies'][idx])
-                        out[0]['bodies_id'][idx] = id
+                        body.to_numpy(out['bodies'][idx])
+                        out['bodies_id'][idx] = id
 
             if self.eyes_tracked:
                 for idx, element in enumerate(self.eyes.items()):
                     id, eyes = element
                     if eyes is not None:
-                        eyes.to_numpy(out[0]['eyes'][idx])
-                        out[0]['eyes_id'][idx] = id
+                        eyes.to_numpy(out['eyes'][idx])
+                        out['eyes_id'][idx] = id
 
             if self.tail_tracked:
                 for idx, element in enumerate(self.tail.items()):
                     id, tail = element
                     if tail is not None:
-                        tail.to_numpy(out[0]['tails'][idx]) 
-                        out[0]['tails_id'][idx] = id
+                        tail.to_numpy(out['tails'][idx]) 
+                        out['tails_id'][idx] = id
 
         else:
             dt_tuples = []
@@ -126,7 +128,9 @@ class MultiFishTracking:
                 eyes += [
                     EyesTracking(
                         im_eyes_shape = self.im_eyes_shape,
+                        im_eyes_fullres_shape = self.im_eyes_fullres_shape,
                         image = np.zeros(self.im_eyes_shape, dtype=np.float32),
+                        image_fullres = np.zeros(self.im_eyes_fullres_shape, dtype=np.float32), 
                         mask = np.zeros(self.im_eyes_shape, dtype=np.bool_)
                     ).to_numpy()
                 ] * pad_len
@@ -146,7 +150,9 @@ class MultiFishTracking:
                         num_tail_pts = self.num_tail_pts,
                         num_tail_interp_pts = self.num_tail_interp_pts,
                         im_tail_shape = self.im_tail_shape,
+                        im_tail_fullres_shape = self.im_tail_fullres_shape,
                         image = np.zeros(self.im_tail_shape, dtype=np.float32),
+                        image_fullres = np.zeros(self.im_tail_fullres_shape, dtype=np.float32),
                     ).to_numpy()
                 ] * pad_len
                 dt_tuples.append(('tails', tails[0].dtype, (self.max_num_animals,)))

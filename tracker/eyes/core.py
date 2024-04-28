@@ -22,6 +22,9 @@ class EyesTrackerParamTracking:
     def mm2px(self, val_mm):
         return int(val_mm * self.target_pix_per_mm) 
     
+    def source_mm2px(self, val_mm):
+        return int(val_mm * self.pix_per_mm) 
+    
     @property
     def resize(self):
         return self.target_pix_per_mm/self.pix_per_mm
@@ -49,11 +52,23 @@ class EyesTrackerParamTracking:
             2* (self.mm2px(self.crop_dimension_mm[0])//2),
             2* (self.mm2px(self.crop_dimension_mm[1])//2)
         ) 
-    
+
+    @property
+    def source_crop_dimension_px(self):
+        # some video codec require height, width to be divisible by 2
+        return (
+            2* (self.source_mm2px(self.crop_dimension_mm[0])//2),
+            2* (self.source_mm2px(self.crop_dimension_mm[1])//2)
+        ) 
+        
     @property
     def crop_offset_px(self):
         return self.mm2px(self.crop_offset_mm)
-    
+
+    @property
+    def source_crop_offset_px(self):
+        return self.source_mm2px(self.crop_offset_mm)
+        
     def to_dict(self):
         res = {}
         res['pix_per_mm'] = self.pix_per_mm
@@ -102,10 +117,10 @@ class Eye:
         '''serialize to structured numpy array'''
 
         if out is not None:
-            out[0]['empty'] = self.direction is None
-            out[0]['direction'] = np.zeros((1,2), np.single) if self.direction is None else self.direction
-            out[0]['angle'] = np.zeros((1,), np.single) if self.angle is None else self.angle
-            out[0]['centroid'] = np.zeros((1,2), np.single) if self.centroid is None else self.centroid
+            out['empty'] = self.direction is None
+            out['direction'] = np.zeros((1,2), np.single) if self.direction is None else self.direction
+            out['angle'] = np.zeros((1,), np.single) if self.angle is None else self.angle
+            out['centroid'] = np.zeros((1,2), np.single) if self.centroid is None else self.centroid
 
         else:
             dt = np.dtype([
@@ -138,10 +153,12 @@ class Eye:
 @dataclass    
 class EyesTracking:
     im_eyes_shape: tuple
+    im_eyes_fullres_shape: tuple
     mask: NDArray
     image: NDArray
+    image_fullres: NDArray
     centroid: Optional[NDArray] = None
-    offset: Optional[NDArray] = None
+    origin: Optional[NDArray] = None
     left_eye: Eye = Eye()
     right_eye: Eye = Eye()
     
@@ -153,15 +170,16 @@ class EyesTracking:
         '''serialize to fixed-size structured numpy array'''
 
         if out is not None:
-            out[0]['empty'] = self.centroid is None
-            out[0]['centroid'] = np.zeros((1,2), np.float32) if self.centroid is None else self.centroid
-            out[0]['offset'] = np.zeros((1,2), np.int32) if self.offset is None else self.offset
+            out['empty'] = self.centroid is None
+            out['centroid'] = np.zeros((1,2), np.float32) if self.centroid is None else self.centroid
+            out['origin'] = np.zeros((1,2), np.int32) if self.origin is None else self.origin
             if self.left_eye is not None:
-                self.left_eye.to_numpy(out[0]['left_eye'])
+                self.left_eye.to_numpy(out['left_eye'])
             if self.right_eye is not None:
-                self.right_eye.to_numpy(out[0]['right_eye'])
-            out[0]['mask'] = self.mask
-            out[0]['image'] = self.image 
+                self.right_eye.to_numpy(out['right_eye'])
+            out['mask'] = self.mask
+            out['image'] = self.image
+            out['image_fullres'] = self.image_fullres 
 
         else:
             left_eye = self.left_eye.to_numpy() if self.left_eye is not None else Eye().to_numpy()
@@ -170,22 +188,24 @@ class EyesTracking:
             dt = np.dtype([
                 ('empty', bool, (1,)),
                 ('centroid', np.float32, (1,2)),
-                ('offset',  np.int32, (1,2)),
+                ('origin',  np.int32, (1,2)),
                 ('left_eye',  left_eye.dtype, left_eye.shape),
                 ('right_eye',  right_eye.dtype, right_eye.shape),
                 ('mask',  np.bool_, self.im_eyes_shape),
                 ('image',  np.float32, self.im_eyes_shape),
+                ('image_fullres',  np.float32, self.im_eyes_fullres_shape),
             ])
 
             arr = np.array(
                 (
                     self.centroid is None,
                     np.zeros((1,2), np.float32) if self.centroid is None else self.centroid,
-                    np.zeros((1,2), np.int32) if self.offset is None else self.offset,
+                    np.zeros((1,2), np.int32) if self.origin is None else self.origin,
                     left_eye, 
                     right_eye,                
                     self.mask, 
-                    self.image 
+                    self.image,
+                    self.image_fullres 
                 ), 
                 dtype=dt
             )
@@ -195,10 +215,12 @@ class EyesTracking:
     def from_numpy(cls, array):
         instance = cls(
             im_eyes_shape = array['image'].shape,
+            im_eyes_fullres_shape = array['image_fullres'].shape,
             mask = array['mask'],
             image = array['image'],
+            image_fullres = array['image_fullres'],
             centroid = None if array['empty'][0] else array['centroid'][0],
-            offset = None if array['empty'][0] else array['offset'][0],
+            origin = None if array['empty'][0] else array['origin'][0],
             left_eye = Eye.from_numpy(array['left_eye']),
             right_eye = Eye.from_numpy(array['right_eye'])
         )

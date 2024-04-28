@@ -128,6 +128,7 @@ class BodyTracking:
     image_fullres: NDArray
     heading: Optional[NDArray] = None
     centroid: Optional[NDArray] = None
+    origin: Optional[NDArray] = None
     angle_rad: Optional[float] = None
 
     def to_csv(self):
@@ -140,19 +141,21 @@ class BodyTracking:
         '''serialize to fixed-size structured numpy array'''
 
         if out is not None:
-            out[0]['empty'] = self.heading is None
-            out[0]['heading'] = np.zeros((2,2), np.float32) if self.heading is None else self.heading
-            out[0]['centroid'] = np.zeros((1,2), np.float32) if self.centroid is None else self.centroid
-            out[0]['angle_rad'] = 0.0 if self.angle_rad is None else self.angle_rad
-            out[0]['mask'] = self.mask
-            out[0]['image'] = self.image
-            out[0]['image_fullres'] = self.image_fullres
+            out['empty'] = self.heading is None
+            out['heading'] = np.zeros((2,2), np.float32) if self.heading is None else self.heading
+            out['centroid'] = np.zeros((1,2), np.float32) if self.centroid is None else self.centroid
+            out['origin'] = np.zeros((1,2), np.float32) if self.origin is None else self.origin
+            out['angle_rad'] = 0.0 if self.angle_rad is None else self.angle_rad
+            out['mask'] = self.mask
+            out['image'] = self.image
+            out['image_fullres'] = self.image_fullres
 
         else:
             dt = np.dtype([
                 ('empty', bool, (1,)),
                 ('heading', np.float32, (2,2)),
                 ('centroid', np.float32, (1,2)),
+                ('origin', np.float32, (1,2)),
                 ('angle_rad', np.float32, (1,)),
                 ('mask', np.bool_, self.im_body_shape),
                 ('image', np.float32, self.im_body_shape),
@@ -164,6 +167,7 @@ class BodyTracking:
                     self.heading is None,
                     np.zeros((2,2), np.float32) if self.heading is None else self.heading, 
                     np.zeros((1,2), np.float32) if self.centroid is None else self.centroid,
+                    np.zeros((1,2), np.float32) if self.origin is None else self.origin,
                     0.0 if self.angle_rad is None else self.angle_rad, 
                     self.mask, 
                     self.image,
@@ -180,6 +184,7 @@ class BodyTracking:
             im_body_fullres_shape = array['image_fullres'].shape,
             heading = None if array['empty'][0] else array['heading'],
             centroid = None if array['empty'][0] else array['centroid'][0],
+            origin = None if array['empty'][0] else array['origin'][0],
             angle_rad = None if array['empty'][0] else array['angle_rad'][0],
             mask = array['mask'],
             image = array['image'],

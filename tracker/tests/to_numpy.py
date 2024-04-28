@@ -122,6 +122,7 @@ tracker = MultiFishTracker_CPU(
 tracking = tracker.track(np.zeros((500,504), dtype=np.float32))
 arr = tracking.to_numpy()
 print(arr.itemsize, arr.dtype)
+null_arr = np.zeros((1,), dtype=arr.dtype)
 
 for i in tqdm(range(num_frames)):
     (rval, frame) = video_reader.next_frame()
@@ -133,6 +134,9 @@ for i in tqdm(range(num_frames)):
 
     # transform to numpy array
     arr = tracking.to_numpy()
+
+    # write directly into buffer
+    tracking.to_numpy(null_arr)
 
     # transform back
     tracking_rec = MultiFishTracking.from_numpy(arr)

@@ -123,13 +123,13 @@ class AnimalTracking:
         '''serialize to fixed-size structured numpy array'''
 
         if out is not None:
-            out[0]['empty'] = self.identities is None
-            out[0]['max_num_animals'] = self.max_num_animals
-            out[0]['identities'] = np.zeros((self.max_num_animals, 1), int) if self.identities is None else self.identities
-            out[0]['indices'] = np.zeros((self.max_num_animals, 1), int) if self.indices is None else self.indices
-            out[0]['centroids'] = np.zeros((self.max_num_animals, 2), np.float32) if self.centroids is None else self.centroids
-            out[0]['mask'] = self.mask
-            out[0]['image'] = self.image
+            out['empty'] = self.identities is None
+            out['max_num_animals'] = self.max_num_animals
+            out['identities'] = np.zeros((self.max_num_animals, 1), int) if self.identities is None else self.identities
+            out['indices'] = np.zeros((self.max_num_animals, 1), int) if self.indices is None else self.indices
+            out['centroids'] = np.zeros((self.max_num_animals, 2), np.float32) if self.centroids is None else self.centroids
+            out['mask'] = self.mask
+            out['image'] = self.image
 
         else:
             dt = np.dtype([

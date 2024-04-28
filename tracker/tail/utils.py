@@ -22,14 +22,14 @@ def interpolate_skeleton(skeleton: NDArray, n_pts_interp: int) -> NDArray:
     return skeleton_interp
 
 def tail_skeleton_max(
-        image_crop: NDArray,
+        image: NDArray,
         arc_angle_deg: float,
         tail_length_px: int,
         n_tail_points: int,
         n_pts_arc: int,
         dist_swim_bladder_px: int,
         n_pts_interp: int,
-        offset: NDArray,
+        origin: NDArray,
         resize: float,
         w: float
     ) -> Tuple[NDArray,NDArray]: 
@@ -54,7 +54,7 @@ def tail_skeleton_max(
                 # Convert them to integer, because of definite pixels
                 xs, ys = xs.astype(int), ys.astype(int)
                 # Find the index of the minimum or maximum pixel intensity along arc
-                idx = np.argmax(image_crop[ys, xs])
+                idx = np.argmax(image[ys, xs])
                 # Update new x, y points
                 x = xs[idx]
                 y = ys[idx]
@@ -65,7 +65,7 @@ def tail_skeleton_max(
             except IndexError:
                 points.append(points[-1])
 
-        skeleton = np.array(points).astype('float') + offset
+        skeleton = np.array(points).astype('float') + origin
         skeleton = skeleton / resize
         
         # interpolate
@@ -82,7 +82,7 @@ def get_skeleton_ball(
         y,
         n_tail_points,
         spacing,
-        image_crop,
+        image,
         ball_radius_px
     ):
 
@@ -99,13 +99,13 @@ def get_skeleton_ball(
         # Swipe the ball along the arc and compute the sum
         max_value, x, y, a = 0, 0, 0, 0
 
-        height, width = image_crop.shape
+        height, width = image.shape
         for theta, u, v in zip(arc, xs, ys):
             s = 0
             for i in range(height):
                 for j in range(width):
                     if ((j - u)**2 + (i - v)**2) <= ball_radius_px**2:
-                        s += image_crop[i,j]
+                        s += image[i,j]
 
             if s >= max_value:
                 max_value, x, y, a  = s, u, v, theta
@@ -119,7 +119,7 @@ def get_skeleton_ball(
     return points
 
 def tail_skeleton_ball(
-        image_crop: NDArray,
+        image: NDArray,
         ball_radius_px: int,
         arc_angle_deg: float,
         tail_length_px: int,
@@ -127,7 +127,7 @@ def tail_skeleton_ball(
         n_pts_arc: int,
         dist_swim_bladder_px: int,
         n_pts_interp: int,
-        offset: NDArray,
+        origin: NDArray,
         resize: float,
         w: float
     ) -> Tuple[NDArray,NDArray]: 
@@ -151,11 +151,11 @@ def tail_skeleton_ball(
             start_y,
             n_tail_points,
             spacing,
-            image_crop,
+            image,
             ball_radius_px
         )
 
-        skeleton = np.array(skeleton).astype('float') + offset
+        skeleton = np.array(skeleton).astype('float') + origin
         skeleton = skeleton / resize
         
         # interpolate
