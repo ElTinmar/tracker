@@ -63,7 +63,7 @@ class EyesTrackerParamTracking:
         
     @property
     def crop_offset_px(self):
-        return self.mm2px(self.crop_offset_mm)
+        return self.source_mm2px(self.crop_offset_mm)
 
     @property
     def source_crop_offset_px(self):
