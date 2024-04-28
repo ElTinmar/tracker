@@ -53,6 +53,7 @@ class MultiFishTracking:
             if self.image_exported:
                 out['image'] = self.image
 
+            # TODO this is repeated -> function
             if self.body_tracked:
                 for idx, element in enumerate(self.body.items()):
                     id, body = element
