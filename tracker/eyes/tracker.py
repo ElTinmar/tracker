@@ -18,15 +18,16 @@ class EyesTracker_CPU(EyesTracker):
         
         # pre-process image: crop/resize/tune intensity
         (origin, image_crop, image_processed) = prepare_image(
-            image,
-            self.tracking_param.source_crop_dimension_px,
-            self.tracking_param.crop_dimension_px, 
-            centroid,
-            self.tracking_param.eye_contrast,
-            self.tracking_param.eye_gamma,
-            self.tracking_param.eye_brightness,
-            self.tracking_param.blur_sz_px,
-            self.tracking_param.median_filter_sz_px
+            image=image,
+            source_crop_dimension_px=self.tracking_param.source_crop_dimension_px,
+            target_crop_dimension_px=self.tracking_param.crop_dimension_px, 
+            vertical_offset_px=self.tracking_param.crop_offset_px, 
+            centroid=centroid,
+            contrast=self.tracking_param.eye_contrast,
+            gamma=self.tracking_param.eye_gamma,
+            brightness=self.tracking_param.eye_brightness,
+            blur_sz_px=self.tracking_param.blur_sz_px,
+            median_filter_sz_px=self.tracking_param.median_filter_sz_px
         )
 
         # sweep threshold to obtain 3 connected component within size range (include swim bladder)

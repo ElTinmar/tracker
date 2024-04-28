@@ -8,6 +8,7 @@ def prepare_image(
         image: NDArray,
         source_crop_dimension_px: Tuple[int, int],
         target_crop_dimension_px: Tuple[int, int], 
+        vertical_offset_px: int,
         centroid: NDArray,
         contrast: float,
         gamma: float,
@@ -23,7 +24,7 @@ def prepare_image(
     image_padded = np.pad(image, (pad_width,pad_width))
 
     # crop image: put centroid in the middle
-    origin = np.asarray((-w//2, -h//2))
+    origin = np.asarray((-w//2, -h//2+vertical_offset_px))
     left, bottom = centroid.astype(np.int32) + origin + np.array([pad_width,pad_width])
     right, top = left+w, bottom+h 
     image_crop = image_padded[bottom:top, left:right]

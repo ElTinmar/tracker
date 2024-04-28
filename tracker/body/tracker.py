@@ -23,15 +23,16 @@ class BodyTracker_CPU(BodyTracker):
         
         # pre-process image: crop/resize/tune intensity
         (origin, image_crop, image_processed) = prepare_image(
-            image,
-            self.tracking_param.source_crop_dimension_px,
-            self.tracking_param.crop_dimension_px, 
-            centroid,
-            self.tracking_param.body_contrast,
-            self.tracking_param.body_gamma,
-            self.tracking_param.body_brightness,
-            self.tracking_param.blur_sz_px,
-            self.tracking_param.median_filter_sz_px
+            image=image,
+            source_crop_dimension_px=self.tracking_param.source_crop_dimension_px,
+            target_crop_dimension_px=self.tracking_param.crop_dimension_px, 
+            vertical_offset_px=0,
+            centroid=centroid,
+            contrast=self.tracking_param.body_contrast,
+            gamma=self.tracking_param.body_gamma,
+            brightness=self.tracking_param.body_brightness,
+            blur_sz_px=self.tracking_param.blur_sz_px,
+            median_filter_sz_px=self.tracking_param.median_filter_sz_px
         )
     
         # actual tracking starts here

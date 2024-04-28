@@ -124,6 +124,8 @@ arr = tracking.to_numpy()
 print(arr.itemsize, arr.dtype)
 null_arr = np.zeros((1,), dtype=arr.dtype)
 
+import cv2
+
 for i in tqdm(range(num_frames)):
     (rval, frame) = video_reader.next_frame()
     if not rval:
@@ -141,4 +143,9 @@ for i in tqdm(range(num_frames)):
     # transform back
     tracking_rec = MultiFishTracking.from_numpy(arr)
 
+    # plot
+    cv2.imshow('body', tracking.body[0].image)
+    cv2.imshow('tail', tracking.tail[0].image)
+    cv2.imshow('eyes', tracking.eyes[0].image)
+    cv2.waitKey(1)
 
