@@ -49,21 +49,24 @@ class EyesTracker_CPU(EyesTracker):
             # identify left eye, right eye and swimbladder
             blob_centroids = np.array([blob.centroid for blob in props])
             sb_idx, left_idx, right_idx = assign_features(blob_centroids)
+            centroid_left = np.asarray(props[left_idx].centroid[::-1], dtype=np.float32)
+            centroid_right = np.asarray(props[right_idx].centroid[::-1], dtype=np.float32)
+            centroid_sb = np.asarray(props[sb_idx].centroid[::-1], dtype=np.float32)
 
             # compute eye orientation
             left_eye = get_eye_prop(
-                props[left_idx].centroid, 
+                centroid_left, 
                 props[left_idx].inertia_tensor, 
                 origin*self.tracking_param.resize,
                 self.tracking_param.resize
             )
             right_eye = get_eye_prop(
-                props[right_idx].centroid, 
+                centroid_right, 
                 props[right_idx].inertia_tensor,
                 origin*self.tracking_param.resize,
                 self.tracking_param.resize
             )
-            heading_vector = (props[left_idx].centroid + props[right_idx].centroid)/2 - props[sb_idx].centroid
+            heading_vector = (centroid_left + centroid_right)/2 - centroid_sb
             heading_vector = heading_vector / np.linalg.norm(heading_vector)
 
         res = EyesTracking(

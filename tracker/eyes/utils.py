@@ -22,9 +22,7 @@ def get_eye_prop(
 
     eye_dir = ellipse_direction(inertia_tensor, heading)
     eye_angle = angle_between_vectors(eye_dir, heading)
-    # (row,col) to (x,y) coordinates 
-    y, x = centroid 
-    eye_centroid = np.array([x, y], dtype = np.single) + origin
+    eye_centroid = centroid + origin
     return Eye(direction=eye_dir, angle=eye_angle, centroid=eye_centroid/resize)
 
 
