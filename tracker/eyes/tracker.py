@@ -41,7 +41,7 @@ class EyesTracker_CPU(EyesTracker):
         # find eye angles
         left_eye = None
         right_eye = None
-        new_heading = None
+        heading_vector = None
         
         if found_eyes_and_sb: 
             # identify left eye, right eye and swimbladder
@@ -61,13 +61,14 @@ class EyesTracker_CPU(EyesTracker):
                 origin*self.tracking_param.resize,
                 self.tracking_param.resize
             )
-            #new_heading = (props[left_idx].centroid + props[right_idx].centroid)/2 - props[sb_idx].centroid
-            #new_heading = new_heading / np.linalg.norm(new_heading)
+            heading_vector = (props[left_idx].centroid + props[right_idx].centroid)/2 - props[sb_idx].centroid
+            heading_vector = heading_vector / np.linalg.norm(heading_vector)
 
         res = EyesTracking(
             im_eyes_shape = image_processed.shape,
             im_eyes_fullres_shape = image_crop.shape,
             centroid = centroid,
+            heading_vector = heading_vector,
             origin = origin,
             left_eye = left_eye,
             right_eye = right_eye,

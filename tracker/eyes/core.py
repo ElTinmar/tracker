@@ -158,6 +158,7 @@ class EyesTracking:
     image: NDArray
     image_fullres: NDArray
     centroid: Optional[NDArray] = None
+    heading_vector: Optional[NDArray] = None
     origin: Optional[NDArray] = None
     left_eye: Eye = Eye()
     right_eye: Eye = Eye()
@@ -172,6 +173,7 @@ class EyesTracking:
         if out is not None:
             out['empty'] = self.centroid is None
             out['centroid'] = np.zeros((1,2), np.float32) if self.centroid is None else self.centroid
+            out['heading_vector'] = np.zeros((1,2), np.float32) if self.heading_vector is None else self.heading_vector
             out['origin'] = np.zeros((1,2), np.int32) if self.origin is None else self.origin
             if self.left_eye is not None:
                 self.left_eye.to_numpy(out['left_eye'])
@@ -188,6 +190,7 @@ class EyesTracking:
             dt = np.dtype([
                 ('empty', bool, (1,)),
                 ('centroid', np.float32, (1,2)),
+                ('heading_vector', np.float32, (1,2)),
                 ('origin',  np.int32, (1,2)),
                 ('left_eye',  left_eye.dtype, left_eye.shape),
                 ('right_eye',  right_eye.dtype, right_eye.shape),
@@ -200,6 +203,7 @@ class EyesTracking:
                 (
                     self.centroid is None,
                     np.zeros((1,2), np.float32) if self.centroid is None else self.centroid,
+                    np.zeros((1,2), np.float32) if self.heading_vector is None else self.heading_vector,
                     np.zeros((1,2), np.int32) if self.origin is None else self.origin,
                     left_eye, 
                     right_eye,                
@@ -220,6 +224,7 @@ class EyesTracking:
             image = array['image'],
             image_fullres = array['image_fullres'],
             centroid = None if array['empty'][0] else array['centroid'][0],
+            heading_vector = None if array['empty'][0] else array['heading_vector'][0],
             origin = None if array['empty'][0] else array['origin'][0],
             left_eye = Eye.from_numpy(array['left_eye']),
             right_eye = Eye.from_numpy(array['right_eye'])
