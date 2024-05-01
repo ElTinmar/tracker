@@ -12,7 +12,7 @@ from tqdm import tqdm
 
 VIDEOS = [
     ('../toy_data/multi_freelyswimming_1800x1800px_nobckg.avi', 40),
-    ('../toy_data/single_freelyswimming_504x500px_nobckg.avi', 40),
+    ('../toy_data/single_freelyswimming_504x500px_nobckg.avi', 33),
     ('../toy_data/single_headembedded_544x380px_noparam_nobckg.avi', 100),
     ('../toy_data/single_headembedded_544x380px_param_nobckg.avi', 100)
 ]
