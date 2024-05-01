@@ -16,7 +16,7 @@ def prepare_image(
         blur_sz_px: float,
         median_filter_sz_px: float
     ) -> Tuple[NDArray, NDArray, NDArray]:
-    '''Pad, crop, resize and enhance image before tracking'''
+    '''crop, resize and enhance image before tracking'''
     
     # crop to get fixed image size 
     # NOTE: this may affect the distribution of pixel values on the edges
