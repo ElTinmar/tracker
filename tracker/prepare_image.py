@@ -18,8 +18,7 @@ def prepare_image(
     ) -> Tuple[NDArray, NDArray, NDArray]:
     '''Pad, crop, resize and enhance image before tracking'''
     
-    # pad image with zeros then crop to get fixed image size 
-
+    # crop to get fixed image size 
     # NOTE: this may affect the distribution of pixel values on the edges
     w, h = source_crop_dimension_px
     origin = np.asarray((-w//2, -h//2+vertical_offset_px))
