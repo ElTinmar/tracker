@@ -35,7 +35,9 @@ class EyesTracker_CPU(EyesTracker):
             image_processed, 
             self.tracking_param.eye_dyntresh_res, 
             self.tracking_param.eye_size_lo_px, 
-            self.tracking_param.eye_size_hi_px
+            self.tracking_param.eye_size_hi_px,
+            self.tracking_param.eye_thresh_lo,
+            self.tracking_param.eye_thresh_hi
         )
 
         # find eye angles

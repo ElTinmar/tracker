@@ -14,6 +14,8 @@ class EyesTrackerParamTracking:
     eye_contrast: float = 1.0
     eye_size_lo_mm: float = 1.0
     eye_size_hi_mm: float = 10.0
+    eye_thresh_lo: float = 0.0
+    eye_thresh_hi: float = 1.0
     blur_sz_mm: float = 0.05
     median_filter_sz_mm: float = 0.15
     crop_dimension_mm: Tuple[float, float] = (1.2, 1.2) 
@@ -79,6 +81,8 @@ class EyesTrackerParamTracking:
         res['eye_contrast'] = self.eye_contrast
         res['eye_size_lo_mm'] = self.eye_size_lo_mm
         res['eye_size_hi_mm'] = self.eye_size_hi_mm
+        res['eye_thresh_lo'] = self.eye_thresh_lo
+        res['eye_thresh_hi'] = self.eye_thresh_hi
         res['blur_sz_mm'] = self.blur_sz_mm
         res['median_filter_sz_mm'] = self.median_filter_sz_mm
         res['crop_dimension_mm'] = self.crop_dimension_mm

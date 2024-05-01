@@ -55,11 +55,13 @@ def find_eyes_and_swimbladder(
         image: NDArray, 
         eye_dyntresh_res: int, 
         eye_size_lo_px: float, 
-        eye_size_hi_px: float
+        eye_size_hi_px: float,
+        thresh_lo: float = 0,
+        thresh_hi: float = 1,
     ) -> Tuple:
     
     # OPTIM this is slow
-    thresholds = np.linspace(image.min(),image.max(),eye_dyntresh_res)
+    thresholds = np.linspace(thresh_lo,thresh_hi,eye_dyntresh_res)
     found_eyes_and_sb = False
     for t in thresholds:
         mask = 1.0*(image >= t)
