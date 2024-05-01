@@ -22,10 +22,12 @@ class MultiFishOverlay_opencv(MultiFishOverlay):
 
         if (tracking is not None):
 
+            T_scale = Affine2DTransform.scaling(tracking.downsample_fullres_export, tracking.downsample_fullres_export)
+
             overlay = im2rgb(im2uint8(image))
 
             # overlay animal bounding boxes, coord system 1.
-            overlay = self.animal.overlay(overlay, tracking.animals)        
+            overlay = self.animal.overlay(overlay, tracking.animals, T_scale)         
 
             # loop over animals
             for idx, id in zip(tracking.animals.indices, tracking.animals.identities):
@@ -35,8 +37,7 @@ class MultiFishOverlay_opencv(MultiFishOverlay):
                     # transformation matrix from coord system 1. to coord system 2., just a translation  
                     tx, ty = tracking.animals.centroids[idx,:] - np.asarray(tracking.body[id].image_fullres.shape[::-1])//2 # dirty fix?
                     T_bbox_to_image = Affine2DTransform.translation(tx,ty)
-                    T_scale = Affine2DTransform.scaling(tracking.downsample_fullres_export, tracking.downsample_fullres_export)
-
+                    
                     # overlay body, coord. system 2.
                     overlay = self.body.overlay(
                         overlay, 
