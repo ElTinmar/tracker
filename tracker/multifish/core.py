@@ -20,6 +20,7 @@ class MultiFishTracking:
     eyes_tracked: bool = False
     tail_tracked: bool = False
     image_exported: bool = False
+    downsample_fullres_export: float = 1
     image: Optional[NDArray] = None
     im_body_shape: Optional[tuple] = None
     im_body_fullres_shape: Optional[tuple] = None
@@ -44,6 +45,7 @@ class MultiFishTracking:
         if out is not None:
             out['max_num_animals'] = self.max_num_animals
             out['image_exported'] = self.image_exported
+            out['downsample_fullres_export'] = self.downsample_fullres_export
             out['body_tracked'] = self.body_tracked
             out['eyes_tracked'] = self.eyes_tracked
             out['tail_tracked'] = self.tail_tracked
@@ -88,6 +90,9 @@ class MultiFishTracking:
 
             dt_tuples.append(('image_exported', np.bool_, (1,)))
             array_content.append(self.image_exported)
+
+            dt_tuples.append(('downsample_fullres_export', np.float32, (1,)))
+            array_content.append(self.downsample_fullres_export)
 
             dt_tuples.append(('body_tracked', np.bool_, (1,)))
             array_content.append(self.body_tracked)
@@ -173,6 +178,7 @@ class MultiFishTracking:
             max_num_animals = array['max_num_animals'][0],
             animals = AnimalTracking.from_numpy(array['animals'][0]),
             image_exported = array['image_exported'][0],
+            downsample_fullres_export = array['downsample_fullres_export'][0],
             body_tracked = array['body_tracked'][0],
             eyes_tracked = array['eyes_tracked'][0],
             tail_tracked = array['tail_tracked'][0],
@@ -193,12 +199,14 @@ class MultiFishTracker(Tracker):
             body: Optional[BodyTracker], 
             eyes: Optional[EyesTracker], 
             tail: Optional[TailTracker],
-            export_fullres_image: bool = True
+            export_fullres_image: bool = True,
+            downsample_fullres_export: float = 1
         ):
         self.max_num_animals = max_num_animals
         self.accumulator = accumulator
         self.animal = animal
         self.export_fullres_image = export_fullres_image
+        self.downsample_fullres_export = downsample_fullres_export
         self.body = body
         self.eyes = eyes
         self.tail = tail

@@ -1,8 +1,10 @@
 import numpy as np
 from typing import Optional
 from numpy.typing import NDArray
-from image_tools import imrotate, im2uint8
+from image_tools import imrotate
 from .core import MultiFishTracker, MultiFishTracking
+import cv2
+
 class MultiFishTracker_CPU(MultiFishTracker):
 
     def get_kwargs(self, image: NDArray, animals, body, eyes, tail) -> dict:
@@ -17,6 +19,15 @@ class MultiFishTracker_CPU(MultiFishTracker):
 
         if self.export_fullres_image:
             kwargs['image_exported'] = True
+            kwargs['downsample_fullres_export'] = self.downsample_fullres_export
+            if self.downsample_fullres_export != 1:
+                h, w = image.shape
+                dsize = (round(w*self.downsample_fullres_export), round(h*self.downsample_fullres_export))
+                image = cv2.resize(
+                    image,
+                    dsize,
+                    interpolation=cv2.INTER_NEAREST
+                )
             kwargs['image'] = image
 
         if self.body is not None:
