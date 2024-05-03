@@ -113,11 +113,11 @@ class AnimalTracking:
     indices: Optional[NDArray] = None
     centroids: Optional[NDArray] = None
 
-    def to_csv(self):
-        '''
-        export data to csv
-        '''
-        pass    
+    def csv_header(self) -> str:
+        return ""
+    
+    def to_csv(self) -> str:
+        return f""
 
     def to_numpy(self, out: Optional[NDArray] = None) -> Optional[NDArray]:
         '''serialize to fixed-size structured numpy array'''
