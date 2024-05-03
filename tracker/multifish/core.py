@@ -33,7 +33,10 @@ class MultiFishTracking:
     body: Optional[Dict[int, BodyTracking]] = None
     eyes: Optional[Dict[int, EyesTracking]] = None
     tail: Optional[Dict[int, TailTracking]] = None
-    
+
+    def csv_header(self) -> str:
+        return ""
+        
     def to_csv(self):
         '''export data as csv'''
         pass

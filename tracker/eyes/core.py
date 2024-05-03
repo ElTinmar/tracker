@@ -166,7 +166,10 @@ class EyesTracking:
     origin: Optional[NDArray] = None
     left_eye: Eye = Eye()
     right_eye: Eye = Eye()
-    
+
+    def csv_header(self) -> str:
+        return ""
+        
     def to_csv(self):
         '''export data as csv'''
         pass

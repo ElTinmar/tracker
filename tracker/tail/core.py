@@ -125,6 +125,9 @@ class TailTracking:
     skeleton: Optional[NDArray] = None
     skeleton_interp: Optional[NDArray] = None
 
+    def csv_header(self) -> str:
+        return ""
+    
     def to_csv(self):
         '''export data as csv'''
         pass

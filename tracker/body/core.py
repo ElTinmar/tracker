@@ -130,7 +130,10 @@ class BodyTracking:
     centroid: Optional[NDArray] = None
     origin: Optional[NDArray] = None
     angle_rad: Optional[float] = None
-
+    
+    def csv_header(self) -> str:
+        return ""
+    
     def to_csv(self):
         '''
         export data to csv
