@@ -20,7 +20,7 @@ class MultiFishTracker_CPU(MultiFishTracker):
         if self.export_fullres_image:
             kwargs['image_exported'] = True
             kwargs['downsample_fullres_export'] = self.downsample_fullres_export
-            if self.downsample_fullres_export != 1:
+            if self.downsample_fullres_export != 1: # TODO maybe use decimation instead of resizing
                 h, w = image.shape
                 dsize = (round(w*self.downsample_fullres_export), round(h*self.downsample_fullres_export))
                 image = cv2.resize(
