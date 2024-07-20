@@ -1,5 +1,6 @@
 from image_tools import im2rgb, im2uint8
-from geometry import to_homogeneous, from_homogeneous
+from geometry import to_homogeneous, from_homogeneous, Affine2DTransform
+
 import numpy as np
 from numpy.typing import NDArray
 import cv2
@@ -12,7 +13,7 @@ class BodyOverlay_opencv(BodyOverlay):
             self,
             image: NDArray, 
             tracking: Optional[BodyTracking], 
-            transformation_matrix: NDArray 
+            transformation_matrix: NDArray = Affine2DTransform.identity()
         ) -> Optional[NDArray]:
 
         '''

@@ -3,7 +3,7 @@ import numpy as np
 from numpy.typing import NDArray
 from typing import Optional
 from image_tools import im2uint8, im2rgb
-from geometry import to_homogeneous, from_homogeneous
+from geometry import to_homogeneous, from_homogeneous, Affine2DTransform
 from .core import TailOverlay, TailTracking
 
 class TailOverlay_opencv(TailOverlay):
@@ -12,7 +12,7 @@ class TailOverlay_opencv(TailOverlay):
             self,
             image: NDArray, 
             tracking: Optional[TailTracking], 
-            transformation_matrix: NDArray
+            transformation_matrix: NDArray = Affine2DTransform.identity()
         ) -> Optional[NDArray]:
 
         '''
