@@ -71,7 +71,7 @@ class BodyOverlay_opencv(BodyOverlay):
                 overlay, 
                 pts_[0],
                 pts_[1], 
-                self.overlay_param.heading_color_BGR,
+                self.overlay_param.lateral_color_BGR,
                 self.overlay_param.thickness,
                 self.overlay_param.arrow_radius_px
             )
