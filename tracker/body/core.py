@@ -102,8 +102,9 @@ class BodyTrackerParamTracking:
 @dataclass
 class BodyTrackerParamOverlay:
     pix_per_mm: float = 40.0
-    heading_len_mm: float = 1.25
+    heading_len_mm: float = 3
     heading_color_BGR: tuple = (0,128,255)
+    lateral_color_BGR: tuple = (128,0,128)
     thickness: int = 2
     arrow_radius_mm: float = 0.1
 
