@@ -105,7 +105,7 @@ class BodyTrackerParamOverlay:
     heading_len_mm: float = 3
     heading_color_BGR: tuple = (0,128,255)
     lateral_color_BGR: tuple = (128,64,128)
-    thickness: int = 2
+    thickness: int = 1
     arrow_radius_mm: float = 0.1
 
     def mm2px(self, val_mm):
