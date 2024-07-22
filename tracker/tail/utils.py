@@ -65,7 +65,7 @@ def tail_skeleton_max(
             except IndexError:
                 points.append(points[-1])
 
-        skeleton = np.array(points).astype('float') + origin
+        skeleton = np.array(points).astype('float') + origin  #NOTE adding origin introduces a discrepancy with body coordinate system  
         skeleton = skeleton / resize
         
         # interpolate

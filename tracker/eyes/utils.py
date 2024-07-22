@@ -22,7 +22,7 @@ def get_eye_prop(
 
     eye_dir = ellipse_direction(inertia_tensor, heading)
     eye_angle = angle_between_vectors(eye_dir, heading)
-    eye_centroid = centroid + origin
+    eye_centroid = centroid + origin #NOTE adding origin introduces a discrepancy with body coordinate system  
     return Eye(direction=eye_dir, angle=eye_angle, centroid=eye_centroid/resize)
 
 
