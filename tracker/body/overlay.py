@@ -47,6 +47,8 @@ class BodyOverlay_opencv(BodyOverlay):
         if (tracking is not None) and (tracking.centroid is not None):
 
             overlay = im2rgb(im2uint8(image))
+            original = overlay.copy()        
+            alpha = 0.5
             
             src = tracking.centroid
             front = self.overlay_param.heading_len_px * tracking.heading[:,0]
@@ -75,5 +77,7 @@ class BodyOverlay_opencv(BodyOverlay):
                 self.overlay_param.thickness,
                 self.overlay_param.arrow_radius_px
             )
-        
+
+            overlay = cv2.addWeighted(overlay, alpha, original, 1 - alpha, 0)
+            
             return overlay

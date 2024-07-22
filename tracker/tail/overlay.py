@@ -21,7 +21,9 @@ class TailOverlay_opencv(TailOverlay):
                 
         if tracking is not None:         
 
-            overlay = im2rgb(im2uint8(image))       
+            overlay = im2rgb(im2uint8(image))
+            original = overlay.copy()        
+            alpha = 0.5
             
             if tracking.skeleton_interp is not None:
                 
@@ -45,5 +47,7 @@ class TailOverlay_opencv(TailOverlay):
                         self.overlay_param.color_tail_BGR, 
                         1
                     )
+
+            overlay = cv2.addWeighted(overlay, alpha, original, 1 - alpha, 0)
 
             return overlay
