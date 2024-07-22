@@ -74,7 +74,6 @@ class EyesOverlay_opencv(EyesOverlay):
 
             overlay = im2rgb(im2uint8(image))
             original = overlay.copy()        
-            alpha = 0.5
             
             # left eye
             if tracking.left_eye is not None and tracking.left_eye.direction is not None:
@@ -104,6 +103,6 @@ class EyesOverlay_opencv(EyesOverlay):
                     self.overlay_param.arrow_radius_px
                 )
 
-            overlay = cv2.addWeighted(overlay, alpha, original, 1 - alpha, 0)
+            overlay = cv2.addWeighted(overlay, self.overlay_param.alpha, original, 1 - self.overlay_param.alpha, 0)
             
             return overlay

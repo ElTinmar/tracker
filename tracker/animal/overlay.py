@@ -19,7 +19,6 @@ class AnimalOverlay_opencv(AnimalOverlay):
 
             overlay = im2rgb(im2uint8(image))
             original = overlay.copy()        
-            alpha = 0.5
 
             for idx, id in zip(tracking.indices, tracking.identities):
 
@@ -43,7 +42,7 @@ class AnimalOverlay_opencv(AnimalOverlay):
                     cv2.LINE_AA
                 )
             
-            overlay = cv2.addWeighted(overlay, alpha, original, 1 - alpha, 0)
+            overlay = cv2.addWeighted(overlay, self.overlay_param.alpha, original, 1 - self.overlay_param.alpha, 0)
 
             return overlay
         
