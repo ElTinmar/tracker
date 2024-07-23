@@ -16,6 +16,10 @@ class BodyTracker_CPU(BodyTracker):
         '''
         centroid: centroid of the fish to track if it's already known.
         Useful when tracking multiple fish to discriminate between nearby blobs
+
+        output coordinates: 
+            - (0,0) = topleft corner of the bounding box
+            - scale of the full-resolution image, before resizing
         '''
 
         if (image is None) or (image.size == 0):

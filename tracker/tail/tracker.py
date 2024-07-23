@@ -11,6 +11,11 @@ class TailTracker_CPU(TailTracker):
             image: NDArray, 
             centroid: Optional[NDArray]
         ) -> Optional[TailTracking]:
+        """
+        output coordinates: 
+            - (0,0) = fish centroid
+            - scale of the full-resolution image, before resizing
+        """
 
         if (image is None) or (image.size == 0) or (centroid is None):
             return None
