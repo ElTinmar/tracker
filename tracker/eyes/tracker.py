@@ -10,7 +10,7 @@ class EyesTracker_CPU(EyesTracker):
     def track(
             self,
             image: NDArray, 
-            centroid: Optional[NDArray],
+            centroid: Optional[NDArray], # TODO maybe provide a transformation from local to global coordinates 
         ) -> Optional[EyesTracking]:
         """
         output coordinates: 

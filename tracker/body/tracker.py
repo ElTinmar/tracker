@@ -11,7 +11,7 @@ class BodyTracker_CPU(BodyTracker):
     def track(
             self,
             image: NDArray, 
-            centroid: Optional[NDArray] = None
+            centroid: Optional[NDArray] = None # TODO maybe provide a transformation from local to global coordinates
         ) -> BodyTracking:
         '''
         centroid: centroid of the fish to track if it's already known.
