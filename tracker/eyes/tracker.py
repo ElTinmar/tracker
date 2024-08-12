@@ -4,13 +4,15 @@ from typing import Optional
 from .core import EyesTracker, EyesTracking
 from .utils import get_eye_prop, find_eyes_and_swimbladder, assign_features
 from tracker.prepare_image import prepare_image
+from geometry import to_homogeneous, from_homogeneous, Affine2DTransform
 
 class EyesTracker_CPU(EyesTracker):
 
     def track(
             self,
             image: NDArray, 
-            centroid: Optional[NDArray], # TODO maybe provide a transformation from local to global coordinates and store both in result 
+            centroid: Optional[NDArray], 
+            transformation_matrix: Optional[NDArray] = Affine2DTransform.identity()
         ) -> Optional[EyesTracking]:
         """
         output coordinates: 
