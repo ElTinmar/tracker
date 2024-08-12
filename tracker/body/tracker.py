@@ -5,13 +5,16 @@ from typing import Optional
 from .core import BodyTracker, BodyTracking
 from .utils import get_orientation
 from tracker.prepare_image import prepare_image
+from geometry import to_homogeneous, from_homogeneous, Affine2DTransform
+
 
 class BodyTracker_CPU(BodyTracker):
         
     def track(
             self,
             image: NDArray, 
-            centroid: Optional[NDArray] = None # TODO maybe provide a transformation from local to global coordinates and store both in result
+            centroid: Optional[NDArray] = None,
+            transformation_matrix: Optional[NDArray] = Affine2DTransform.identity()
         ) -> BodyTracking:
         '''
         centroid: centroid of the fish to track if it's already known.
@@ -56,10 +59,6 @@ class BodyTracker_CPU(BodyTracker):
             res = BodyTracking(
                 im_body_shape = image_processed.shape,
                 im_body_fullres_shape = image_crop.shape,
-                heading = None,
-                centroid = None,
-                origin = None,
-                angle_rad = None,
                 mask = mask,
                 image_fullres = image_crop,
                 image = image_processed
@@ -87,10 +86,6 @@ class BodyTracker_CPU(BodyTracker):
                 res = BodyTracking(
                     im_body_shape = image_processed.shape,
                     im_body_fullres_shape = image_crop.shape,
-                    heading = None,
-                    centroid = None,
-                    origin = None,
-                    angle_rad = None,
                     mask = mask,
                     image_fullres = image_crop,
                     image = image_processed
@@ -99,11 +94,14 @@ class BodyTracker_CPU(BodyTracker):
                     
             (principal_components, centroid_coords) = get_orientation(track_coords)
 
+            centroid_ori = origin + centroid + centroid_coords / self.tracking_param.resize 
+
             res = BodyTracking(
                 im_body_shape = image_processed.shape,
                 im_body_fullres_shape = image_crop.shape,
                 heading = principal_components,
                 centroid = centroid_coords / self.tracking_param.resize,
+                centroid_original_space = from_homogeneous((transformation_matrix @ to_homogeneous(centroid_ori).T).T),
                 origin = origin,
                 angle_rad = np.arctan2(principal_components[1,1], principal_components[0,1]),
                 mask = mask,
