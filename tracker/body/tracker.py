@@ -101,7 +101,7 @@ class BodyTracker_CPU(BodyTracker):
                 im_body_fullres_shape = image_crop.shape,
                 heading = principal_components,
                 centroid = centroid_coords / self.tracking_param.resize,
-                centroid_original_space = from_homogeneous((transformation_matrix @ to_homogeneous(centroid_ori).T).T),
+                centroid_original_space = from_homogeneous((transformation_matrix @ to_homogeneous(centroid_ori[np.newaxis,]).T).T),
                 origin = origin,
                 angle_rad = np.arctan2(principal_components[1,1], principal_components[0,1]),
                 mask = mask,
