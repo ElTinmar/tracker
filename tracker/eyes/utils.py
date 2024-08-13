@@ -5,6 +5,8 @@ from typing import Tuple
 from image_tools import bwareafilter_props, bwareafilter
 from geometry import ellipse_direction, angle_between_vectors
 from .core import Eye
+from geometry import transform2d, Affine2DTransform
+
 
 # TODO implement watershed segmentation for eye and swimmbladder 
 # this may help disconnect eye and swimmbladder when they are 
@@ -14,7 +16,8 @@ def get_eye_prop(
         centroid: NDArray, 
         inertia_tensor: NDArray, 
         origin: NDArray, 
-        resize: float
+        resize: float,
+        transformation_matrix: NDArray
     ) -> Eye:
 
     # fish must be vertical head up
@@ -22,8 +25,19 @@ def get_eye_prop(
 
     eye_dir = ellipse_direction(inertia_tensor, heading)
     eye_angle = angle_between_vectors(eye_dir, heading)
-    eye_centroid = centroid + origin #NOTE adding origin introduces a discrepancy with body coordinate system  
-    return Eye(direction=eye_dir, angle=eye_angle, centroid=eye_centroid/resize)
+    eye_centroid = centroid + origin 
+    eye_dir_original_space = transform2d(transformation_matrix, eye_dir)
+    eye_centroid_original_space = transform2d(transformation_matrix, eye_centroid/resize)
+
+    eye =  Eye(
+        direction=eye_dir, 
+        angle=eye_angle, 
+        centroid=eye_centroid/resize,
+        direction_original_space=eye_dir_original_space,
+        centroid_original_space=eye_centroid_original_space
+    )
+
+    return eye
 
 
 def assign_features(blob_centroids: ArrayLike) -> Tuple[int, int, int]:

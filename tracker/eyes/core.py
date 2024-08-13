@@ -116,6 +116,8 @@ class Eye:
     direction: Optional[NDArray] = None
     angle: Optional[float] = None
     centroid: Optional[NDArray] = None
+    direction_original_space: Optional[NDArray] = None
+    centroid_original_space: Optional[NDArray] = None
 
     def to_numpy(self, out: Optional[NDArray] = None) -> Optional[NDArray]:
         '''serialize to structured numpy array'''
@@ -125,13 +127,17 @@ class Eye:
             out['direction'] = np.zeros((1,2), np.single) if self.direction is None else self.direction
             out['angle'] = np.zeros((1,), np.single) if self.angle is None else self.angle
             out['centroid'] = np.zeros((1,2), np.single) if self.centroid is None else self.centroid
+            out['direction_original_space'] = np.zeros((1,2), np.single) if self.direction_original_space is None else self.direction_original_space
+            out['centroid_original_space'] = np.zeros((1,2), np.single) if self.centroid_original_space is None else self.centroid_original_space
 
         else:
             dt = np.dtype([
                 ('empty', bool, (1,)),
                 ('direction', np.single, (1,2)),
                 ('angle', np.single, (1,)),
-                ('centroid', np.single, (1,2))
+                ('centroid', np.single, (1,2)),
+                ('centroid_original_space', np.single, (1,2))
+                ('direction_original_space', np.single, (1,2))
             ])
                         
             arr = np.array(
@@ -139,7 +145,9 @@ class Eye:
                     self.direction is None,
                     np.zeros((1,2), np.single) if self.direction is None else self.direction, 
                     np.zeros((1,), np.single) if self.angle is None else self.angle, 
-                    np.zeros((1,2), np.single) if self.centroid is None else self.centroid
+                    np.zeros((1,2), np.single) if self.centroid is None else self.centroid,
+                    np.zeros((1,2), np.single) if self.direction_original_space is None else self.direction_original_space,
+                    np.zeros((1,2), np.single) if self.centroid_original_space is None else self.centroid_original_space
                 ), 
                 dtype=dt
             )
@@ -151,6 +159,8 @@ class Eye:
             direction = None if array['empty'][0] else array['direction'][0],
             angle = None if array['empty'][0] else array['angle'][0],
             centroid = None if array['empty'][0] else array['centroid'][0],
+            direction_original_space = None if array['empty'][0] else array['direction_original_space'][0],
+            centroid_original_space = None if array['empty'][0] else array['centroid_original_space'][0]
         )
         return instance
 
