@@ -4,7 +4,7 @@ from typing import Optional
 from .core import EyesTracker, EyesTracking
 from .utils import get_eye_prop, find_eyes_and_swimbladder, assign_features
 from tracker.prepare_image import prepare_image
-from geometry import to_homogeneous, from_homogeneous, Affine2DTransform
+from geometry import transform2d, Affine2DTransform
 
 class EyesTracker_CPU(EyesTracker):
 
@@ -75,6 +75,7 @@ class EyesTracker_CPU(EyesTracker):
             )
             heading_vector = (centroid_left + centroid_right)/2 - centroid_sb
             heading_vector = heading_vector / np.linalg.norm(heading_vector)
+            #heading_vector_original_space = 
 
         res = EyesTracking(
             im_eyes_shape = image_processed.shape,

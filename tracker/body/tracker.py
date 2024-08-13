@@ -5,7 +5,7 @@ from typing import Optional
 from .core import BodyTracker, BodyTracking
 from .utils import get_orientation
 from tracker.prepare_image import prepare_image
-from geometry import to_homogeneous, from_homogeneous, Affine2DTransform
+from geometry import transform2d, Affine2DTransform
 
 
 class BodyTracker_CPU(BodyTracker):
@@ -101,7 +101,7 @@ class BodyTracker_CPU(BodyTracker):
                 im_body_fullres_shape = image_crop.shape,
                 heading = principal_components,
                 centroid = centroid_coords / self.tracking_param.resize,
-                centroid_original_space = from_homogeneous((transformation_matrix @ to_homogeneous(centroid_ori[np.newaxis,]).T).T),
+                centroid_original_space = transform2d(transformation_matrix, centroid_ori),
                 origin = origin,
                 angle_rad = np.arctan2(principal_components[1,1], principal_components[0,1]),
                 mask = mask,
