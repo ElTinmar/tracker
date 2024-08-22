@@ -122,7 +122,7 @@ class MultiFishTracking:
                         image_fullres = np.zeros(self.im_body_fullres_shape, dtype=np.float32), 
                         mask = np.zeros(self.im_body_shape, dtype=np.bool_)
                     ).to_numpy()
-                ] * (self.max_num_animals - len(bodies))
+                ] * pad_len
                 dt_tuples.append(('bodies', bodies[0].dtype, (self.max_num_animals,)))
                 array_content.append(bodies)
 
