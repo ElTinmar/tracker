@@ -136,7 +136,7 @@ class Eye:
                 ('direction', np.single, (1,2)),
                 ('angle', np.single, (1,)),
                 ('centroid', np.single, (1,2)),
-                ('centroid_original_space', np.single, (1,2))
+                ('centroid_original_space', np.single, (1,2)),
                 ('direction_original_space', np.single, (1,2))
             ])
                         
