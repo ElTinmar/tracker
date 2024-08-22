@@ -7,11 +7,6 @@ from geometry import ellipse_direction, angle_between_vectors
 from .core import Eye
 from geometry import transform2d, Affine2DTransform
 
-
-# TODO implement watershed segmentation for eye and swimmbladder 
-# this may help disconnect eye and swimmbladder when they are 
-# connected together and remove the need to swipe the threshold
-
 def get_eye_prop(
         centroid: NDArray, 
         inertia_tensor: NDArray, 
