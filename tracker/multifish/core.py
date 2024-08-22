@@ -221,12 +221,12 @@ class MultiFishTracking:
             body = None if not array['body_tracked'][0] else {id: BodyTracking.from_numpy(tracking) for id, tracking in zip(array['bodies_id'],array['bodies'])},
             eyes = None if not array['eyes_tracked'][0] else {id: EyesTracking.from_numpy(tracking) for id, tracking in zip(array['eyes_id'],array['eyes'])},
             tail = None if not array['tail_tracked'][0] else {id: TailTracking.from_numpy(tracking) for id, tracking in zip(array['tails_id'],array['tails'])},
-            im_body_shape = None if not array['body_tracked'][0] else array['im_body_shape'][0],
-            im_body_fullres_shape = None if not array['body_tracked'][0] else array['im_body_fullres_shape'][0],
-            im_eyes_shape = None if not array['eyes_tracked'][0] else array['im_eyes_shape'][0],
-            im_eyes_fullres_shape = None if not array['eyes_tracked'][0] else array['im_eyes_fullres_shape'][0],
-            im_tail_shape = None if not array['tail_tracked'][0] else array['im_tail_shape'][0],
-            im_tail_fullres_shape = None if not array['tail_tracked'][0] else array['im_tail_fullres_shape'][0],
+            im_body_shape = None if not array['body_tracked'][0] else array['im_body_shape'],
+            im_body_fullres_shape = None if not array['body_tracked'][0] else array['im_body_fullres_shape'],
+            im_eyes_shape = None if not array['eyes_tracked'][0] else array['im_eyes_shape'],
+            im_eyes_fullres_shape = None if not array['eyes_tracked'][0] else array['im_eyes_fullres_shape'],
+            im_tail_shape = None if not array['tail_tracked'][0] else array['im_tail_shape'],
+            im_tail_fullres_shape = None if not array['tail_tracked'][0] else array['im_tail_fullres_shape'],
             num_tail_pts = None if not array['tail_tracked'][0] else array['num_tail_pts'][0],
             num_tail_interp_pts = None if not array['tail_tracked'][0] else array['num_tail_interp_pts'][0]
         )
