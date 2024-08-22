@@ -60,6 +60,8 @@ class MultiFishTracking:
 
             # TODO this is repeated -> function
             if self.body_tracked:
+                out['im_body_shape'] = self.im_body_shape
+                out['im_body_fullres_shape'] = self.im_body_fullres_shape
                 for idx, element in enumerate(self.body.items()):
                     id, body = element
                     if body is not None:
@@ -67,6 +69,8 @@ class MultiFishTracking:
                         out['bodies_id'][idx] = id
 
             if self.eyes_tracked:
+                out['im_eyes_shape'] = self.im_eyes_shape
+                out['im_eyes_fullres_shape'] = self.im_eyes_fullres_shape
                 for idx, element in enumerate(self.eyes.items()):
                     id, eyes = element
                     if eyes is not None:
@@ -74,6 +78,10 @@ class MultiFishTracking:
                         out['eyes_id'][idx] = id
 
             if self.tail_tracked:
+                out['im_tail_shape'] = self.im_tail_shape
+                out['im_tail_fullres_shape'] = self.im_tail_fullres_shape
+                out['num_tail_pts'] = self.num_tail_pts
+                out['num_tail_interp_pts'] = self.num_tail_interp_pts
                 for idx, element in enumerate(self.tail.items()):
                     id, tail = element
                     if tail is not None:
@@ -112,6 +120,12 @@ class MultiFishTracking:
 
             # TODO: this is mostly repeated 3 times, write a function 
             if self.body_tracked:
+                dt_tuples.append(('im_body_shape', np.int32, (2,)))
+                array_content.append(self.im_body_shape)
+
+                dt_tuples.append(('im_body_fullres_shape', np.int32, (2,)))
+                array_content.append(self.im_body_fullres_shape)
+
                 bodies = [body.to_numpy() for id, body in self.body.items() if body is not None]
                 pad_len = (self.max_num_animals - len(bodies))
                 bodies += [
@@ -132,6 +146,12 @@ class MultiFishTracking:
                 array_content.append(bodies_ids)
             
             if self.eyes_tracked:
+                dt_tuples.append(('im_eyes_shape', np.int32, (2,)))
+                array_content.append(self.im_eyes_shape)
+
+                dt_tuples.append(('im_eyes_fullres_shape', np.int32, (2,)))
+                array_content.append(self.im_eyes_fullres_shape)
+
                 eyes = [eyes.to_numpy() for id, eyes in self.eyes.items() if eyes is not None]
                 pad_len = (self.max_num_animals - len(eyes))
                 eyes += [
@@ -152,6 +172,18 @@ class MultiFishTracking:
                 array_content.append(eyes_ids)
 
             if self.tail_tracked:
+                dt_tuples.append(('im_tail_shape', np.int32, (2,)))
+                array_content.append(self.im_tail_shape)
+
+                dt_tuples.append(('im_tail_fullres_shape', np.int32, (2,)))
+                array_content.append(self.im_tail_fullres_shape)
+
+                dt_tuples.append(('num_tail_pts', np.int32, (1,)))
+                array_content.append(self.num_tail_pts)
+
+                dt_tuples.append(('num_tail_interp_pts', np.int32, (1,)))
+                array_content.append(self.num_tail_interp_pts)
+
                 tails = [tail.to_numpy() for id, tail in self.tail.items() if tail is not None]
                 pad_len = (self.max_num_animals - len(tails))
                 tails += [
@@ -188,7 +220,15 @@ class MultiFishTracking:
             image = None if not array['image_exported'][0] else array['image'],
             body = None if not array['body_tracked'][0] else {id: BodyTracking.from_numpy(tracking) for id, tracking in zip(array['bodies_id'],array['bodies'])},
             eyes = None if not array['eyes_tracked'][0] else {id: EyesTracking.from_numpy(tracking) for id, tracking in zip(array['eyes_id'],array['eyes'])},
-            tail = None if not array['tail_tracked'][0] else {id: TailTracking.from_numpy(tracking) for id, tracking in zip(array['tails_id'],array['tails'])}
+            tail = None if not array['tail_tracked'][0] else {id: TailTracking.from_numpy(tracking) for id, tracking in zip(array['tails_id'],array['tails'])},
+            im_body_shape = None if not array['body_tracked'][0] else array['im_body_shape'][0],
+            im_body_fullres_shape = None if not array['body_tracked'][0] else array['im_body_fullres_shape'][0],
+            im_eyes_shape = None if not array['eyes_tracked'][0] else array['im_eyes_shape'][0],
+            im_eyes_fullres_shape = None if not array['eyes_tracked'][0] else array['im_eyes_fullres_shape'][0],
+            im_tail_shape = None if not array['tail_tracked'][0] else array['im_tail_shape'][0],
+            im_tail_fullres_shape = None if not array['tail_tracked'][0] else array['im_tail_fullres_shape'][0],
+            num_tail_pts = None if not array['tail_tracked'][0] else array['num_tail_pts'][0],
+            num_tail_interp_pts = None if not array['tail_tracked'][0] else array['num_tail_interp_pts'][0]
         )
         return instance
     
