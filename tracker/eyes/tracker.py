@@ -65,13 +65,15 @@ class EyesTracker_CPU(EyesTracker):
                 centroid_left, 
                 props[left_idx].inertia_tensor, 
                 origin*self.tracking_param.resize,
-                self.tracking_param.resize
+                self.tracking_param.resize,
+                transformation_matrix
             )
             right_eye = get_eye_prop(
                 centroid_right, 
                 props[right_idx].inertia_tensor,
                 origin*self.tracking_param.resize,
-                self.tracking_param.resize
+                self.tracking_param.resize,
+                transformation_matrix
             )
             heading_vector = (centroid_left + centroid_right)/2 - centroid_sb
             heading_vector = heading_vector / np.linalg.norm(heading_vector)
