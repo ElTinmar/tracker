@@ -34,11 +34,15 @@ class AnimalTracker_CPU(AnimalTracker):
 
         height, width = image.shape
 
-        TRY_NEW_BWAREA = False
+        TRY_NEW_BWAREA = True
         if TRY_NEW_BWAREA:
-            # use compare instead of threshold to return U8 directly
             mask = cv2.compare(image, self.tracking_param.animal_intensity, cv2.CMP_GT)
-            centroids = bwareafilter_centroids_cv2(
+            bwfun = bwareafilter_centroids_cv2
+        else:
+            mask = (image >= self.tracking_param.animal_intensity)
+            bwfun = bwareafilter_centroids
+
+        centroids = bwfun(
                 mask, 
                 min_size = self.tracking_param.min_animal_size_px,
                 max_size = self.tracking_param.max_animal_size_px, 
@@ -46,18 +50,7 @@ class AnimalTracker_CPU(AnimalTracker):
                 max_length = self.tracking_param.max_animal_length_px,
                 min_width = self.tracking_param.min_animal_width_px,
                 max_width = self.tracking_param.max_animal_width_px
-            )
-        else:
-            mask = (image >= self.tracking_param.animal_intensity)
-            centroids = bwareafilter_centroids(
-                    mask, 
-                    min_size = self.tracking_param.min_animal_size_px,
-                    max_size = self.tracking_param.max_animal_size_px, 
-                    min_length = self.tracking_param.min_animal_length_px,
-                    max_length = self.tracking_param.max_animal_length_px,
-                    min_width = self.tracking_param.min_animal_width_px,
-                    max_width = self.tracking_param.max_animal_width_px
-            )        
+        )        
 
         if centroids.size == 0:
             res = AnimalTracking(
