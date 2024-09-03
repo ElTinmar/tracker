@@ -34,7 +34,7 @@ class AnimalTracker_CPU(AnimalTracker):
 
         height, width = image.shape
         #mask = (image >= self.tracking_param.animal_intensity)
-        mask = cv2.threshold(image, self.tracking_param.animal_intensity, 1.0,cv2.THRESH_BINARY)
+        _, mask = cv2.threshold(image, self.tracking_param.animal_intensity, 1.0,cv2.THRESH_BINARY)
         centroids = bwareafilter_centroids_cv2(
             mask, 
             min_size = self.tracking_param.min_animal_size_px,
