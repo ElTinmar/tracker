@@ -9,8 +9,13 @@ class TailTracker_CPU(TailTracker):
     def track(
             self,
             image: NDArray, 
-            centroid: Optional[NDArray]
+            centroid: Optional[NDArray] # TODO maybe provide a transformation from local to global coordinates and store both in result
         ) -> Optional[TailTracking]:
+        """
+        output coordinates: 
+            - (0,0) = fish centroid
+            - scale of the full-resolution image, before resizing
+        """
 
         if (image is None) or (image.size == 0) or (centroid is None):
             return None

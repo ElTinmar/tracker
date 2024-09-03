@@ -4,14 +4,21 @@ from typing import Optional
 from .core import EyesTracker, EyesTracking
 from .utils import get_eye_prop, find_eyes_and_swimbladder, assign_features
 from tracker.prepare_image import prepare_image
+from geometry import transform2d, Affine2DTransform
 
 class EyesTracker_CPU(EyesTracker):
 
     def track(
             self,
             image: NDArray, 
-            centroid: Optional[NDArray],
+            centroid: Optional[NDArray], 
+            transformation_matrix: Optional[NDArray] = Affine2DTransform.identity()
         ) -> Optional[EyesTracking]:
+        """
+        output coordinates: 
+            - (0,0) = fish centroid
+            - scale of the full-resolution image, before resizing
+        """
 
         if (image is None) or (image.size == 0) or (centroid is None):
             return None
@@ -58,16 +65,19 @@ class EyesTracker_CPU(EyesTracker):
                 centroid_left, 
                 props[left_idx].inertia_tensor, 
                 origin*self.tracking_param.resize,
-                self.tracking_param.resize
+                self.tracking_param.resize,
+                transformation_matrix
             )
             right_eye = get_eye_prop(
                 centroid_right, 
                 props[right_idx].inertia_tensor,
                 origin*self.tracking_param.resize,
-                self.tracking_param.resize
+                self.tracking_param.resize,
+                transformation_matrix
             )
             heading_vector = (centroid_left + centroid_right)/2 - centroid_sb
             heading_vector = heading_vector / np.linalg.norm(heading_vector)
+            #heading_vector_original_space = 
 
         res = EyesTracking(
             im_eyes_shape = image_processed.shape,

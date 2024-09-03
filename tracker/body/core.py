@@ -130,6 +130,7 @@ class BodyTracking:
     image_fullres: NDArray
     heading: Optional[NDArray] = None
     centroid: Optional[NDArray] = None
+    centroid_original_space: Optional[NDArray] = None
     origin: Optional[NDArray] = None
     angle_rad: Optional[float] = None
     
@@ -149,6 +150,7 @@ class BodyTracking:
             out['empty'] = self.heading is None
             out['heading'] = np.zeros((2,2), np.float32) if self.heading is None else self.heading
             out['centroid'] = np.zeros((1,2), np.float32) if self.centroid is None else self.centroid
+            out['centroid_original_space'] = np.zeros((1,2), np.float32) if self.centroid_original_space is None else self.centroid_original_space
             out['origin'] = np.zeros((1,2), np.float32) if self.origin is None else self.origin
             out['angle_rad'] = 0.0 if self.angle_rad is None else self.angle_rad
             out['mask'] = self.mask
@@ -160,6 +162,7 @@ class BodyTracking:
                 ('empty', bool, (1,)),
                 ('heading', np.float32, (2,2)),
                 ('centroid', np.float32, (1,2)),
+                ('centroid_original_space', np.float32, (1,2)),
                 ('origin', np.float32, (1,2)),
                 ('angle_rad', np.float32, (1,)),
                 ('mask', np.bool_, self.im_body_shape),
@@ -172,6 +175,7 @@ class BodyTracking:
                     self.heading is None,
                     np.zeros((2,2), np.float32) if self.heading is None else self.heading, 
                     np.zeros((1,2), np.float32) if self.centroid is None else self.centroid,
+                    np.zeros((1,2), np.float32) if self.centroid_original_space is None else self.centroid_original_space,
                     np.zeros((1,2), np.float32) if self.origin is None else self.origin,
                     0.0 if self.angle_rad is None else self.angle_rad, 
                     self.mask, 
@@ -189,6 +193,7 @@ class BodyTracking:
             im_body_fullres_shape = array['image_fullres'].shape,
             heading = None if array['empty'][0] else array['heading'],
             centroid = None if array['empty'][0] else array['centroid'][0],
+            centroid_original_space = None if array['empty'][0] else array['centroid_original_space'][0],
             origin = None if array['empty'][0] else array['origin'][0],
             angle_rad = None if array['empty'][0] else array['angle_rad'][0],
             mask = array['mask'],
