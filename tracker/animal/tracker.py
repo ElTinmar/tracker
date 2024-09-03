@@ -36,7 +36,7 @@ class AnimalTracker_CPU(AnimalTracker):
         #mask = (image >= self.tracking_param.animal_intensity)
 
         # use cxompare instead of threshold to return U8 directly
-        mask = cv2.compare(image, self.tracking_param.animal_intensity, 255, cv2.CMP_GT)
+        mask = cv2.compare(image, self.tracking_param.animal_intensity, cv2.CMP_GT)
         centroids = bwareafilter_centroids_cv2(
             mask, 
             min_size = self.tracking_param.min_animal_size_px,
