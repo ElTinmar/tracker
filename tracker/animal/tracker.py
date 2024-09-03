@@ -46,6 +46,7 @@ class AnimalTracker_CPU(AnimalTracker):
             min_width = self.tracking_param.min_animal_width_px,
             max_width = self.tracking_param.max_animal_width_px
         )
+        print(centroids)
 
         if centroids.size == 0:
             res = AnimalTracking(
