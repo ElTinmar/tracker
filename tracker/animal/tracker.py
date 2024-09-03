@@ -1,4 +1,4 @@
-from image_tools import bwareafilter_centroids, enhance, im2uint8
+from image_tools import bwareafilter_centroids, bwareafilter_centroids_cv2, enhance, im2uint8
 import numpy as np
 from numpy.typing import NDArray
 import cv2
@@ -34,7 +34,7 @@ class AnimalTracker_CPU(AnimalTracker):
 
         height, width = image.shape
         mask = (image >= self.tracking_param.animal_intensity)
-        centroids = bwareafilter_centroids(
+        centroids = bwareafilter_centroids_cv2(
             mask, 
             min_size = self.tracking_param.min_animal_size_px,
             max_size = self.tracking_param.max_animal_size_px, 

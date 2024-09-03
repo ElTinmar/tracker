@@ -1,4 +1,4 @@
-from image_tools import  bwareafilter_props
+from image_tools import  bwareafilter_props, bwareafilter_props_cv2
 import numpy as np
 from numpy.typing import NDArray
 from typing import Optional

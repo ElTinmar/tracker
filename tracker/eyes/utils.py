@@ -2,7 +2,7 @@ from scipy.spatial.distance import pdist
 import numpy as np
 from numpy.typing import NDArray, ArrayLike
 from typing import Tuple
-from image_tools import bwareafilter_props, bwareafilter
+from image_tools import bwareafilter_props, bwareafilter, bwareafilter_props_cv2, bwareafilter_cv2
 from geometry import ellipse_direction, angle_between_vectors
 from .core import Eye
 
