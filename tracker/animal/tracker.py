@@ -34,7 +34,7 @@ class AnimalTracker_CPU(AnimalTracker):
 
         height, width = image.shape
 
-        TRY_NEW_BWAREA = True
+        TRY_NEW_BWAREA = False
         if TRY_NEW_BWAREA:
             mask = cv2.compare(image, self.tracking_param.animal_intensity, cv2.CMP_GT)
             bwfun = bwareafilter_centroids_cv2
