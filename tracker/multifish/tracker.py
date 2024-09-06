@@ -51,7 +51,7 @@ class MultiFishTracker_CPU(MultiFishTracker):
             self.tracking_param.accumulator.update(res)
 
         # save tracking results and return
-        arr = [animals]
+        arr = (animals,)
 
         if self.tracking_param.body is not None:
             arr += tuple(body)
