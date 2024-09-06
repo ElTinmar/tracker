@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import QWidget, QLabel, QHBoxLayout, QVBoxLayout
-from .core import AnimalTracker, AnimalOverlay, AnimalTrackerParamOverlay, AnimalTrackerParamTracking, AnimalTracking
+from .core import AnimalTracker, AnimalOverlay, AnimalTrackerParamOverlay, AnimalTrackerParamTracking
 from .tracker import AnimalTracker_CPU
 from .overlay import AnimalOverlay_opencv
 from .assignment_widget import AssignmentWidget
@@ -8,6 +8,7 @@ from image_tools import im2uint8
 import cv2
 from geometry import Affine2DTransform
 import numpy as np
+from numpy.typing import NDArray
 
 class AnimalTrackerWidget(QWidget):
     
@@ -230,18 +231,18 @@ class AnimalTrackerWidget(QWidget):
         )
         self.overlay = self.overlay_class(overlay_param)
 
-    def display(self, tracking: AnimalTracking) -> None:
+    def display(self, tracking: NDArray) -> None:
 
         if tracking is not None:
             
             s = self.tracker.tracking_param.resize
             T = Affine2DTransform.scaling(s, s)
-            overlay = self.overlay.overlay(tracking.image, tracking, T)
+            overlay = self.overlay.overlay(tracking['image'], tracking, T)
 
             zoom = self.zoom.value()/100.0
-            image = cv2.resize(im2uint8(tracking.image),None,None,zoom,zoom,cv2.INTER_NEAREST)
+            image = cv2.resize(im2uint8(tracking['image']),None,None,zoom,zoom,cv2.INTER_NEAREST)
             self.image.setPixmap(NDarray_to_QPixmap(image))
-            mask = cv2.resize(im2uint8(tracking.mask),None,None,zoom,zoom,cv2.INTER_NEAREST)
+            mask = cv2.resize(im2uint8(tracking['mask']),None,None,zoom,zoom,cv2.INTER_NEAREST)
             self.mask.setPixmap(NDarray_to_QPixmap(mask))
             if (overlay is not None) and (overlay.size > 0): 
                 overlay = cv2.resize(overlay,None,None,zoom,zoom,cv2.INTER_NEAREST)

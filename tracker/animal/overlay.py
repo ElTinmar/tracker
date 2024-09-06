@@ -4,26 +4,26 @@ import numpy as np
 from numpy.typing import NDArray
 import cv2
 from typing import Optional
-from .core import AnimalOverlay, AnimalTracking
+from .core import AnimalOverlay
 
 class AnimalOverlay_opencv(AnimalOverlay):
 
     def overlay(
             self,
             image: NDArray, 
-            tracking: Optional[AnimalTracking], 
+            tracking: Optional[NDArray], 
             transformation_matrix: NDArray = Affine2DTransform.identity()
         ) -> Optional[NDArray]:
 
-        if (tracking is not None) and (tracking.centroids.size > 0):
+        if tracking is not None:
 
             overlay = im2rgb(im2uint8(image))
             original = overlay.copy()        
 
-            for idx, id in zip(tracking.indices, tracking.identities):
+            for idx, id in zip(tracking['indices'], tracking['identities']):
 
                 # draw centroid
-                x,y,_ = transformation_matrix @ to_homogeneous(tracking.centroids[idx,:])
+                x,y,_ = transformation_matrix @ to_homogeneous(tracking['centroids'][idx,:])
                 overlay = cv2.circle(
                     overlay,
                     (int(x),int(y)), 

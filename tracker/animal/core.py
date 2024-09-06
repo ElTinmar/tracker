@@ -1,4 +1,4 @@
-from typing import Optional, Protocol
+from typing import Optional, Protocol, Tuple
 from numpy.typing import NDArray
 from dataclasses import dataclass
 from tracker.core import Tracker, TrackingOverlay
@@ -28,10 +28,20 @@ class AnimalTrackerParamTracking:
     max_animal_length_mm: float = 6.0
     min_animal_width_mm: float = 1.0
     max_animal_width_mm: float = 3.0
+    source_image_shape: Tuple[int, int] 
+    max_num_animals: int = 1
 
     def mm2px(self, val_mm):
         val_px = int(val_mm * self.target_pix_per_mm) 
         return val_px
+    
+    @property
+    def image_shape(self) -> Tuple[int, int]:
+        # some video codec require height, width to be divisible by 2
+        return (
+            int(2*((self.resize * self.source_image_shape[0])//2)),
+            int(2*((self.resize * self.source_image_shape[1])//2))
+        ) 
 
     @property
     def resize(self):
@@ -86,6 +96,17 @@ class AnimalTrackerParamTracking:
         res['min_animal_width_mm'] = self.min_animal_width_mm
         res['max_animal_width_mm'] = self.max_animal_width_mm
         return res
+    
+    def dtype(self) -> np.dtype:
+        dt = np.dtype([
+            ('empty', bool),
+            ('max_num_animals', int),
+            ('identities', int, (self.max_num_animals, 1)),
+            ('indices', int, (self.max_num_animals, 1)),
+            ('centroids', np.float32, (self.max_num_animals, 2)),
+            ('mask', np.bool_, self.image_shape),
+            ('image', np.float32, self.image_shape),
+        ])
 
 @dataclass
 class AnimalTrackerParamOverlay:
@@ -103,72 +124,7 @@ class AnimalTrackerParamOverlay:
     @property
     def radius_px(self):
         return self.mm2px(self.radius_mm)
-
-@dataclass
-class AnimalTracking:
-    im_animals_shape: tuple
-    max_num_animals: int
-    mask: NDArray
-    image: NDArray
-    identities: Optional[NDArray] = None
-    indices: Optional[NDArray] = None
-    centroids: Optional[NDArray] = None
-
-    def csv_header(self) -> str:
-        return ""
     
-    def to_csv(self) -> str:
-        return f""
-
-    def to_numpy(self, out: Optional[NDArray] = None) -> Optional[NDArray]:
-        '''serialize to fixed-size structured numpy array'''
-
-        if out is not None:
-            out['empty'] = self.identities is None
-            out['max_num_animals'] = self.max_num_animals
-            out['identities'] = np.zeros((self.max_num_animals, 1), int) if self.identities is None else self.identities
-            out['indices'] = np.zeros((self.max_num_animals, 1), int) if self.indices is None else self.indices
-            out['centroids'] = np.zeros((self.max_num_animals, 2), np.float32) if self.centroids is None else self.centroids
-            out['mask'] = self.mask
-            out['image'] = self.image
-
-        else:
-            dt = np.dtype([
-                ('empty', bool, (1,)),
-                ('max_num_animals', int, (1,)),
-                ('identities', int, (self.max_num_animals, 1)),
-                ('indices', int, (self.max_num_animals, 1)),
-                ('centroids', np.float32, (self.max_num_animals, 2)),
-                ('mask', np.bool_, self.im_animals_shape),
-                ('image', np.float32, self.im_animals_shape),
-            ])
-            
-            arr = np.array(
-                (
-                    self.identities is None,
-                    self.max_num_animals,
-                    np.zeros((self.max_num_animals, 1), int) if self.identities is None else self.identities,
-                    np.zeros((self.max_num_animals, 1), int) if self.indices is None else self.indices, 
-                    np.zeros((self.max_num_animals, 2), np.float32) if self.centroids is None else self.centroids, 
-                    self.mask, 
-                    self.image
-                ), 
-                dtype=dt
-            )
-            return arr
-    
-    @classmethod
-    def from_numpy(cls, array):
-        instance = cls(
-            im_animals_shape = array['image'].shape,
-            max_num_animals = array['max_num_animals'][0],
-            mask = array['mask'],
-            image = array['image'],
-            identities = None if array['empty'][0] else array['identities'][0],
-            indices = None if array['empty'][0] else array['indices'][0],
-            centroids = None if array['empty'][0] else array['centroids'],
-        )
-        return instance
     
 class AnimalTracker(Tracker):
 

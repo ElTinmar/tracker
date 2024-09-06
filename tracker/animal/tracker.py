@@ -3,11 +3,11 @@ import numpy as np
 from numpy.typing import NDArray
 import cv2
 from typing import Optional
-from .core import AnimalTracker, AnimalTracking
+from .core import AnimalTracker
 
 class AnimalTracker_CPU(AnimalTracker):
     
-    def track(self, image: NDArray, centroid: Optional[NDArray] = None) -> Optional[AnimalTracking]:
+    def track(self, image: NDArray, centroid: Optional[NDArray] = None) -> Optional[NDArray]:
 
         if (image is None) or (image.size == 0):
             return None
@@ -15,10 +15,7 @@ class AnimalTracker_CPU(AnimalTracker):
         if self.tracking_param.resize != 1:
             image = cv2.resize(
                 image, 
-                None, 
-                None,
-                self.tracking_param.resize,
-                self.tracking_param.resize,
+                self.tracking_param.image_shape,
                 cv2.INTER_NEAREST
             )
         
@@ -31,8 +28,6 @@ class AnimalTracker_CPU(AnimalTracker):
             self.tracking_param.blur_sz_px,
             self.tracking_param.median_filter_sz_px
         )
-
-        height, width = image.shape
 
         TRY_NEW_BWAREA = False
         if TRY_NEW_BWAREA:
@@ -52,29 +47,28 @@ class AnimalTracker_CPU(AnimalTracker):
                 max_width = self.tracking_param.max_animal_width_px
         )        
 
-        if centroids.size == 0:
-            res = AnimalTracking(
-                im_animals_shape = image.shape,
-                max_num_animals = self.assignment.max_num_animals,
-                identities = None,
-                centroids = None,
-                mask = mask,
-                image = image
-            )
-            return res
+        if centroids.size != 0:
+            # identity assignment
+            self.assignment.update(centroids)
+            identities = self.assignment.get_ID()
+            indices_tokeep = self.assignment.get_kept_centroids()   
+            centroids = centroids[indices_tokeep,:]/self.tracking_param.resize
+        else:
+            centroids = np.zeros((self.tracking_param.max_num_animals, 2), np.float32)
+            identities = np.zeros((self.tracking_param.max_num_animals, 1), int)
+            indices_tokeep = np.zeros((self.tracking_param.max_num_animals, 1), int)
 
-        # identity assignment
-        self.assignment.update(centroids)
-        identities = self.assignment.get_ID()
-        to_keep = self.assignment.get_kept_centroids()   
-
-        res = AnimalTracking(
-            im_animals_shape = image.shape,
-            max_num_animals = self.assignment.max_num_animals,
-            identities = identities,
-            indices = to_keep,
-            centroids = centroids[to_keep,:]/self.tracking_param.resize,
-            mask = mask,
-            image = image
+        res = np.array(
+            (
+                identities is None,
+                self.tracking_param.max_num_animals,
+                identities,
+                indices_tokeep, 
+                centroids, 
+                mask, 
+                image
+            ), 
+            dtype=self.tracking_param.dtype()
         )
+    
         return res
