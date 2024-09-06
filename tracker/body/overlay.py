@@ -5,7 +5,7 @@ import numpy as np
 from numpy.typing import NDArray
 import cv2
 from typing import Optional
-from .core import BodyOverlay, BodyTracking
+from .core import BodyOverlay
 
 def draw_arrow(image, src, dst, color, thickness, radius):
 
@@ -36,7 +36,7 @@ class BodyOverlay_opencv(BodyOverlay):
     def overlay(
             self,
             image: NDArray, 
-            tracking: Optional[BodyTracking], 
+            tracking: Optional[NDArray], 
             transformation_matrix: NDArray = Affine2DTransform.identity()
         ) -> Optional[NDArray]:
 
@@ -44,14 +44,14 @@ class BodyOverlay_opencv(BodyOverlay):
         Coordinate system: origin = fish bounding box top left coordinates
         '''
 
-        if (tracking is not None) and (tracking.centroid is not None):
+        if (tracking is not None) and (tracking['centroid'] is not None):
 
             overlay = im2rgb(im2uint8(image))
             original = overlay.copy()        
             
-            src = tracking.centroid
-            front = self.overlay_param.heading_len_px * tracking.heading[:,0]
-            right = self.overlay_param.heading_len_px/2 * tracking.heading[:,1]
+            src = tracking['centroid']
+            front = self.overlay_param.heading_len_px * tracking['heading'][:,0]
+            right = self.overlay_param.heading_len_px/2 * tracking['heading'][:,1]
             yy = src + front
             xx = src + right
 

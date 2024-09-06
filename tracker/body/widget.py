@@ -1,11 +1,12 @@
 from PyQt5.QtWidgets import QWidget, QLabel, QHBoxLayout, QVBoxLayout
-from .core import BodyTracker, BodyOverlay, BodyTrackerParamOverlay, BodyTrackerParamTracking, BodyTracking
+from .core import BodyTracker, BodyOverlay, BodyTrackerParamOverlay, BodyTrackerParamTracking
 from .tracker import BodyTracker_CPU
 from .overlay import BodyOverlay_opencv
 from qt_widgets import NDarray_to_QPixmap, LabeledDoubleSpinBox, LabeledSpinBox
 import cv2
 from geometry import Affine2DTransform
 from image_tools import im2uint8
+from numpy.typing import NDArray
 
 # TODO maybe group settings into collapsable blocks
 
@@ -207,7 +208,7 @@ class BodyTrackerWidget(QWidget):
         )
         self.overlay = self.overlay_class(overlay_param)
 
-    def display(self, tracking: BodyTracking):
+    def display(self, tracking: NDArray):
         
         if tracking is not None:
             
@@ -215,13 +216,13 @@ class BodyTrackerWidget(QWidget):
             T = Affine2DTransform.scaling(s, s)
            
             zoom = self.zoom.value()/100.0
-            image = cv2.resize(im2uint8(tracking.image),None,None,zoom,zoom,cv2.INTER_NEAREST)
-            mask = cv2.resize(im2uint8(tracking.mask),None,None,zoom,zoom,cv2.INTER_NEAREST)
+            image = cv2.resize(im2uint8(tracking['image']),None,None,zoom,zoom,cv2.INTER_NEAREST)
+            mask = cv2.resize(im2uint8(tracking['mask']),None,None,zoom,zoom,cv2.INTER_NEAREST)
             self.image.setPixmap(NDarray_to_QPixmap(image))
             self.mask.setPixmap(NDarray_to_QPixmap(mask))
 
-            if tracking.centroid is not None: # if we actually found a fish
-                overlay = self.overlay.overlay(tracking.image, tracking, T)
+            if tracking['centroid'] is not None: # if we actually found a fish
+                overlay = self.overlay.overlay(tracking['image'], tracking, T)
                 overlay = cv2.resize(overlay,None,None,zoom,zoom,cv2.INTER_NEAREST)
                 self.image_overlay.setPixmap(NDarray_to_QPixmap(overlay))
 
