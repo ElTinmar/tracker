@@ -7,13 +7,17 @@ from numpy.typing import NDArray
 Assign identity to tracked objects frame after frame
 '''
 
+# TODO enforce num_animals. The assignment must always 
+# return nun_animals. No more no less. 
+
+
 class GridAssignment:
-    def __init__(self, LUT, max_num_animals: int = 1):
+    def __init__(self, LUT, num_animals: int = 1):
         self.ID = None
         self.LUT = LUT
         self.centroids = None
         self.indices = None
-        self.max_num_animals = max_num_animals
+        self.num_animals = num_animals
 
     def update(self, centroids: NDArray):
         IDs = []
@@ -45,15 +49,14 @@ class GridAssignment:
     def get_centroids(self) -> NDArray:
         return self.centroids
     
-# TODO enforce max_num_animals
 class LinearSumAssignment:
-    def __init__(self, distance_threshold, max_num_animals: int = 1):
+    def __init__(self, distance_threshold, num_animals: int = 1):
         self.ID = None
         self.ID_max = 0
         self.indices = None
         self.previous_centroids = None
         self.distance_threshold = distance_threshold
-        self.max_num_animals = max_num_animals
+        self.num_animals = num_animals
 
     def update(self, centroids):
             # the following events can happen:

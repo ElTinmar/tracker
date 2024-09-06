@@ -30,7 +30,7 @@ class AnimalTrackerParamTracking:
     max_animal_width_mm: float = 3.0
     downsample_fullres: float = 0.25
     source_image_shape: Tuple[int, int] 
-    max_num_animals: int = 1
+    num_animals: int = 1
 
     def mm2px(self, val_mm):
         val_px = int(val_mm * self.target_pix_per_mm) 
@@ -108,10 +108,10 @@ class AnimalTrackerParamTracking:
     def dtype(self) -> np.dtype:
         dt = np.dtype([
             ('empty', bool),
-            ('max_num_animals', int),
-            ('identities', int, (self.max_num_animals, 1)),
-            ('indices', int, (self.max_num_animals, 1)),
-            ('centroids', np.float32, (self.max_num_animals, 2)),
+            ('num_animals', int),
+            ('identities', int, (self.num_animals, 1)),
+            ('indices', int, (self.num_animals, 1)),
+            ('centroids', np.float32, (self.num_animals, 2)),
             ('mask', np.bool_, self.image_shape),
             ('image', np.float32, self.image_shape),
             ('image_fullres', np.float32, self.downsampled_shape)

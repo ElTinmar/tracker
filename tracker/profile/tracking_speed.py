@@ -124,7 +124,7 @@ tail_tracker = TailTracker_CPU(
 )
 
 tracker = MultiFishTracker_CPU(
-    max_num_animals=1,            
+    num_animals=1,            
     accumulator=accumulator,
     animal=animal_tracker,
     body=body_tracker, 

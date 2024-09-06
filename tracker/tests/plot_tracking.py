@@ -213,7 +213,7 @@ if __name__ == '__main__':
     tail_overlay = TailOverlay_opencv(TailTrackerParamOverlay())
 
     tracker = MultiFishTracker_CPU(
-        max_num_animals=1,            
+        num_animals=1,            
         accumulator=accumulator,
         animal=animal_tracker,
         body=body_tracker, 

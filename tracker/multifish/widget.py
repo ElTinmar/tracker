@@ -139,10 +139,10 @@ class TrackerWidget(QMainWindow):
             tail_overlay = self.tail_tracker_widget.overlay
 
         # TODO update this 
-        max_num_animals = 10
+        num_animals = 10
 
         self.tracker = self.tracker_class(
-            max_num_animals,
+            num_animals,
             None,
             animal_tracker,
             body_tracker,
