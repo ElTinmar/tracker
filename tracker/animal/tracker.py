@@ -15,7 +15,7 @@ class AnimalTracker_CPU(AnimalTracker):
         if self.tracking_param.resize != 1:
             image_processed = cv2.resize(
                 image, 
-                self.tracking_param.image_shape,
+                self.tracking_param.image_shape[::-1], # transform shape (row, col) to width, height
                 cv2.INTER_NEAREST
             )
         
@@ -61,7 +61,7 @@ class AnimalTracker_CPU(AnimalTracker):
         # Downsample image export. This is a bit easier on RAM
         image_export = cv2.resize(
             image,
-            self.tracking_param.downsampled_shape,
+            self.tracking_param.downsampled_shape[::-1], # transform shape (row, col) to width, height
             cv2.INTER_NEAREST
         )
 

@@ -2,7 +2,7 @@ from tracker.animal import AnimalTrackerWidget
 from tracker.body import BodyTrackerWidget
 from tracker.eyes import EyesTrackerWidget
 from tracker.tail import TailTrackerWidget 
-from .core import MultiFishTracker, MultiFishOverlay, MultiFishTracking
+from .core import MultiFishTracker, MultiFishOverlay
 from .tracker import MultiFishTracker_CPU
 from .overlay import MultiFishOverlay_opencv
 from PyQt5.QtCore import Qt
@@ -11,6 +11,7 @@ from typing import Optional
 from qt_widgets import NDarray_to_QPixmap, LabeledSpinBox, FileSaveLabeledEditButton
 import cv2
 import json
+from numpy.typing import NDArray
 
 # TODO add widget to chose accumulator method (useful when you want to actually do the tracking)
 # TODO add widget to show background subtracted image histogram 
@@ -157,25 +158,25 @@ class TrackerWidget(QMainWindow):
             tail_overlay
         )
 
-    def display(self, tracking: MultiFishTracking) -> None:
+    def display(self, tracking: NDArray) -> None:
 
         if tracking is not None:
 
-            overlay = self.overlay.overlay(tracking.image, tracking)
+            overlay = self.overlay.overlay(tracking['animal']['image'], tracking)
             zoom = self.zoom.value()/100.0
             if (overlay is not None) and (overlay.size > 0): 
                 overlay = cv2.resize(overlay,None,None,zoom,zoom,cv2.INTER_NEAREST)
                 self.image_overlay.setPixmap(NDarray_to_QPixmap(overlay))
 
-            self.animal_tracker_widget.display(tracking.animals)
-            current_id = self.animal_tracker_widget.current_id
+            self.animal_tracker_widget.display(tracking['animals'])
+            current_id = self.animal_tracker_widget.current_id #TODO this may be broken (idx io id)
             try:
-                if (self.body_tracker_widget is not None) and (tracking.body is not None):
-                    self.body_tracker_widget.display(tracking.body[current_id])
-                if (self.eyes_tracker_widget is not None) and (tracking.eyes is not None):
-                    self.eyes_tracker_widget.display(tracking.eyes[current_id])
-                if (self.tail_tracker_widget is not None) and (tracking.tail is not None):
-                    self.tail_tracker_widget.display(tracking.tail[current_id])
+                if (self.body_tracker_widget is not None) and (tracking['body'] is not None):
+                    self.body_tracker_widget.display(tracking['body'][current_id])
+                if (self.eyes_tracker_widget is not None) and (tracking['eyes'] is not None):
+                    self.eyes_tracker_widget.display(tracking['eyes'][current_id])
+                if (self.tail_tracker_widget is not None) and (tracking['tail'] is not None):
+                    self.tail_tracker_widget.display(tracking['tail'][current_id])
             except KeyError:
                 pass
 

@@ -14,7 +14,7 @@ class Assignment(Protocol):
 
 @dataclass
 class AnimalTrackerParamTracking:        
-    source_image_shape: Tuple[int, int] 
+    source_image_shape: Tuple[int, int] # height, width
     pix_per_mm: float = 40.0
     target_pix_per_mm: float = 10.0
     animal_intensity: float = 0.1
@@ -109,13 +109,14 @@ class AnimalTrackerParamTracking:
         dt = np.dtype([
             ('empty', bool),
             ('num_animals', int),
-            ('identities', int, (self.num_animals, 1)),
-            ('indices', int, (self.num_animals, 1)),
+            ('identities', int, (self.num_animals,)),
+            ('indices', int, (self.num_animals,)),
             ('centroids', np.float32, (self.num_animals, 2)),
             ('mask', np.bool_, self.image_shape),
             ('image', np.float32, self.image_shape),
             ('image_fullres', np.float32, self.downsampled_shape)
         ])
+        return dt
 
 @dataclass
 class AnimalTrackerParamOverlay:

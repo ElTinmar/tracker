@@ -20,13 +20,15 @@ class MultiFishTracker_CPU(MultiFishTracker):
 
         # loop over detected animals to get body, eyes and tail tracking
 
-        if animals.identities is not None:
-            for id in animals.identities:
+        if animals['identities'] is not None:
+            for id in animals['identities']:
                 if self.tracking_param.body is not None:
 
                     # get more precise centroid and orientation of the animals
-                    b = self.tracking_param.body.track(image, centroid=animals.centroids[id,:])
+                    b = self.tracking_param.body.track(image, centroid=animals['centroids'][id,:])
                     body.append(b)
+                    
+                    print(b['centroid'])
 
                     # if body was found, track eyes and tail
                     if (b is not None) and (b['centroid'] is not None):
@@ -34,7 +36,7 @@ class MultiFishTracker_CPU(MultiFishTracker):
                         # rotate the animal so that it's vertical head up
                         image_rot, centroid_rot = imrotate(
                             b['image_fullres'], 
-                            b['centroid'][0], b['centroid'][1], 
+                            b['centroid'][0,0], b['centroid'][0,1], 
                             np.rad2deg(b['angle_rad'])
                         )
 

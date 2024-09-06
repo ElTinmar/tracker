@@ -29,21 +29,21 @@ class MultiFishTrackerParamTracking:
             dt_list += [(
                 'body', 
                 self.body.tracking_param.dtype(), 
-                (self.animal.tracking_param.num_animals,1)
+                (self.animal.tracking_param.num_animals,)
             )]
         
         if self.eyes is not None:
             dt_list += [(
                 'eyes', 
                 self.eyes.tracking_param.dtype(),
-                (self.animal.tracking_param.num_animals,1)
+                (self.animal.tracking_param.num_animals,)
             )]
 
         if self.tail is not None:
             dt_list += [(
                 'tail', 
                 self.tail.tracking_param.dtype(),
-                (self.animal.tracking_param.num_animals,1)
+                (self.animal.tracking_param.num_animals,)
             )]
         
         dt = np.dtype(dt_list)

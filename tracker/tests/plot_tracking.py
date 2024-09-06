@@ -147,9 +147,11 @@ if __name__ == '__main__':
             max_animal_length_mm=0,
             min_animal_width_mm=0,
             max_animal_width_mm=0,
-            pad_value_mm=4.0,
             blur_sz_mm=1/7.5,
             median_filter_sz_mm=0,
+            downsample_fullres=0.25,
+            num_animals=1,
+            source_image_shape=(height, width)
         )
     )
     body_tracker = BodyTracker_CPU(
@@ -214,19 +216,22 @@ if __name__ == '__main__':
     tail_overlay = TailOverlay_opencv(TailTrackerParamOverlay())
 
     tracker = MultiFishTracker_CPU(
-        num_animals=1,            
-        accumulator=accumulator,
-        animal=animal_tracker,
-        body=body_tracker, 
-        eyes=eyes_tracker, 
-        tail=tail_tracker
+        MultiFishTrackerParamTracking(
+            accumulator=None,
+            animal=animal_tracker,
+            body=body_tracker, 
+            eyes=eyes_tracker, 
+            tail=tail_tracker
+        )
     )
 
     overlay = MultiFishOverlay_opencv(
-        animal_overlay,
-        body_overlay,
-        eyes_overlay,
-        tail_overlay
+        MultiFishTrackerParamOverlay(
+            animal_overlay,
+            body_overlay,
+            eyes_overlay,
+            tail_overlay
+        )
     )
 
     video_writer = FFMPEG_VideoWriter_CPU(

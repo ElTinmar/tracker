@@ -6,8 +6,8 @@ from image_tools import  enhance
 
 def prepare_image(
         image: NDArray,
-        source_crop_dimension_px: Tuple[int, int],
-        target_crop_dimension_px: Tuple[int, int], 
+        source_crop_dimension_px: Tuple[int, int], # width, height
+        target_crop_dimension_px: Tuple[int, int], # width, height
         vertical_offset_px: int,
         centroid: NDArray,
         contrast: float,
