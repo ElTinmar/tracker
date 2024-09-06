@@ -107,9 +107,9 @@ class BodyTrackerParamTracking:
             ('centroid_original_space', np.float32, (1,2)),
             ('origin', np.float32, (1,2)),
             ('angle_rad', np.float32),
-            ('mask', np.bool_, self.crop_dimension_px),
-            ('image', np.float32, self.crop_dimension_px),
-            ('image_fullres', np.float32, self.source_crop_dimension_px),
+            ('mask', np.bool_, self.crop_dimension_px[::-1]),
+            ('image', np.float32, self.crop_dimension_px[::-1]),
+            ('image_fullres', np.float32, self.source_crop_dimension_px[::-1]),
         ])
         return dt
 

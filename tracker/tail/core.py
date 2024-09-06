@@ -105,8 +105,8 @@ class TailTrackerParamTracking:
             ('origin',  np.float32, (1,2)),
             ('skeleton',  np.float32, (self.n_tail_points,2)),
             ('skeleton_interp',  np.float32, (self.n_pts_interp,2)),
-            ('image',  np.float32, self.crop_dimension_px),
-            ('image_fullres',  np.float32, self.source_crop_dimension_px)
+            ('image',  np.float32, self.crop_dimension_px[::-1]),
+            ('image_fullres',  np.float32, self.source_crop_dimension_px[::-1])
         ])
         return dt
 

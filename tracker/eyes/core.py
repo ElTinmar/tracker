@@ -5,7 +5,6 @@ from typing import Tuple
 from tracker.core import Tracker, TrackingOverlay
 
 DTYPE_EYE = np.dtype([
-    ('empty', bool),
     ('direction', np.single, (1,2)),
     ('angle', np.single),
     ('centroid', np.single, (1,2)),
@@ -106,9 +105,9 @@ class EyesTrackerParamTracking:
             ('origin',  np.int32, (1,2)),
             ('left_eye', DTYPE_EYE),
             ('right_eye', DTYPE_EYE),
-            ('mask',  np.bool_, self.crop_dimension_px),
-            ('image',  np.float32, self.crop_dimension_px),
-            ('image_fullres',  np.float32, self.source_crop_dimension_px),
+            ('mask',  np.bool_, self.crop_dimension_px[::-1]),
+            ('image',  np.float32, self.crop_dimension_px[::-1]),
+            ('image_fullres',  np.float32, self.source_crop_dimension_px[::-1]),
         ])
         return dt
     
