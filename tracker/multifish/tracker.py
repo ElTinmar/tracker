@@ -28,8 +28,6 @@ class MultiFishTracker_CPU(MultiFishTracker):
                     b = self.tracking_param.body.track(image, centroid=animals['centroids'][id,:])
                     body.append(b)
                     
-                    print(b['centroid'])
-
                     # if body was found, track eyes and tail
                     if (b is not None) and (b['centroid'] is not None):
                         
@@ -56,13 +54,13 @@ class MultiFishTracker_CPU(MultiFishTracker):
         arr = [animals]
 
         if self.tracking_param.body is not None:
-            arr += [body]
+            arr += tuple(body)
 
         if self.tracking_param.eyes is not None:
-            arr += [eyes]
+            arr += tuple(eyes)
 
         if self.tracking_param.tail is not None:
-            arr += [tail]
+            arr += tuple(tail)
 
         res = np.array(
             arr,
