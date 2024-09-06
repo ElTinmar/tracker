@@ -13,15 +13,15 @@ class AnimalTracker_CPU(AnimalTracker):
             return None
         
         if self.tracking_param.resize != 1:
-            image = cv2.resize(
+            image_processed = cv2.resize(
                 image, 
                 self.tracking_param.image_shape,
                 cv2.INTER_NEAREST
             )
         
         # tune image contrast and gamma
-        image = enhance(
-            image,
+        image_processed = enhance(
+            image_processed,
             self.tracking_param.animal_contrast,
             self.tracking_param.animal_gamma,
             self.tracking_param.animal_brightness,
@@ -31,10 +31,10 @@ class AnimalTracker_CPU(AnimalTracker):
 
         TRY_NEW_BWAREA = False
         if TRY_NEW_BWAREA:
-            mask = cv2.compare(image, self.tracking_param.animal_intensity, cv2.CMP_GT)
+            mask = cv2.compare(image_processed, self.tracking_param.animal_intensity, cv2.CMP_GT)
             bwfun = bwareafilter_centroids_cv2
         else:
-            mask = (image >= self.tracking_param.animal_intensity)
+            mask = (image_processed >= self.tracking_param.animal_intensity)
             bwfun = bwareafilter_centroids
 
         centroids = bwfun(
@@ -58,6 +58,13 @@ class AnimalTracker_CPU(AnimalTracker):
             identities = np.zeros((self.tracking_param.max_num_animals, 1), int)
             indices_tokeep = np.zeros((self.tracking_param.max_num_animals, 1), int)
 
+        # Downsample image export. This is a bit easier on RAM
+        image_export = cv2.resize(
+            image,
+            self.tracking_param.downsampled_shape,
+            cv2.INTER_NEAREST
+        )
+
         res = np.array(
             (
                 identities is None,
@@ -66,7 +73,8 @@ class AnimalTracker_CPU(AnimalTracker):
                 indices_tokeep, 
                 centroids, 
                 mask, 
-                image
+                image_processed,
+                image_export
             ), 
             dtype=self.tracking_param.dtype()
         )

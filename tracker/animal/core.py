@@ -28,6 +28,7 @@ class AnimalTrackerParamTracking:
     max_animal_length_mm: float = 6.0
     min_animal_width_mm: float = 1.0
     max_animal_width_mm: float = 3.0
+    downsample_fullres: float = 0.25
     source_image_shape: Tuple[int, int] 
     max_num_animals: int = 1
 
@@ -41,6 +42,13 @@ class AnimalTrackerParamTracking:
         return (
             int(2*((self.resize * self.source_image_shape[0])//2)),
             int(2*((self.resize * self.source_image_shape[1])//2))
+        ) 
+    
+    @property
+    def downsampled_shape(self) -> Tuple[int, int]:
+        return (
+            int(2*((self.downsample_fullres * self.source_image_shape[0])//2)),
+            int(2*((self.downsample_fullres * self.source_image_shape[1])//2))
         ) 
 
     @property
@@ -106,6 +114,7 @@ class AnimalTrackerParamTracking:
             ('centroids', np.float32, (self.max_num_animals, 2)),
             ('mask', np.bool_, self.image_shape),
             ('image', np.float32, self.image_shape),
+            ('image_fullres', np.float32, self.downsampled_shape)
         ])
 
 @dataclass
