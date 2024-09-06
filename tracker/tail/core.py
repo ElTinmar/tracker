@@ -1,7 +1,6 @@
 from dataclasses import dataclass
-from numpy.typing import NDArray, ArrayLike
 import numpy as np
-from typing import Tuple, Optional
+from typing import Tuple
 from tracker.core import Tracker, TrackingOverlay
 
 @dataclass
@@ -97,6 +96,19 @@ class TailTrackerParamTracking:
         res['ball_radius_mm'] = self.ball_radius_mm
         return res
     
+    def dtype(self) -> np.dtype:
+        dt = np.dtype([
+            ('empty', bool),
+            ('num_tail_pts', int),
+            ('num_tail_interp_pts', int),
+            ('centroid', np.float32, (1,2)),
+            ('origin',  np.float32, (1,2)),
+            ('skeleton',  np.float32, (self.n_tail_points,2)),
+            ('skeleton_interp',  np.float32, (self.n_pts_interp,2)),
+            ('image',  np.float32, self.crop_dimension_px),
+            ('image_fullres',  np.float32, self.source_crop_dimension_px)
+        ])
+        return dt
 
 @dataclass
 class TailTrackerParamOverlay:
@@ -112,85 +124,6 @@ class TailTrackerParamOverlay:
     @property
     def ball_radius_px(self):
         return self.mm2px(self.ball_radius_mm) 
-        
-@dataclass
-class TailTracking:
-    num_tail_pts: int
-    num_tail_interp_pts: int
-    im_tail_shape: tuple
-    im_tail_fullres_shape: tuple
-    image: NDArray
-    image_fullres: NDArray
-    centroid: Optional[NDArray] = None
-    origin: Optional[NDArray] = None
-    skeleton: Optional[NDArray] = None
-    skeleton_interp: Optional[NDArray] = None
-
-    def csv_header(self) -> str:
-        return ""
-    
-    def to_csv(self):
-        '''export data as csv'''
-        pass
-
-    def to_numpy(self, out: Optional[NDArray] = None) -> Optional[NDArray]:
-        '''serialize to fixed-size structured numpy array'''
-
-        if out is not None:
-            out['empty'] = self.skeleton is None
-            out['num_tail_pts'] = self.num_tail_pts
-            out['num_tail_interp_pts'] = self.num_tail_interp_pts
-            out['centroid'] = np.zeros((1,2), np.float32) if self.centroid is None else self.centroid
-            out['origin'] = np.zeros((1,2), np.float32) if self.origin is None else self.origin
-            out['skeleton'] = np.zeros((self.num_tail_pts,2), np.float32) if self.skeleton is None else self.skeleton
-            out['skeleton_interp'] = np.zeros((self.num_tail_interp_pts,2), np.float32) if self.skeleton_interp is None else self.skeleton_interp
-            out['image'] = self.image
-            out['image_fullres'] = self.image_fullres
-
-        else:            
-            dt = np.dtype([
-                ('empty', bool, (1,)),
-                ('num_tail_pts', int, (1,)),
-                ('num_tail_interp_pts', int, (1,)),
-                ('centroid', np.float32, (1,2)),
-                ('origin',  np.float32, (1,2)),
-                ('skeleton',  np.float32, (self.num_tail_pts,2)),
-                ('skeleton_interp',  np.float32, (self.num_tail_interp_pts,2)),
-                ('image',  np.float32, self.im_tail_shape),
-                ('image_fullres',  np.float32, self.im_tail_fullres_shape)
-            ])
-            
-            arr = np.array(
-                (
-                    self.skeleton is None,
-                    self.num_tail_pts,
-                    self.num_tail_interp_pts,
-                    np.zeros((1,2), np.float32) if self.centroid is None else self.centroid, 
-                    np.zeros((1,2), np.float32) if self.origin is None else self.origin,
-                    np.zeros((self.num_tail_pts,2), np.float32) if self.skeleton is None else self.skeleton,
-                    np.zeros((self.num_tail_interp_pts,2), np.float32) if self.skeleton_interp is None else self.skeleton_interp,
-                    self.image,
-                    self.image_fullres
-                ), 
-                dtype=dt
-            )
-            return arr
-
-    @classmethod
-    def from_numpy(cls, array):
-        instance = cls(
-            num_tail_pts = array['num_tail_pts'][0],
-            num_tail_interp_pts = array['num_tail_interp_pts'][0],
-            im_tail_shape = array['image'].shape,
-            im_tail_fullres_shape = array['image_fullres'].shape,
-            image = array['image'],
-            image_fullres = array['image_fullres'],
-            centroid = None if array['empty'][0] else array['centroid'][0],
-            origin = None if array['empty'][0] else array['origin'][0],
-            skeleton = None if array['empty'][0] else array['skeleton'],
-            skeleton_interp = None if array['empty'][0] else array['skeleton_interp'],
-        )
-        return instance
 
 class TailTracker(Tracker):
 

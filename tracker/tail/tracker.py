@@ -1,6 +1,7 @@
 from numpy.typing import NDArray
+import numpy as np
 from typing import Optional
-from .core import TailTracker, TailTracking
+from .core import TailTracker
 from .utils import tail_skeleton_ball
 from tracker.prepare_image import prepare_image
 
@@ -10,7 +11,7 @@ class TailTracker_CPU(TailTracker):
             self,
             image: NDArray, 
             centroid: Optional[NDArray] # TODO maybe provide a transformation from local to global coordinates and store both in result
-        ) -> Optional[TailTracking]:
+        ) -> Optional[NDArray]:
         """
         output coordinates: 
             - (0,0) = fish centroid
@@ -48,17 +49,20 @@ class TailTracker_CPU(TailTracker):
             w = self.tracking_param.crop_dimension_px[0]
         )
 
-        res = TailTracking(
-            num_tail_pts = self.tracking_param.n_tail_points,
-            num_tail_interp_pts = self.tracking_param.n_pts_interp,
-            im_tail_shape = image_processed.shape,
-            im_tail_fullres_shape = image_crop.shape,
-            centroid = centroid,
-            origin = origin,
-            skeleton = skeleton,
-            skeleton_interp = skeleton_interp,
-            image = image_processed,
-            image_fullres = image_crop
-        )    
+        # save result to numpy structured array
+        res = np.array(
+            (
+                skeleton is None,
+                self.tracking_param.n_tail_points,
+                self.tracking_param.n_pts_interp,
+                np.zeros((1,2), np.float32) if centroid is None else centroid, 
+                np.zeros((1,2), np.float32) if origin is None else origin,
+                np.zeros((self.tracking_param.n_tail_points,2), np.float32) if skeleton is None else skeleton,
+                np.zeros((self.tracking_param.n_pts_interp,2), np.float32) if skeleton_interp is None else skeleton_interp,
+                image_processed,
+                image_crop
+            ), 
+            dtype= self.tracking_param.dtype()
+        )
 
         return res
