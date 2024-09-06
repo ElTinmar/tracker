@@ -1,11 +1,12 @@
 from PyQt5.QtWidgets import QWidget, QLabel, QHBoxLayout, QVBoxLayout
-from .core import EyesTracker, EyesOverlay, EyesTrackerParamOverlay, EyesTrackerParamTracking, EyesTracking
+from .core import EyesTracker, EyesOverlay, EyesTrackerParamOverlay, EyesTrackerParamTracking
 from .tracker import EyesTracker_CPU
 from .overlay import EyesOverlay_opencv
 from qt_widgets import NDarray_to_QPixmap, LabeledDoubleSpinBox, LabeledSpinBox
 import cv2
 from geometry import Affine2DTransform
 from image_tools import im2uint8
+from numpy.typing import NDArray
 
 # TODO maybe group settings into collapsable blocks
 
@@ -193,19 +194,19 @@ class EyesTrackerWidget(QWidget):
         )
         self.overlay = self.overlay_class(overlay_param)
 
-    def display(self, tracking: EyesTracking) -> None:
+    def display(self, tracking: NDArray) -> None:
 
         if tracking is not None:
 
             s = self.tracker.tracking_param.resize
-            tx, ty = -tracking.offset
+            tx, ty = -tracking['offset']
             S = Affine2DTransform.scaling(s,s)
             T = Affine2DTransform.translation(tx, ty)
-            overlay = self.overlay.overlay(tracking.image, tracking, T @ S)
+            overlay = self.overlay.overlay(tracking['image'], tracking, T @ S)
 
             zoom = self.zoom.value()/100.0
-            image = cv2.resize(im2uint8(tracking.image),None,None,zoom,zoom,cv2.INTER_NEAREST)
-            mask = cv2.resize(im2uint8(tracking.mask),None,None,zoom,zoom,cv2.INTER_NEAREST)
+            image = cv2.resize(im2uint8(tracking['image']),None,None,zoom,zoom,cv2.INTER_NEAREST)
+            mask = cv2.resize(im2uint8(tracking['mask']),None,None,zoom,zoom,cv2.INTER_NEAREST)
             overlay = cv2.resize(overlay,None,None,zoom,zoom,cv2.INTER_NEAREST)
 
             self.image.setPixmap(NDarray_to_QPixmap(image))

@@ -4,7 +4,7 @@ from numpy.typing import NDArray
 from typing import Optional
 from image_tools import im2uint8, im2rgb
 from geometry import to_homogeneous, from_homogeneous, Affine2DTransform
-from .core import EyesOverlay, EyesTracking
+from .core import EyesOverlay
 
 def disp_eye(
         image: NDArray, 
@@ -62,7 +62,7 @@ class EyesOverlay_opencv(EyesOverlay):
     def overlay(
             self,
             image: NDArray, 
-            tracking: Optional[EyesTracking], 
+            tracking: Optional[NDArray], 
             transformation_matrix: NDArray = Affine2DTransform.identity()
         ) -> Optional[NDArray]:
 
@@ -75,33 +75,18 @@ class EyesOverlay_opencv(EyesOverlay):
             overlay = im2rgb(im2uint8(image))
             original = overlay.copy()        
             
-            # left eye
-            if tracking.left_eye is not None and tracking.left_eye.direction is not None:
-
-                overlay = disp_eye(
-                    overlay, 
-                    tracking.left_eye.centroid,
-                    tracking.left_eye.direction,
-                    transformation_matrix,
-                    self.overlay_param.color_eye_left_BGR, 
-                    self.overlay_param.eye_len_px, 
-                    self.overlay_param.thickness,
-                    self.overlay_param.arrow_radius_px
-                )
-
-            # right eye
-            if tracking.right_eye is not None and tracking.right_eye.direction is not None:   
-
-                overlay = disp_eye(
-                    overlay, 
-                    tracking.right_eye.centroid,
-                    tracking.right_eye.direction,
-                    transformation_matrix,
-                    self.overlay_param.color_eye_right_BGR, 
-                    self.overlay_param.eye_len_px, 
-                    self.overlay_param.thickness,
-                    self.overlay_param.arrow_radius_px
-                )
+            for eye in ['left_eye', 'right_eye']:
+                if tracking[eye] is not None and tracking[eye]['direction'] is not None:
+                    overlay = disp_eye(
+                        overlay, 
+                        tracking[eye]['centroid'],
+                        tracking[eye]['direction'],
+                        transformation_matrix,
+                        self.overlay_param.color_eye_left_BGR, 
+                        self.overlay_param.eye_len_px, 
+                        self.overlay_param.thickness,
+                        self.overlay_param.arrow_radius_px
+                    )
 
             overlay = cv2.addWeighted(overlay, self.overlay_param.alpha, original, 1 - self.overlay_param.alpha, 0)
             

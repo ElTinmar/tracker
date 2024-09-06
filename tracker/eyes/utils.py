@@ -4,8 +4,8 @@ from numpy.typing import NDArray, ArrayLike
 from typing import Tuple
 from image_tools import bwareafilter_props, bwareafilter, bwareafilter_props_cv2, bwareafilter_cv2
 from geometry import ellipse_direction, angle_between_vectors
-from .core import Eye
-from geometry import transform2d, Affine2DTransform
+from .core import DTYPE_EYE
+from geometry import transform2d
 
 def get_eye_prop(
         centroid: NDArray, 
@@ -13,7 +13,7 @@ def get_eye_prop(
         origin: NDArray, 
         resize: float,
         transformation_matrix: NDArray
-    ) -> Eye:
+    ) -> NDArray:
 
     # fish must be vertical head up
     heading = np.array([0, 1], dtype=np.single)
@@ -24,16 +24,17 @@ def get_eye_prop(
     eye_dir_original_space = transform2d(transformation_matrix, eye_dir)
     eye_centroid_original_space = transform2d(transformation_matrix, eye_centroid/resize)
 
-    eye =  Eye(
-        direction=eye_dir, 
-        angle=eye_angle, 
-        centroid=eye_centroid/resize,
-        direction_original_space=eye_dir_original_space,
-        centroid_original_space=eye_centroid_original_space
+    eye =  np.array(
+        (
+            eye_dir, 
+            eye_angle, 
+            eye_centroid/resize,
+            eye_dir_original_space,
+            eye_centroid_original_space
+        ),
+        dtype = DTYPE_EYE
     )
-
     return eye
-
 
 def assign_features(blob_centroids: ArrayLike) -> Tuple[int, int, int]:
     """From Duncan, returns indices of swimbladder, left eye and right eye"""

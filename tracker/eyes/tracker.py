@@ -1,10 +1,10 @@
 import numpy as np
 from numpy.typing import NDArray
 from typing import Optional
-from .core import EyesTracker, EyesTracking
+from .core import EyesTracker, DTYPE_EYE
 from .utils import get_eye_prop, find_eyes_and_swimbladder, assign_features
 from tracker.prepare_image import prepare_image
-from geometry import transform2d, Affine2DTransform
+from geometry import Affine2DTransform
 
 class EyesTracker_CPU(EyesTracker):
 
@@ -13,7 +13,7 @@ class EyesTracker_CPU(EyesTracker):
             image: NDArray, 
             centroid: Optional[NDArray], 
             transformation_matrix: Optional[NDArray] = Affine2DTransform.identity()
-        ) -> Optional[EyesTracking]:
+        ) -> Optional[NDArray]:
         """
         output coordinates: 
             - (0,0) = fish centroid
@@ -79,17 +79,19 @@ class EyesTracker_CPU(EyesTracker):
             heading_vector = heading_vector / np.linalg.norm(heading_vector)
             #heading_vector_original_space = 
 
-        res = EyesTracking(
-            im_eyes_shape = image_processed.shape,
-            im_eyes_fullres_shape = image_crop.shape,
-            centroid = centroid,
-            heading_vector = heading_vector,
-            origin = origin,
-            left_eye = left_eye,
-            right_eye = right_eye,
-            mask = mask,
-            image_fullres = image_crop,
-            image = image_processed
+        res = np.array(
+            (
+                centroid is None,
+                np.zeros((1,2), np.float32) if centroid is None else centroid,
+                np.zeros((1,2), np.float32) if heading_vector is None else heading_vector,
+                np.zeros((1,2), np.int32) if origin is None else origin,
+                np.zeros(1,dtype=DTYPE_EYE) if left_eye is None else left_eye, 
+                np.zeros(1,dtype=DTYPE_EYE) if right_eye is None else right_eye,                
+                mask, 
+                image_processed,
+                image_crop 
+            ), 
+            dtype = self.tracking_param.dtype()
         )
 
         return res
