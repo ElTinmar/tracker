@@ -1,7 +1,8 @@
 from video_tools import InMemory_OpenCV_VideoReader, VideoDisplay, FFMPEG_VideoWriter_CPU, OpenCV_VideoReader
 from image_tools import im2single, im2gray
 from tracker import (
-    GridAssignment, MultiFishTracker_CPU, MultiFishOverlay_opencv, MultiFishTracking,
+    GridAssignment,
+    MultiFishTracker_CPU, MultiFishOverlay_opencv, MultiFishTrackerParamTracking, MultiFishTrackerParamOverlay,
     AnimalTracker_CPU, AnimalOverlay_opencv, AnimalTrackerParamTracking, AnimalTrackerParamOverlay,
     BodyTracker_CPU, BodyOverlay_opencv, BodyTrackerParamTracking, BodyTrackerParamOverlay,
     EyesTracker_CPU, EyesOverlay_opencv, EyesTrackerParamTracking, EyesTrackerParamOverlay,

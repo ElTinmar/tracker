@@ -1,7 +1,7 @@
 from typing import Protocol, Optional, Dict
 from numpy.typing import NDArray
 from tracker.core import Tracker, TrackingOverlay
-from tracker.animal import AnimalOverlay, AnimalTracker, 
+from tracker.animal import AnimalOverlay, AnimalTracker
 from tracker.body import BodyOverlay, BodyTracker
 from tracker.eyes import EyesOverlay, EyesTracker
 from tracker.tail import TailOverlay, TailTracker
@@ -13,7 +13,7 @@ class Accumulator(Protocol):
         ...
 
 @dataclass
-class MultiFishTrackerTrackingParam:
+class MultiFishTrackerParamTracking:
     accumulator: Accumulator
     animal: AnimalTracker
     body: Optional[BodyTracker]
@@ -61,7 +61,7 @@ class MultiFishTracker(Tracker):
 
     def __init__(
             self, 
-            tracking_param = MultiFishTrackerTrackingParam
+            tracking_param = MultiFishTrackerParamTracking
         ):
 
         self.tracking_param = tracking_param

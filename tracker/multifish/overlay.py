@@ -3,14 +3,14 @@ import numpy as np
 from numpy.typing import NDArray
 from image_tools import im2uint8, im2rgb
 from geometry import Affine2DTransform
-from .core import MultiFishOverlay, MultiFishTracking
+from .core import MultiFishOverlay
 
 class MultiFishOverlay_opencv(MultiFishOverlay):
 
     def overlay(
             self, 
             image: NDArray, 
-            tracking: Optional[MultiFishTracking], 
+            tracking: Optional[NDArray], 
             transformation_matrix: NDArray = Affine2DTransform.identity()
         ) -> NDArray:
         '''
@@ -22,49 +22,50 @@ class MultiFishOverlay_opencv(MultiFishOverlay):
 
         if (tracking is not None):
 
-            T_scale = Affine2DTransform.scaling(tracking.downsample_fullres_export, tracking.downsample_fullres_export)
+            #T_scale = Affine2DTransform.scaling(tracking.downsample_fullres_export, tracking.downsample_fullres_export)
+            T_scale = Affine2DTransform.scaling(1,1) #TODO fix 
 
             overlay = im2rgb(im2uint8(image))
 
             # overlay animal bounding boxes, coord system 1.
-            overlay = self.animal.overlay(overlay, tracking.animals, T_scale)         
+            overlay = self.overlay_param.animal.overlay(overlay, tracking['animals'], T_scale)         
 
             # loop over animals
-            for idx, id in zip(tracking.animals.indices, tracking.animals.identities):
+            for idx, id in zip(tracking['animals']['indices'], tracking['animals']['identities']):
 
-                if (self.body is not None) and (tracking.body[id] is not None) and (tracking.body[id].centroid is not None):
+                if (self.body is not None) and (tracking['body'][idx] is not None) and (tracking['body'][idx]['centroid'] is not None):
 
                     # transformation matrix from coord system 1. to coord system 2., just a translation  
-                    tx, ty = tracking.animals.centroids[idx,:] - np.asarray(tracking.body[id].image_fullres.shape[::-1])//2 # dirty fix?
+                    tx, ty = tracking['animals']['centroids'][idx,:] - np.asarray(tracking['body'][idx]['image_fullres'].shape[::-1])//2 # dirty fix?
                     T_bbox_to_image = Affine2DTransform.translation(tx,ty)
                     
                     # overlay body, coord. system 2.
-                    overlay = self.body.overlay(
+                    overlay = self.overlay_param.body.overlay(
                         overlay, 
-                        tracking.body[id], # body coordinates in bbox
+                        tracking['body'][idx], # body coordinates in bbox
                         T_scale @ T_bbox_to_image
                     )
 
                     # transformation matrix from coord system 1. to coord system 3., rotation + translation
-                    angle = tracking.body[id].angle_rad
+                    angle = tracking['body'][idx]['angle_rad']
                     rotation = Affine2DTransform.rotation(angle)
-                    tx, ty = tracking.body[id].centroid
+                    tx, ty = tracking['body'][idx]['centroid']
                     T_fish_centroid_to_bbox = Affine2DTransform.translation(tx, ty)
                     T_egocentric_to_image = T_scale @ T_bbox_to_image @ T_fish_centroid_to_bbox @ rotation 
                     
                     # overlay eyes, coord system 3.
-                    if (self.eyes is not None) and (tracking.eyes[id] is not None):
-                        overlay = self.eyes.overlay(
+                    if (self.overlay_param.eyes is not None) and (tracking['eyes'][idx] is not None):
+                        overlay = self.overlay_param.eyes.overlay(
                             overlay, 
-                            tracking.eyes[id], # egocentric eye coordinates
+                            tracking['eyes'][idx], # egocentric eye coordinates
                             T_egocentric_to_image
                         )
                     
                     # overlay tail, coord system 3.
-                    if (self.tail is not None) and (tracking.tail[id] is not None):
-                        overlay = self.tail.overlay(
+                    if (self.overlay_param.tail is not None) and (tracking['tail'][idx]  is not None):
+                        overlay = self.overlay_param.tail.overlay(
                             overlay, 
-                            tracking.tail[id], # egocentric tail coordinates 
+                            tracking['tail'][idx], # egocentric tail coordinates 
                             T_egocentric_to_image
                         )
 

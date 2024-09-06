@@ -2,12 +2,11 @@ import numpy as np
 from typing import Optional
 from numpy.typing import NDArray
 from image_tools import imrotate
-from .core import MultiFishTracker, MultiFishTracking
-import cv2
+from .core import MultiFishTracker
 
 class MultiFishTracker_CPU(MultiFishTracker):
 
-    def track(self, image: NDArray, centroid: Optional[NDArray] = None) -> Optional[MultiFishTracking]:
+    def track(self, image: NDArray, centroid: Optional[NDArray] = None) -> Optional[NDArray]:
 
         if (image is None) or (image.size == 0):
             return None
@@ -53,7 +52,7 @@ class MultiFishTracker_CPU(MultiFishTracker):
 
         # save tracking results and return
         arr = [animals]
-        
+
         if self.tracking_param.body is not None:
             arr += [body]
 

@@ -13,7 +13,8 @@ class Assignment(Protocol):
         ...
 
 @dataclass
-class AnimalTrackerParamTracking:
+class AnimalTrackerParamTracking:        
+    source_image_shape: Tuple[int, int] 
     pix_per_mm: float = 40.0
     target_pix_per_mm: float = 10.0
     animal_intensity: float = 0.1
@@ -29,7 +30,6 @@ class AnimalTrackerParamTracking:
     min_animal_width_mm: float = 1.0
     max_animal_width_mm: float = 3.0
     downsample_fullres: float = 0.25
-    source_image_shape: Tuple[int, int] 
     num_animals: int = 1
 
     def mm2px(self, val_mm):

@@ -1,6 +1,6 @@
 from sklearn.decomposition import PCA
-from numpy.typing import NDArray, List, Optional
-from typing import Tuple
+from numpy.typing import NDArray
+from typing import Tuple, List, Optional
 import numpy as np
 from skimage.measure._regionprops import RegionProperties
 
