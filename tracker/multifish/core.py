@@ -20,7 +20,8 @@ class MultiFishTrackerParamTracking:
     eyes: Optional[EyesTracker] 
     tail: Optional[TailTracker]
 
-    def dtype(self):
+    def dtype(self) -> np.dtype:
+
         dt_list = [
             ('animals', self.animal.tracking_param.dtype()),
         ]
