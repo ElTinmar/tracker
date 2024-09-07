@@ -75,14 +75,19 @@ class EyesOverlay_opencv(EyesOverlay):
             overlay = im2rgb(im2uint8(image))
             original = overlay.copy()        
             
-            for eye in ['left_eye', 'right_eye']:
+            it = zip(
+                ['left_eye', 'right_eye'], 
+                [self.overlay_param.color_eye_left_BGR, self.overlay_param.color_eye_right_BGR]
+            )
+
+            for eye, col in it:
                 if tracking[eye] is not None and tracking[eye]['direction'] is not None:
                     overlay = disp_eye(
                         overlay, 
                         tracking[eye]['centroid'],
                         tracking[eye]['direction'],
                         transformation_matrix,
-                        self.overlay_param.color_eye_left_BGR, 
+                        col, 
                         self.overlay_param.eye_len_px, 
                         self.overlay_param.thickness,
                         self.overlay_param.arrow_radius_px
