@@ -32,6 +32,9 @@ def get_orientation(coordinates: NDArray) -> Tuple[NDArray, NDArray]:
     get blob main axis using PCA
     '''
 
+    if coordinates.shape[0] <= 1:
+        return (None, None)
+
     pca = PCA()
     scores = pca.fit_transform(coordinates)
     # PCs are organized in rows, transform to columns
