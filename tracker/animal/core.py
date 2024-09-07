@@ -114,7 +114,8 @@ class AnimalTrackerParamTracking:
             ('centroids', np.float32, (self.num_animals, 2)),
             ('mask', np.bool_, self.image_shape),
             ('image', np.float32, self.image_shape),
-            ('image_fullres', np.float32, self.downsampled_shape)
+            ('image_fullres', np.float32, self.downsampled_shape),
+            ('downsample_ratio', np.float32)
         ])
         return dt
 

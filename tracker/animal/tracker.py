@@ -74,7 +74,8 @@ class AnimalTracker_CPU(AnimalTracker):
                 centroids, 
                 mask, 
                 image_processed,
-                image_export
+                image_export,
+                self.tracking_param.downsample_fullres
             ), 
             dtype=self.tracking_param.dtype()
         )
