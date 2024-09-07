@@ -10,7 +10,7 @@ from tracker import (
 )
 from tqdm import tqdm
 import numpy as np
-
+import cv2
 
 # background subtracted video
 VIDEOS = [
@@ -153,10 +153,12 @@ try:
 
         # track
         tracking = tracker.track(frame_gray)
-        break
 
         # display tracking
         oly = overlay.overlay(frame_gray, tracking)
+        
+        cv2.imshow('overlay',oly)
+        cv2.waitKey(1)
     
 finally:
     video_reader.close()
