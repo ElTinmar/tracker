@@ -12,7 +12,7 @@ from tqdm import tqdm
 import numpy as np
 import cv2
 
-DISPLAY=False
+DISPLAY=True
 
 # background subtracted video
 VIDEOS = [
@@ -22,7 +22,7 @@ VIDEOS = [
     ('toy_data/single_headembedded_544x380px_param_nobckg.avi', 100)
 ]
 # background subtracted video
-VIDEO_NUM = 0
+VIDEO_NUM = 1
 INPUT_VIDEO, PIX_PER_MM = VIDEOS[VIDEO_NUM]
 
 video_reader = InMemory_OpenCV_VideoReader()
