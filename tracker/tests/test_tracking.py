@@ -12,6 +12,8 @@ from tqdm import tqdm
 import numpy as np
 import cv2
 
+DISPLAY=False
+
 # background subtracted video
 VIDEOS = [
     ('toy_data/multi_freelyswimming_1800x1800px_nobckg.avi', 40),
@@ -20,7 +22,8 @@ VIDEOS = [
     ('toy_data/single_headembedded_544x380px_param_nobckg.avi', 100)
 ]
 # background subtracted video
-INPUT_VIDEO, PIX_PER_MM = VIDEOS[1]
+VIDEO_NUM = 0
+INPUT_VIDEO, PIX_PER_MM = VIDEOS[VIDEO_NUM]
 
 video_reader = InMemory_OpenCV_VideoReader()
 video_reader.open_file(
@@ -37,17 +40,16 @@ fps = video_reader.get_fps()
 num_frames = video_reader.get_number_of_frame()
 
 LUT = np.zeros((height, width))
-'''
-LUT[0:600,0:600] = 0
-LUT[0:600,600:1200] = 1
-LUT[0:600,1200:1800] = 2
-LUT[600:1200,0:600] = 3
-LUT[600:1200,600:1200] = 4
-LUT[600:1200,1200:1800] = 5
-LUT[1200:1800,0:600] = 6
-LUT[1200:1800,600:1200] = 7
-LUT[1200:1800,1200:1800] = 8
-'''
+if VIDEO_NUM == 0:
+    LUT[0:600,0:600] = 0
+    LUT[0:600,600:1200] = 1
+    LUT[0:600,1200:1800] = 2
+    LUT[600:1200,0:600] = 3
+    LUT[600:1200,600:1200] = 4
+    LUT[600:1200,1200:1800] = 5
+    LUT[1200:1800,0:600] = 6
+    LUT[1200:1800,600:1200] = 7
+    LUT[1200:1800,1200:1800] = 8
 assignment = GridAssignment(LUT)
 
 # tracking 
@@ -168,11 +170,11 @@ try:
         tracking = tracker.track(frame_gray)
 
         # display tracking
-        oly = overlay.overlay(frame_gray, tracking)
-
-        r = cv2.resize(oly,(512, 512))
-        cv2.imshow('overlay',r)
-        cv2.waitKey(1)
+        if DISPLAY:
+            oly = overlay.overlay(frame_gray, tracking)
+            r = cv2.resize(oly,(512, 512))
+            cv2.imshow('overlay',r)
+            cv2.waitKey(1)
     
 finally:
     video_reader.close()
