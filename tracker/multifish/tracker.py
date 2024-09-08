@@ -54,13 +54,13 @@ class MultiFishTracker_CPU(MultiFishTracker):
         arr = (animals,)
 
         if self.tracking_param.body is not None:
-            arr += tuple(body)
+            arr += (body,)
 
         if self.tracking_param.eyes is not None:
-            arr += tuple(eyes)
+            arr += (eyes,)
 
         if self.tracking_param.tail is not None:
-            arr += tuple(tail)
+            arr += (tail,)
 
         res = np.array(
             arr,
