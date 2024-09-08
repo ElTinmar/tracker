@@ -46,13 +46,14 @@ class AnimalTracker_CPU(AnimalTracker):
                 min_width = self.tracking_param.min_animal_width_px,
                 max_width = self.tracking_param.max_animal_width_px
         )        
-
+        
         if centroids.size != 0:
             # identity assignment
+            centroids = centroids/self.tracking_param.resize
             self.assignment.update(centroids)
             identities = self.assignment.get_ID()
             indices_tokeep = self.assignment.get_kept_centroids()   
-            centroids = centroids[indices_tokeep,:]/self.tracking_param.resize
+            centroids = centroids[indices_tokeep,:]
         else:
             centroids = np.zeros((self.tracking_param.num_animals, 2), np.float32)
             identities = np.zeros((self.tracking_param.num_animals, 1), int)
