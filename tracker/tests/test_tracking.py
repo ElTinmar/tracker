@@ -37,6 +37,17 @@ fps = video_reader.get_fps()
 num_frames = video_reader.get_number_of_frame()
 
 LUT = np.zeros((height, width))
+'''
+LUT[0:600,0:600] = 0
+LUT[0:600,600:1200] = 1
+LUT[0:600,1200:1800] = 2
+LUT[600:1200,0:600] = 3
+LUT[600:1200,600:1200] = 4
+LUT[600:1200,1200:1800] = 5
+LUT[1200:1800,0:600] = 6
+LUT[1200:1800,600:1200] = 7
+LUT[1200:1800,1200:1800] = 8
+'''
 assignment = GridAssignment(LUT)
 
 # tracking 
@@ -58,7 +69,7 @@ animal_tracker = AnimalTracker_CPU(
         blur_sz_mm=0.6,
         median_filter_sz_mm=0,
         downsample_fullres=0.25,
-        num_animals=1,
+        num_animals=9,
         source_image_shape=(height, width)
     )
 )
@@ -158,8 +169,9 @@ try:
 
         # display tracking
         oly = overlay.overlay(frame_gray, tracking)
-        
-        cv2.imshow('overlay',oly)
+
+        r = cv2.resize(oly,(512, 512))
+        cv2.imshow('overlay',r)
         cv2.waitKey(1)
     
 finally:
