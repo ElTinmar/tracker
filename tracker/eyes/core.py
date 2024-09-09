@@ -5,11 +5,11 @@ from typing import Tuple
 from tracker.core import Tracker, TrackingOverlay
 
 DTYPE_EYE = np.dtype([
-    ('direction', np.single, (1,2)),
+    ('direction', np.single, (2,)),
     ('angle', np.single),
-    ('centroid', np.single, (1,2)),
-    ('centroid_original_space', np.single, (1,2)),
-    ('direction_original_space', np.single, (1,2))
+    ('centroid', np.single, (2,)),
+    ('centroid_original_space', np.single, (2,)),
+    ('direction_original_space', np.single, (2,))
 ])
 
 @dataclass
