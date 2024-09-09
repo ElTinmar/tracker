@@ -7,9 +7,9 @@ from tracker.core import Tracker, TrackingOverlay
 class TailTrackerParamTracking:
     pix_per_mm: float = 40.0
     target_pix_per_mm: float = 20.0
-    tail_contrast: float = 1.0,
-    tail_gamma: float = 1.0,
-    tail_brightness: float = 0.2,
+    tail_contrast: float = 1.0
+    tail_gamma: float = 1.0
+    tail_brightness: float = 0.2
     arc_angle_deg: float = 120.0
     n_tail_points: int = 12
     n_pts_arc: int = 20
