@@ -103,9 +103,9 @@ class BodyTrackerParamTracking:
         dt = np.dtype([
             ('empty', bool),
             ('heading', np.float32, (2,2)),
-            ('centroid', np.float32, (1,2)),
-            ('centroid_original_space', np.float32, (1,2)),
-            ('origin', np.float32, (1,2)),
+            ('centroid', np.float32, (2,)),
+            ('centroid_original_space', np.float32, (2,)),
+            ('origin', np.float32, (2,)),
             ('angle_rad', np.float32),
             ('mask', np.bool_, self.crop_dimension_px[::-1]),
             ('image', np.float32, self.crop_dimension_px[::-1]),

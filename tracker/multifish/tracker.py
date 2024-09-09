@@ -34,7 +34,7 @@ class MultiFishTracker_CPU(MultiFishTracker):
                         # rotate the animal so that it's vertical head up
                         image_rot, centroid_rot = imrotate(
                             b['image_fullres'], 
-                            b['centroid'][0,0], b['centroid'][0,1], 
+                            b['centroid'][0], b['centroid'][1], 
                             np.rad2deg(b['angle_rad'])
                         )
 

@@ -57,7 +57,7 @@ class MultiFishOverlay_opencv(MultiFishOverlay):
                     # transformation matrix from coord system 1. to coord system 3., rotation + translation
                     angle = tracking['body'][idx]['angle_rad']
                     rotation = Affine2DTransform.rotation(angle)
-                    tx, ty = tracking['body'][idx]['centroid'][0]
+                    tx, ty = tracking['body'][idx]['centroid']
                     T_fish_centroid_to_bbox = Affine2DTransform.translation(tx, ty)
                     T_egocentric_to_image = T_scale @ T_bbox_to_image @ T_fish_centroid_to_bbox @ rotation 
                     

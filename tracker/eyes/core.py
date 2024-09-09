@@ -100,9 +100,9 @@ class EyesTrackerParamTracking:
     def dtype(self) -> np.dtype:
         dt = np.dtype([
             ('empty', bool),
-            ('centroid', np.float32, (1,2)),
-            ('heading_vector', np.float32, (1,2)),
-            ('origin',  np.int32, (1,2)),
+            ('centroid', np.float32, (2,)),
+            ('heading_vector', np.float32, (2,)),
+            ('origin',  np.int32, (2,)),
             ('left_eye', DTYPE_EYE),
             ('right_eye', DTYPE_EYE),
             ('mask',  np.bool_, self.crop_dimension_px[::-1]),
