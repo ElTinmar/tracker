@@ -70,7 +70,7 @@ animal_tracker = AnimalTracker_CPU(
         max_animal_width_mm=0,
         blur_sz_mm=0.6,
         median_filter_sz_mm=0,
-        downsample_fullres=0.25,
+        downsample_fullres=1.0,
         num_animals=9,
         source_image_shape=(height, width)
     )
@@ -171,10 +171,11 @@ try:
 
         # display tracking
         if DISPLAY:
-            oly = overlay.overlay(frame_gray, tracking)
+            oly = overlay.overlay(tracking['animals']['image_fullres'], tracking)
             r = cv2.resize(oly,(512, 512))
             cv2.imshow('overlay',r)
             cv2.waitKey(1)
     
 finally:
     video_reader.close()
+    cv2.destroyAllWindows()
