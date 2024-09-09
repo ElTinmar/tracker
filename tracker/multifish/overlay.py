@@ -28,7 +28,10 @@ class MultiFishOverlay_opencv(MultiFishOverlay):
                 tracking['animals']['downsample_ratio']
             )
             '''
-            T_scale = Affine2DTransform.scaling(1,1) #TODO fix 
+            T_scale = Affine2DTransform.scaling(
+                tracking['animals']['downsample_ratio'],
+                tracking['animals']['downsample_ratio']
+            ) #TODO fix 
 
             overlay = im2rgb(im2uint8(image))
 
