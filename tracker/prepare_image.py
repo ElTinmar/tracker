@@ -6,8 +6,8 @@ from image_tools import  enhance
 
 def prepare_image(
         image: NDArray,
-        source_crop_dimension_px: Tuple[int, int], # width, height
-        target_crop_dimension_px: Tuple[int, int], # width, height
+        source_crop_dimension_px: Tuple[int, int],
+        target_crop_dimension_px: Tuple[int, int], 
         vertical_offset_px: int,
         centroid: NDArray,
         contrast: float,
@@ -29,6 +29,9 @@ def prepare_image(
     pad_right = right-image.shape[1] if right>=image.shape[1] else 0
     pad_bottom = 0 if bottom>=0 else -bottom
     pad_top = top-image.shape[0] if top>=image.shape[0] else 0
+
+    if (bottom+pad_bottom >= top-pad_top) or (left+pad_left >= right-pad_right):
+        return None
     
     image_crop = np.zeros((h,w), dtype=image.dtype)
     image_crop[pad_bottom:h-pad_top, pad_left:w-pad_right] = image[bottom+pad_bottom:top-pad_top, left+pad_left:right-pad_right]
