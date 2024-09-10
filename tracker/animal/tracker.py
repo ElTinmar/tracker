@@ -18,6 +18,8 @@ class AnimalTracker_CPU(AnimalTracker):
                 self.tracking_param.image_shape[::-1], # transform shape (row, col) to width, height
                 cv2.INTER_NEAREST
             )
+        else:
+            image_processed = image
         
         # tune image contrast and gamma
         image_processed = enhance(
