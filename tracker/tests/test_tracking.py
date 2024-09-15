@@ -12,7 +12,7 @@ from tqdm import tqdm
 import numpy as np
 import cv2
 
-DISPLAY=True
+DISPLAY=False
 
 # background subtracted video
 VIDEOS = [
@@ -71,7 +71,7 @@ animal_tracker = AnimalTracker_CPU(
         blur_sz_mm=0.6,
         median_filter_sz_mm=0,
         downsample_fullres=1.0,
-        num_animals=9,
+        num_animals=1,
         source_image_shape=(height, width)
     )
 )

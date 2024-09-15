@@ -5,7 +5,7 @@ import cv2
 from typing import Optional
 from .core import AnimalTracker
 
-TRY_NEW_BWAREA = True
+TRY_NEW_BWAREA = False
 
 class AnimalTracker_CPU(AnimalTracker):
     

@@ -6,7 +6,7 @@ from .utils import get_eye_prop, get_eye_prop_cv2, find_eyes_and_swimbladder, as
 from tracker.prepare_image import prepare_image
 from geometry import Affine2DTransform
 
-TRY_NEW_BWAREA = True
+TRY_NEW_BWAREA = False
 
 class EyesTracker_CPU(EyesTracker):
 

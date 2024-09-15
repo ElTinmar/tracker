@@ -8,7 +8,7 @@ from tracker.prepare_image import prepare_image
 from geometry import transform2d, Affine2DTransform
 import cv2
 
-TRY_NEW_BWAREA = True
+TRY_NEW_BWAREA = False
 
 class BodyTracker_CPU(BodyTracker):
         
