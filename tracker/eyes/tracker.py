@@ -66,14 +66,14 @@ class EyesTracker_CPU(EyesTracker):
             if TRY_NEW_BWAREA:
                 left_eye = get_eye_prop_cv2(
                     centroid_left, 
-                    props[left_idx].principal_axis, 
+                    props[left_idx].principal_axis(np.array([0, 1], dtype=np.single)), 
                     origin*self.tracking_param.resize,
                     self.tracking_param.resize,
                     transformation_matrix
                 )
                 right_eye = get_eye_prop_cv2(
                     centroid_right, 
-                    props[right_idx].principal_axis,
+                    props[right_idx].principal_axis(np.array([0, 1], dtype=np.single)),
                     origin*self.tracking_param.resize,
                     self.tracking_param.resize,
                     transformation_matrix
