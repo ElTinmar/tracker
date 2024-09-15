@@ -8,7 +8,7 @@ from .core import DTYPE_EYE
 from geometry import transform2d
 import cv2
 
-TRY_NEW_BWAREA = False
+TRY_NEW_BWAREA = True
 
 def get_eye_prop(
         centroid: NDArray, 
