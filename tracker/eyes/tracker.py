@@ -6,7 +6,7 @@ from .utils import get_eye_prop, get_eye_prop_cv2, find_eyes_and_swimbladder, as
 from tracker.prepare_image import prepare_image
 from geometry import Affine2DTransform
 
-TRY_NEW_BWAREA = False
+TRY_NEW_BWAREA = True
 
 class EyesTracker_CPU(EyesTracker):
 
@@ -56,12 +56,12 @@ class EyesTracker_CPU(EyesTracker):
         
         if found_eyes_and_sb: 
             # identify left eye, right eye and swimbladder
-            blob_centroids = np.array([blob.centroid for blob in props])
+            blob_centroids = np.array([blob.centroid[::-1] for blob in props])
             sb_idx, left_idx, right_idx = assign_features(blob_centroids)
             centroid_left = np.asarray(props[left_idx].centroid[::-1], dtype=np.float32)
             centroid_right = np.asarray(props[right_idx].centroid[::-1], dtype=np.float32)
             centroid_sb = np.asarray(props[sb_idx].centroid[::-1], dtype=np.float32)
-
+                
             # compute eye orientation
             if TRY_NEW_BWAREA:
                 left_eye = get_eye_prop_cv2(
@@ -78,6 +78,7 @@ class EyesTracker_CPU(EyesTracker):
                     self.tracking_param.resize,
                     transformation_matrix
                 )
+
             else:
                 left_eye = get_eye_prop(
                     centroid_left, 
@@ -93,6 +94,7 @@ class EyesTracker_CPU(EyesTracker):
                     self.tracking_param.resize,
                     transformation_matrix
                 )
+
             heading_vector = (centroid_left + centroid_right)/2 - centroid_sb
             heading_vector = heading_vector / np.linalg.norm(heading_vector)
             #heading_vector_original_space = 

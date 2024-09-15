@@ -176,7 +176,7 @@ try:
             cv2.imshow('overlay',r)
             cv2.waitKey(1)
 
-
+        break
 finally:
     video_reader.close()
     cv2.destroyAllWindows()

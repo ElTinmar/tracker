@@ -8,7 +8,7 @@ from .core import DTYPE_EYE
 from geometry import transform2d
 import cv2
 
-TRY_NEW_BWAREA = False
+TRY_NEW_BWAREA = True
 
 def get_eye_prop(
         centroid: NDArray, 
@@ -23,7 +23,7 @@ def get_eye_prop(
 
     eye_dir = ellipse_direction(inertia_tensor, heading)
     eye_angle = angle_between_vectors(eye_dir, heading)
-    eye_centroid = centroid + origin 
+    eye_centroid = centroid + origin         
     eye_dir_original_space = transform2d(transformation_matrix, eye_dir)
     eye_centroid_original_space = transform2d(transformation_matrix, eye_centroid/resize)
 
@@ -54,7 +54,6 @@ def get_eye_prop_cv2(
     eye_centroid = centroid + origin 
     eye_dir_original_space = transform2d(transformation_matrix, principal_axis)
     eye_centroid_original_space = transform2d(transformation_matrix, eye_centroid/resize)
-
     eye =  np.array(
         (
             principal_axis, 
