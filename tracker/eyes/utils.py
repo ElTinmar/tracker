@@ -6,6 +6,9 @@ from image_tools import bwareafilter_props, bwareafilter, bwareafilter_props_cv2
 from geometry import ellipse_direction, angle_between_vectors
 from .core import DTYPE_EYE
 from geometry import transform2d
+import cv2
+
+TRY_NEW_BWAREA = False
 
 def get_eye_prop(
         centroid: NDArray, 
@@ -72,15 +75,29 @@ def find_eyes_and_swimbladder(
     thresholds = np.linspace(thresh_lo,thresh_hi,eye_dyntresh_res)
     found_eyes_and_sb = False
     for t in thresholds:
-        mask = 1.0*(image >= t)
-        props = bwareafilter_props(
+
+        # actual tracking starts here
+        if TRY_NEW_BWAREA:
+            mask = cv2.compare(image, t, cv2.CMP_GT)
+            bwfun = bwareafilter_props_cv2
+        else:
+            mask = 1.0*(image >= t)
+            bwfun = bwareafilter_props
+
+        props = bwfun(
             mask, 
             min_size = eye_size_lo_px, 
             max_size = eye_size_hi_px
         )
         if len(props) == 3:
             found_eyes_and_sb = True
-            mask = bwareafilter(
+
+            if TRY_NEW_BWAREA:
+                bwfun = bwareafilter_cv2
+            else:
+                bwfun = bwareafilter
+                
+            mask = bwfun(
                 mask, 
                 min_size = eye_size_lo_px, 
                 max_size = eye_size_hi_px

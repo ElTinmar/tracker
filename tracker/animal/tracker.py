@@ -5,6 +5,8 @@ import cv2
 from typing import Optional
 from .core import AnimalTracker
 
+TRY_NEW_BWAREA = False
+
 class AnimalTracker_CPU(AnimalTracker):
     
     def track(self, image: NDArray, centroid: Optional[NDArray] = None) -> Optional[NDArray]:
@@ -31,7 +33,6 @@ class AnimalTracker_CPU(AnimalTracker):
             self.tracking_param.median_filter_sz_px
         )
 
-        TRY_NEW_BWAREA = False
         if TRY_NEW_BWAREA:
             mask = cv2.compare(image_processed, self.tracking_param.animal_intensity, cv2.CMP_GT)
             bwfun = bwareafilter_centroids_cv2

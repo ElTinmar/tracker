@@ -6,6 +6,9 @@ from .core import BodyTracker
 from .utils import get_orientation, get_blob_coordinates
 from tracker.prepare_image import prepare_image
 from geometry import transform2d, Affine2DTransform
+import cv2
+
+TRY_NEW_BWAREA = True
 
 class BodyTracker_CPU(BodyTracker):
         
@@ -42,8 +45,14 @@ class BodyTracker_CPU(BodyTracker):
         )
     
         # actual tracking starts here
-        mask = (image_processed >= self.tracking_param.body_intensity)
-        props = bwareafilter_props(
+        if TRY_NEW_BWAREA:
+            mask = cv2.compare(image_processed, self.tracking_param.body_intensity, cv2.CMP_GT)
+            bwfun = bwareafilter_props_cv2
+        else:
+            mask = (image_processed >= self.tracking_param.body_intensity)
+            bwfun = bwareafilter_props
+
+        props = bwfun(
             mask, 
             min_size = self.tracking_param.min_body_size_px,
             max_size = self.tracking_param.max_body_size_px, 
