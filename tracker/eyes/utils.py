@@ -39,6 +39,34 @@ def get_eye_prop(
     )
     return eye
 
+def get_eye_prop_cv2(
+        centroid: NDArray, 
+        principal_axis: NDArray, 
+        origin: NDArray, 
+        resize: float,
+        transformation_matrix: NDArray
+    ) -> NDArray:
+
+    # fish must be vertical head up
+    heading = np.array([0, 1], dtype=np.single)
+
+    eye_angle = angle_between_vectors(principal_axis, heading)
+    eye_centroid = centroid + origin 
+    eye_dir_original_space = transform2d(transformation_matrix, principal_axis)
+    eye_centroid_original_space = transform2d(transformation_matrix, eye_centroid/resize)
+
+    eye =  np.array(
+        (
+            principal_axis, 
+            eye_angle, 
+            eye_centroid/resize,
+            eye_dir_original_space,
+            eye_centroid_original_space
+        ),
+        dtype = DTYPE_EYE
+    )
+    return eye
+
 def assign_features(blob_centroids: ArrayLike) -> Tuple[int, int, int]:
     """From Duncan, returns indices of swimbladder, left eye and right eye"""
     
@@ -46,21 +74,21 @@ def assign_features(blob_centroids: ArrayLike) -> Tuple[int, int, int]:
     
     # find swimbladder
     distances = pdist(centroids)
-    sb_idx = 2 - np.argmin(distances)
+    swimbladder_index = 2 - np.argmin(distances)
 
     # find eyes
-    eye_idxs = [i for i in range(3) if i != sb_idx]
+    eye_indices = [i for i in range(3) if i != swimbladder_index]
     
     # Getting left and right eyes
     # NOTE: numpy automatically adds 0 to 3rd dimension when 
     # computing cross-product if input arrays are 2D.
-    eye_vectors = centroids[eye_idxs] - centroids[sb_idx]
+    eye_vectors = centroids[eye_indices] - centroids[swimbladder_index]
     cross_product = np.cross(*eye_vectors)
     if cross_product < 0:
-        eye_idxs = eye_idxs[::-1]
-    left_idx, right_idx = eye_idxs
+        eye_indices = eye_indices[::-1]
+    left_eye_index, right_eye_index = eye_indices
 
-    return sb_idx, left_idx, right_idx
+    return swimbladder_index, left_eye_index, right_eye_index
 
 def find_eyes_and_swimbladder(
         image: NDArray, 
