@@ -12,7 +12,7 @@ from tqdm import tqdm
 import numpy as np
 import cv2
 
-DISPLAY=False
+DISPLAY=True
 
 # background subtracted video
 VIDEOS = [
@@ -175,7 +175,8 @@ try:
             r = cv2.resize(oly,(512, 512))
             cv2.imshow('overlay',r)
             cv2.waitKey(1)
-    
+
+
 finally:
     video_reader.close()
     cv2.destroyAllWindows()

@@ -48,7 +48,7 @@ class AnimalTracker_CPU(AnimalTracker):
                 max_length = self.tracking_param.max_animal_length_px,
                 min_width = self.tracking_param.min_animal_width_px,
                 max_width = self.tracking_param.max_animal_width_px
-        )        
+        )     
         
         if centroids.size != 0:
             # identity assignment
@@ -84,5 +84,5 @@ class AnimalTracker_CPU(AnimalTracker):
             ), 
             dtype=self.tracking_param.dtype()
         )
-    
+
         return res
