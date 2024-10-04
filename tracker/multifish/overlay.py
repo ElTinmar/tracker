@@ -37,7 +37,7 @@ class MultiFishOverlay_opencv(MultiFishOverlay):
 
                 if (
                         (self.overlay_param.body is not None) 
-                        and ('body' in tracking) 
+                        and ('body' in tracking.dtype.fields) 
                         and (tracking['body'][idx] is not None) 
                         and (tracking['body'][idx]['centroid'] is not None)
                     ):
@@ -62,9 +62,9 @@ class MultiFishOverlay_opencv(MultiFishOverlay):
                     
                     # overlay eyes, coord system 3.
                     if (
-                        (self.overlay_param.eyes is not None) 
-                        and ('eyes' in tracking)
-                        and (tracking['eyes'][idx] is not None)
+                            (self.overlay_param.eyes is not None) 
+                            and ('eyes' in tracking.dtype.fields)
+                            and (tracking['eyes'][idx] is not None)
                         ):
 
                         overlay = self.overlay_param.eyes.overlay(
@@ -75,9 +75,9 @@ class MultiFishOverlay_opencv(MultiFishOverlay):
                     
                     # overlay tail, coord system 3.
                     if (
-                        (self.overlay_param.tail is not None) 
-                        and ('tail' in tracking)
-                        and (tracking['tail'][idx]  is not None)
+                            (self.overlay_param.tail is not None) 
+                            and ('tail' in tracking.dtype.fields)
+                            and (tracking['tail'][idx]  is not None)
                         ):
 
                         overlay = self.overlay_param.tail.overlay(
