@@ -54,6 +54,8 @@ class LinearSumAssignment:
     '''
 
     ENFORCE_NUM_ANIMALS = True
+    # if I want to properly enforce the num animals, I might have to provide 'true' centroids at the beginning 
+    # and / or everytime we loose tracking. Do I want that ?
     
     def __init__(self, distance_threshold, num_animals: int = 1):
         self.ID = None
