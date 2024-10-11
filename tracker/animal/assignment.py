@@ -10,7 +10,6 @@ Assign identity to tracked objects frame after frame
 # TODO enforce num_animals. The assignment must always 
 # return nun_animals. No more no less. 
 
-
 class GridAssignment:
     def __init__(self, LUT, num_animals: int = 1):
         self.ID = None
@@ -50,6 +49,12 @@ class GridAssignment:
         return self.centroids
     
 class LinearSumAssignment:
+    '''
+    We are using the Hungarian algorithm to solve the assignemnt problem.
+    '''
+
+    ENFORCE_NUM_ANIMALS = True
+    
     def __init__(self, distance_threshold, num_animals: int = 1):
         self.ID = None
         self.ID_max = 0
@@ -68,6 +73,7 @@ class LinearSumAssignment:
             # blob may appear/disappear when:
             # - they get out of the frame
             # - there is a crossing
+            # - tracking fails
 
         if centroids.size == 0:
             return
@@ -79,25 +85,53 @@ class LinearSumAssignment:
             dist = cdist(self.previous_centroids, centroids)
             r,c = linear_sum_assignment(dist)
             distances = dist[r,c]
-            valid = distances < self.distance_threshold
-            new_id = -1*np.ones((centroids.shape[0],), dtype=int)
-            
-            # valid closest blob can keep their numbers
-            new_id[c[valid]] = self.ID[r[valid]]
-            
-            # others are attributed new numbers
-            final_id = np.zeros_like(new_id)
-            for idx, value in enumerate(new_id):
-                if value == -1:
-                    self.ID_max = self.ID_max + 1
-                    final_id[idx] = self.ID_max
-                else:
-                    final_id[idx] = value
 
-            self.ID = final_id
+            if self.ENFORCE_NUM_ANIMALS:
+                
+                # sort distances and keep the self.num_animals closest points 
+                distance_order = np.argsort(distances)[0:self.num_animals]
+                distances_sorted = distances[distance_order]
+                c_sorted = c[distance_order]
+                r_sorted = r[distance_order]
 
-        self.previous_centroids = centroids
-        self.indices = np.arange(centroids.shape[0])
+                # valid closest blob can keep their numbers
+                valid = distances_sorted < self.distance_threshold
+                new_id = -1*np.ones((self.num_animals,), dtype=int)
+                new_id[c_sorted[valid]] = self.ID[r_sorted[valid]]
+
+                # others are attributed new numbers
+                final_id = np.zeros_like(new_id)
+                for idx, value in enumerate(new_id):
+                    if value == -1:
+                        self.ID_max = self.ID_max + 1
+                        final_id[idx] = self.ID_max
+                    else:
+                        final_id[idx] = value
+
+                self.ID = final_id
+                self.previous_centroids = centroids[c_sorted, :]
+                self.indices = np.arange(self.num_animals)
+
+            else:
+
+                valid = distances < self.distance_threshold
+                new_id = -1*np.ones((centroids.shape[0],), dtype=int)
+                # valid closest blob can keep their numbers
+                new_id[c[valid]] = self.ID[r[valid]]
+                
+                # others are attributed new numbers
+                final_id = np.zeros_like(new_id)
+                for idx, value in enumerate(new_id):
+                    if value == -1:
+                        self.ID_max = self.ID_max + 1
+                        final_id[idx] = self.ID_max
+                    else:
+                        final_id[idx] = value
+
+                self.ID = final_id
+
+                self.previous_centroids = centroids
+                self.indices = np.arange(centroids.shape[0])
             
     def get_ID(self) -> NDArray:
         return self.ID
