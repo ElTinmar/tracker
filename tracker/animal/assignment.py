@@ -53,7 +53,7 @@ class LinearSumAssignment:
     We are using the Hungarian algorithm to solve the assignemnt problem.
     '''
 
-    ENFORCE_NUM_ANIMALS = True
+    ENFORCE_NUM_ANIMALS = False
     # if I want to properly enforce the num animals, I might have to provide 'true' centroids at the beginning 
     # and / or everytime we loose tracking. Do I want that ?
     
@@ -102,7 +102,7 @@ class LinearSumAssignment:
             if self.ENFORCE_NUM_ANIMALS:
                 
                 # sort distances and keep the self.num_animals closest points 
-                distance_order = np.argsort(distances)[0:self.num_animals]
+                distance_order = np.argsort(distances)[0:self.num_animals] # NOTE if centroids has size less than self.num_animals we may have a problem
                 distances_sorted = distances[distance_order]
                 c_sorted = c[distance_order]
                 r_sorted = r[distance_order]
