@@ -79,11 +79,11 @@ class LinearSumAssignment:
             return
         
         if self.previous_centroids is None:
-            
+
             if self.ENFORCE_NUM_ANIMALS:
                 self.ID = np.arange(self.num_animals)
                 self.ID_max = np.max(self.ID)
-                self.previous_centroids = centroids
+                self.previous_centroids = centroids[0:self.num_animals,:]
                 self.indices = np.arange(self.num_animals)
 
             else:
