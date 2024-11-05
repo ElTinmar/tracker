@@ -82,9 +82,12 @@ class LinearSumAssignment:
         
         if self.ENFORCE_NUM_ANIMALS:
             
-            # pad centroid 
+            # pad centroid to right size
             to_pad = self.num_animals - centroids.shape[0]
-            centroids = np.pad(centroids,((0,to_pad),(0,0)), constant_values=np.inf)
+            if to_pad < 0:
+                centroids = centroids[0:self.num_animals,:]
+            else:
+                centroids = np.pad(centroids,((0,to_pad),(0,0)), constant_values=np.inf)
 
             if self.previous_centroids is None:
 
