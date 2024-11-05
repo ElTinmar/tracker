@@ -82,7 +82,7 @@ class LinearSumAssignment:
         
         if self.ENFORCE_NUM_ANIMALS:
 
-            print(centroids)
+            print(centroids.shape[0],centroids)
             
             # pad centroid to right size
             to_pad = self.num_animals - centroids.shape[0]
