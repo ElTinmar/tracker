@@ -87,7 +87,7 @@ class LinearSumAssignment:
             if to_pad < 0:
                 centroids = centroids[0:self.num_animals,:]
             else:
-                centroids = np.pad(centroids,((0,to_pad),(0,0)), constant_values=np.inf)
+                centroids = np.pad(centroids,((0,to_pad),(0,0)), constant_values=10_000)
 
             if self.previous_centroids is None:
 
@@ -97,7 +97,9 @@ class LinearSumAssignment:
                 self.indices = np.arange(self.num_animals)
 
             else:
-                dist = cdist(self.previous_centroids, centroids)
+                prev = self.previous_centroids[~np.isnan(self.previous_centroids).any(axis=1),:]
+                curr = centroids[~np.isnan(centroids).any(axis=1),:]
+                dist = cdist(prev, curr)
                 r,c = linear_sum_assignment(dist)
                 distances = dist[r,c]
                 valid = distances < self.distance_threshold
