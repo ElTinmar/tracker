@@ -87,7 +87,7 @@ class LinearSumAssignment:
             if to_pad < 0:
                 centroids = centroids[0:self.num_animals,:]
             else:
-                centroids = np.pad(centroids,((0,to_pad),(0,0)), constant_values=10_000)
+                centroids = np.pad(centroids,((0,to_pad),(0,0)), constant_values=np.nan)
 
             if self.previous_centroids is None:
 
