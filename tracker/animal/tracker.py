@@ -56,8 +56,9 @@ class AnimalTracker_CPU(AnimalTracker):
             self.assignment.update(centroids)
             identities = self.assignment.get_ID()
             indices_tokeep = self.assignment.get_kept_centroids()   
+            centroids = self.assignment.get_centroids()
             #centroids = centroids/self.tracking_param.resize
-            centroids = centroids[indices_tokeep,:]
+            #centroids = centroids[indices_tokeep,:]
         else:
             centroids = np.zeros((self.tracking_param.num_animals, 2), np.float32)
             identities = np.zeros((self.tracking_param.num_animals, 1), int)

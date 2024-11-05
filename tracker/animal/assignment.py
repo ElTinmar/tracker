@@ -119,10 +119,6 @@ class LinearSumAssignment:
                 self.ID = final_id
                 self.previous_centroids = centroids
                 self.indices = np.arange(self.num_animals)
-
-                print(centroids)
-                print(self.ID)
-            
         else:
 
             if self.previous_centroids is None:
