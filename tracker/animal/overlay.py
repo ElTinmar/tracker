@@ -22,8 +22,12 @@ class AnimalOverlay_opencv(AnimalOverlay):
 
             for idx, id in zip(tracking['indices'], tracking['identities']):
 
+                if np.isnan(tracking['centroids'][idx,:]).any():
+                    continue
+
                 # draw centroid
                 x,y,_ = transformation_matrix @ to_homogeneous(tracking['centroids'][idx,:])
+
                 overlay = cv2.circle(
                     overlay,
                     (int(x),int(y)), 
