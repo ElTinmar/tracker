@@ -110,9 +110,15 @@ class LinearSumAssignment:
                 # others are attributed new numbers
                 final_id = np.zeros_like(new_id)
                 for idx, value in enumerate(new_id):
+                    
+                    if np.isnan(centroids[idx,:]).any():
+                        final_id[idx] = np.nan
+                        continue
+                    
                     if value == -1:
                         self.ID_max = self.ID_max + 1
                         final_id[idx] = self.ID_max
+                    
                     else:
                         final_id[idx] = value
 
