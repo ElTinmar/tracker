@@ -81,15 +81,13 @@ class LinearSumAssignment:
             return
         
         if self.ENFORCE_NUM_ANIMALS:
-
-            print(centroids.shape[0],centroids)
             
             # pad centroid to right size
             to_pad = self.num_animals - centroids.shape[0]
             if to_pad < 0:
                 centroids = centroids[0:self.num_animals,:]
             else:
-                centroids = np.pad(centroids,((0,to_pad),(0,0)), constant_values=np.nan)
+                centroids = np.pad(centroids,((0,to_pad), (0,0)), constant_values=np.nan)
 
             if self.previous_centroids is None:
                 self.ID = np.arange(self.num_animals)
@@ -121,6 +119,9 @@ class LinearSumAssignment:
                 self.ID = final_id
                 self.previous_centroids = centroids
                 self.indices = np.arange(self.num_animals)
+
+                print(centroids)
+                print(self.ID)
             
         else:
 
