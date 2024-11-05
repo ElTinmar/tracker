@@ -104,7 +104,7 @@ class LinearSumAssignment:
                 valid = distances < self.distance_threshold
 
                 # valid closest blob can keep their numbers
-                new_id = -1*np.ones((self.num_animals,), dtype=int)
+                new_id = -1*np.ones((self.num_animals,))
                 new_id[c[valid]] = self.ID[r[valid]]
 
                 # others are attributed new numbers
