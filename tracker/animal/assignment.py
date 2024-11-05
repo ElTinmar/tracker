@@ -53,7 +53,7 @@ class LinearSumAssignment:
     We are using the Hungarian algorithm to solve the assignemnt problem.
     '''
 
-    ENFORCE_NUM_ANIMALS = False
+    ENFORCE_NUM_ANIMALS = True
     # if I want to properly enforce the num animals, I might have to provide 'true' centroids at the beginning 
     # and / or everytime we loose tracking. Do I want that ?
     
@@ -80,37 +80,28 @@ class LinearSumAssignment:
         if centroids.size == 0:
             return
         
-        if self.previous_centroids is None:
+        if self.ENFORCE_NUM_ANIMALS:
+            
+            # pad centroid 
+            to_pad = self.num_animals - centroids.shape[0]
+            centroids = np.pad(centroids,((0,to_pad),(0,0)), constant_values=np.inf)
 
-            if self.ENFORCE_NUM_ANIMALS:
+            if self.previous_centroids is None:
+
                 self.ID = np.arange(self.num_animals)
                 self.ID_max = np.max(self.ID)
-                self.previous_centroids = centroids[0:self.num_animals,:]
+                self.previous_centroids = centroids
                 self.indices = np.arange(self.num_animals)
 
             else:
-                self.ID = np.arange(centroids.shape[0])
-                self.ID_max = np.max(self.ID)
-                self.previous_centroids = centroids
-                self.indices = np.arange(centroids.shape[0])
-
-        else:
-            dist = cdist(self.previous_centroids, centroids)
-            r,c = linear_sum_assignment(dist)
-            distances = dist[r,c]
-
-            if self.ENFORCE_NUM_ANIMALS:
-                
-                # sort distances and keep the self.num_animals closest points 
-                distance_order = np.argsort(distances)[0:self.num_animals] # NOTE if centroids has size less than self.num_animals we may have a problem
-                distances_sorted = distances[distance_order]
-                c_sorted = c[distance_order]
-                r_sorted = r[distance_order]
+                dist = cdist(self.previous_centroids, centroids)
+                r,c = linear_sum_assignment(dist)
+                distances = dist[r,c]
+                valid = distances < self.distance_threshold
 
                 # valid closest blob can keep their numbers
-                valid = distances_sorted < self.distance_threshold
                 new_id = -1*np.ones((self.num_animals,), dtype=int)
-                new_id[c_sorted[valid]] = self.ID[r_sorted[valid]]
+                new_id[c[valid]] = self.ID[r[valid]]
 
                 # others are attributed new numbers
                 final_id = np.zeros_like(new_id)
@@ -122,11 +113,22 @@ class LinearSumAssignment:
                         final_id[idx] = value
 
                 self.ID = final_id
-                self.previous_centroids = centroids[c_sorted, :]
+                self.previous_centroids = centroids
                 self.indices = np.arange(self.num_animals)
+            
+        else:
+
+            if self.previous_centroids is None:
+
+                self.ID = np.arange(centroids.shape[0])
+                self.ID_max = np.max(self.ID)
+                self.previous_centroids = centroids
+                self.indices = np.arange(centroids.shape[0])
 
             else:
-
+                dist = cdist(self.previous_centroids, centroids)
+                r,c = linear_sum_assignment(dist)
+                distances = dist[r,c]
                 valid = distances < self.distance_threshold
                 new_id = -1*np.ones((centroids.shape[0],), dtype=int)
                 # valid closest blob can keep their numbers
@@ -142,7 +144,6 @@ class LinearSumAssignment:
                         final_id[idx] = value
 
                 self.ID = final_id
-
                 self.previous_centroids = centroids
                 self.indices = np.arange(centroids.shape[0])
             
