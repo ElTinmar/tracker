@@ -61,8 +61,8 @@ class AnimalTracker_CPU(AnimalTracker):
             #centroids = centroids[indices_tokeep,:]
         else:
             centroids = np.zeros((self.tracking_param.num_animals, 2), np.float32)
-            identities = np.zeros((self.tracking_param.num_animals, 1), int)
-            indices_tokeep = np.zeros((self.tracking_param.num_animals, 1), int)
+            identities = np.zeros((self.tracking_param.num_animals,), int)
+            indices_tokeep = np.zeros((self.tracking_param.num_animals,), int)
 
         # Downsample image export. This is a bit easier on RAM
         image_export = cv2.resize(
