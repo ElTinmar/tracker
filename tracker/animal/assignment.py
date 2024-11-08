@@ -112,7 +112,7 @@ class LinearSumAssignment:
                 for idx, value in enumerate(new_id):
                     
                     if np.isnan(centroids[idx,:]).any():
-                        final_id[idx] = np.nan
+                        final_id[idx] = np.nan #TODO problem with integers and nan
                         continue
                     
                     if value == -1:
