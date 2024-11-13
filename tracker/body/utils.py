@@ -32,7 +32,8 @@ def get_orientation(coordinates: NDArray) -> Tuple[NDArray, NDArray]:
     get blob main axis using PCA
     '''
 
-    if coordinates.shape[0] <= 1:
+    # if only one point, or points aligned in 1D, quit
+    if np.any(np.var(centroid, axis=0) == 0):
         return (None, None)
 
     pca = PCA()
