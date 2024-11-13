@@ -3,6 +3,7 @@ from numpy.typing import NDArray
 from typing import Tuple, List, Optional
 import numpy as np
 from skimage.measure._regionprops import RegionProperties
+import warnings
 
 def get_blob_coordinates(
         centroid: Optional[NDArray], 
@@ -38,7 +39,11 @@ def get_orientation(coordinates: NDArray) -> Tuple[NDArray, NDArray]:
         return (None, None)
     
     pca = PCA()
-    scores = pca.fit_transform(coordinates)
+    try:
+        scores = pca.fit_transform(coordinates)
+    except RuntimeWarning:
+        print(coordinates)
+
     # PCs are organized in rows, transform to columns
     principal_components = pca.components_.T
     centroid = pca.mean_
