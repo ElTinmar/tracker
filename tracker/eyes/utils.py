@@ -1,7 +1,7 @@
 from scipy.spatial.distance import pdist
 import numpy as np
 from numpy.typing import NDArray, ArrayLike
-from typing import Tuple
+from typing import Tuple, Optional
 from image_tools import bwareafilter_props, bwareafilter, bwareafilter_props_cv2, bwareafilter_cv2
 from geometry import ellipse_direction, angle_between_vectors
 from .core import DTYPE_EYE
@@ -41,11 +41,14 @@ def get_eye_prop(
 
 def get_eye_prop_cv2(
         centroid: NDArray, 
-        principal_axis: NDArray, 
+        principal_axis: Optional[NDArray], 
         origin: NDArray, 
         resize: float,
         transformation_matrix: NDArray
-    ) -> NDArray:
+    ) -> Optional[NDArray]:
+
+    if principal_axis is None:
+        return None
 
     # fish must be vertical head up
     heading = np.array([0, 1], dtype=np.single)
