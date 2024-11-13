@@ -3,7 +3,6 @@ from numpy.typing import NDArray
 from typing import Tuple, List, Optional
 import numpy as np
 from skimage.measure._regionprops import RegionProperties
-import warnings
 
 def get_blob_coordinates(
         centroid: Optional[NDArray], 
@@ -33,18 +32,12 @@ def get_orientation(coordinates: NDArray) -> Tuple[NDArray, NDArray]:
     get blob main axis using PCA
     '''
 
-    warnings.filterwarnings("error")
-
     # if only one point, or points aligned in 1D, quit
-    # if np.any(np.var(coordinates, axis=0) == 0):
     if (coordinates.shape[0] <= 1) or np.any(np.var(coordinates, axis=0) == 0):
         return (None, None)
     
     pca = PCA()
-    try:
-        scores = pca.fit_transform(coordinates)
-    except RuntimeWarning:
-        print(coordinates)
+    scores = pca.fit_transform(coordinates)
 
     # PCs are organized in rows, transform to columns
     principal_components = pca.components_.T
