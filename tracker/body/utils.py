@@ -34,7 +34,7 @@ def get_orientation(coordinates: NDArray) -> Tuple[NDArray, NDArray]:
 
     # if only one point, or points aligned in 1D, quit
     # if np.any(np.var(coordinates, axis=0) == 0):
-    if coordinates.shape[0] <= 1:
+    if (coordinates.shape[0] <= 1) or np.any(np.var(coordinates, axis=0) == 0):
         return (None, None)
     
     pca = PCA()
