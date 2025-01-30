@@ -14,6 +14,8 @@ class MultiFishTracker_CPU(MultiFishTracker):
         # get animal centroids (only crude location is necessary)
         animals = self.tracking_param.animal.track(image)
 
+        print(animals)
+
         if animals is None or animals['identities'] is None:
             return
         
