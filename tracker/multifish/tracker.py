@@ -69,9 +69,9 @@ class MultiFishTracker_CPU(MultiFishTracker):
                 arr,
                 dtype=self.tracking_param.dtype()
             )
-        except:
-            print('Problem')
-            print(animals, body, eyes, tail, arr)
+        except ValueError:
+            # FIXME shape (0,) cannot be broadcast to (1,)
+            return
 
         return res 
     
