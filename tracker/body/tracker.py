@@ -71,7 +71,10 @@ class BodyTracker_CPU(BodyTracker):
             coordinates = get_blob_coordinates(centroid, props, self.tracking_param.resize)
             if coordinates.shape[0] > 1:
                 (principal_components, centroid_coords) = get_orientation(coordinates)
-                angle_rad = np.arctan2(principal_components[1,1], principal_components[0,1])
+
+                if principal_components is not None:
+                    angle_rad = np.arctan2(principal_components[1,1], principal_components[0,1])
+                
                 if centroid is not None:
                     centroid_ori = origin + centroid + centroid_coords / self.tracking_param.resize 
 
