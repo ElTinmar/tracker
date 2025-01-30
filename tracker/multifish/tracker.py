@@ -71,6 +71,7 @@ class MultiFishTracker_CPU(MultiFishTracker):
             )
         except ValueError:
             # FIXME shape (0,) cannot be broadcast to (1,)
+            # this may happen if you try to get eyes or tail without body
             return
 
         return res 
