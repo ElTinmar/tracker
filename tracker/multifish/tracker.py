@@ -14,8 +14,6 @@ class MultiFishTracker_CPU(MultiFishTracker):
         # get animal centroids (only crude location is necessary)
         animals = self.tracking_param.animal.track(image)
 
-        print(animals)
-
         if animals is None or animals['identities'] is None:
             return
         
@@ -65,6 +63,11 @@ class MultiFishTracker_CPU(MultiFishTracker):
 
         if self.tracking_param.tail is not None:
             arr += (tail,)
+
+        if arr.shape == (0,):
+            print('Hey')
+            print(arr)
+            return
 
         res = np.array(
             arr,
