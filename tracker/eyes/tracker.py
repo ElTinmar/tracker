@@ -43,8 +43,8 @@ class EyesTracker_CPU(EyesTracker):
             contrast = self.tracking_param.eye_contrast,
             gamma = self.tracking_param.eye_gamma,
             brightness = self.tracking_param.eye_brightness,
-            blur_sz_px = self.tracking_param.blur_sz_px,
-            median_filter_sz_px = self.tracking_param.median_filter_sz_px
+            blur_size_px = self.tracking_param.blur_sz_px,
+            medfilt_size_px = self.tracking_param.median_filter_sz_px
         )
 
         # sweep threshold to obtain 3 connected component within size range (include swim bladder)

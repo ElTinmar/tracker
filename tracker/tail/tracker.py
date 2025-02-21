@@ -40,8 +40,8 @@ class TailTracker_CPU(TailTracker):
             contrast = self.tracking_param.tail_contrast,
             gamma = self.tracking_param.tail_gamma,
             brightness = self.tracking_param.tail_brightness,
-            blur_sz_px = self.tracking_param.blur_sz_px,
-            median_filter_sz_px = self.tracking_param.median_filter_sz_px
+            blur_size_px = self.tracking_param.blur_sz_px,
+            medfilt_size_px = self.tracking_param.median_filter_sz_px
         )
 
         skeleton, skeleton_interp = tail_skeleton_ball(

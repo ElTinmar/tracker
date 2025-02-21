@@ -41,12 +41,12 @@ class BodyTracker_CPU(BodyTracker):
         )
 
         image_processed = enhance(
-            image_resized,
+            image = image_resized,
             contrast = self.tracking_param.body_contrast,
             gamma = self.tracking_param.body_gamma,
             brightness = self.tracking_param.body_brightness,
-            blur_sz_px = self.tracking_param.blur_sz_px,
-            median_filter_sz_px = self.tracking_param.median_filter_sz_px
+            blur_size_px = self.tracking_param.blur_sz_px,
+            medfilt_size_px = self.tracking_param.median_filter_sz_px
         )
 
         # actual tracking starts here
