@@ -2,18 +2,6 @@ from abc import ABC, abstractmethod
 from numpy.typing import NDArray 
 from typing import Any, Optional
 
-'''
-TODO Add optional output as argument to write directly into buffers:
-
-    @abstractmethod
-    def track(
-            self, 
-            image: NDArray,
-            out: Optional[NDArray], -> write directly into buffer
-            centroid: Optional[NDArray],
-            transformation_matrix: Optional[NDArray]
-        ) -> Optional[NDArray]:
-'''
 
 class Tracker(ABC):
     
