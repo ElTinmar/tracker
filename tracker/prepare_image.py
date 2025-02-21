@@ -9,7 +9,6 @@ def crop(
         vertical_offset_px: int = 0,
         centroid: Optional[NDArray] = None,
     ) -> Optional[Tuple[NDArray, NDArray]]:
-    '''crop, resize and enhance image before tracking'''
 
     # TODO make sure this is ok
     if centroid is None:
