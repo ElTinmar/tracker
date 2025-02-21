@@ -29,7 +29,7 @@ class EyesTracker_CPU(EyesTracker):
         (origin, image_crop) = crop(
             image = image,
             source_crop_dimension_px = self.tracking_param.source_crop_dimension_px,
-            target_crop_dimension_px = self.tracking_param.crop_dimension_px, 
+            vertical_offset_px=self.tracking_param.crop_offset_px, 
             centroid = centroid
         )
 
@@ -40,9 +40,9 @@ class EyesTracker_CPU(EyesTracker):
 
         image_processed = enhance(
             image_resized,
-            contrast = self.tracking_param.body_contrast,
-            gamma = self.tracking_param.body_gamma,
-            brightness = self.tracking_param.body_brightness,
+            contrast = self.tracking_param.eye_contrast,
+            gamma = self.tracking_param.eye_gamma,
+            brightness = self.tracking_param.eye_brightness,
             blur_sz_px = self.tracking_param.blur_sz_px,
             median_filter_sz_px = self.tracking_param.median_filter_sz_px
         )

@@ -26,7 +26,7 @@ class TailTracker_CPU(TailTracker):
         (origin, image_crop) = crop(
             image = image,
             source_crop_dimension_px = self.tracking_param.source_crop_dimension_px,
-            target_crop_dimension_px = self.tracking_param.crop_dimension_px, 
+            vertical_offset_px=self.tracking_param.crop_offset_tail_px,
             centroid = centroid
         )
 
@@ -37,9 +37,9 @@ class TailTracker_CPU(TailTracker):
 
         image_processed = enhance(
             image_resized,
-            contrast = self.tracking_param.body_contrast,
-            gamma = self.tracking_param.body_gamma,
-            brightness = self.tracking_param.body_brightness,
+            contrast = self.tracking_param.tail_contrast,
+            gamma = self.tracking_param.tail_gamma,
+            brightness = self.tracking_param.tail_brightness,
             blur_sz_px = self.tracking_param.blur_sz_px,
             median_filter_sz_px = self.tracking_param.median_filter_sz_px
         )

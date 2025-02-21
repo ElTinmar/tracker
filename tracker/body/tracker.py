@@ -32,7 +32,6 @@ class BodyTracker_CPU(BodyTracker):
         (origin, image_crop) = crop(
             image = image,
             source_crop_dimension_px = self.tracking_param.source_crop_dimension_px,
-            target_crop_dimension_px = self.tracking_param.crop_dimension_px, 
             centroid = centroid
         )
 
