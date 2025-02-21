@@ -8,8 +8,6 @@ from tracker.prepare_image import prepare_image
 from geometry import transform2d, Affine2DTransform
 import cv2
 
-TRY_NEW_BWAREA = True
-
 class BodyTracker_CPU(BodyTracker):
         
     def track(
@@ -45,14 +43,8 @@ class BodyTracker_CPU(BodyTracker):
         )
     
         # actual tracking starts here
-        if TRY_NEW_BWAREA:
-            mask = cv2.compare(image_processed, self.tracking_param.body_intensity, cv2.CMP_GT)
-            bwfun = bwareafilter_props_cv2
-        else:
-            mask = (image_processed >= self.tracking_param.body_intensity)
-            bwfun = bwareafilter_props
-
-        props = bwfun(
+        mask = cv2.compare(image_processed, self.tracking_param.body_intensity, cv2.CMP_GT)
+        props = bwareafilter_props_cv2(
             mask, 
             min_size = self.tracking_param.min_body_size_px,
             max_size = self.tracking_param.max_body_size_px, 

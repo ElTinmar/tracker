@@ -2,11 +2,9 @@ import numpy as np
 from numpy.typing import NDArray
 from typing import Optional
 from .core import EyesTracker, DTYPE_EYE
-from .utils import get_eye_prop, get_eye_prop_cv2, find_eyes_and_swimbladder, assign_features
+from .utils import get_eye_prop_cv2, find_eyes_and_swimbladder, assign_features
 from tracker.prepare_image import prepare_image
 from geometry import Affine2DTransform
-
-TRY_NEW_BWAREA = True
 
 class EyesTracker_CPU(EyesTracker):
 
@@ -63,37 +61,20 @@ class EyesTracker_CPU(EyesTracker):
             centroid_sb = np.asarray(props[sb_idx].centroid[::-1], dtype=np.float32)
                 
             # compute eye orientation
-            if TRY_NEW_BWAREA:
-                left_eye = get_eye_prop_cv2(
-                    centroid_left, 
-                    props[left_idx].principal_axis, 
-                    origin*self.tracking_param.resize,
-                    self.tracking_param.resize,
-                    transformation_matrix
-                )
-                right_eye = get_eye_prop_cv2(
-                    centroid_right, 
-                    props[right_idx].principal_axis,
-                    origin*self.tracking_param.resize,
-                    self.tracking_param.resize,
-                    transformation_matrix
-                )
-
-            else:
-                left_eye = get_eye_prop(
-                    centroid_left, 
-                    props[left_idx].inertia_tensor, 
-                    origin*self.tracking_param.resize,
-                    self.tracking_param.resize,
-                    transformation_matrix
-                )
-                right_eye = get_eye_prop(
-                    centroid_right, 
-                    props[right_idx].inertia_tensor,
-                    origin*self.tracking_param.resize,
-                    self.tracking_param.resize,
-                    transformation_matrix
-                )
+            left_eye = get_eye_prop_cv2(
+                centroid_left, 
+                props[left_idx].principal_axis, 
+                origin*self.tracking_param.resize,
+                self.tracking_param.resize,
+                transformation_matrix
+            )
+            right_eye = get_eye_prop_cv2(
+                centroid_right, 
+                props[right_idx].principal_axis,
+                origin*self.tracking_param.resize,
+                self.tracking_param.resize,
+                transformation_matrix
+            )
 
             heading_vector = (centroid_left + centroid_right)/2 - centroid_sb
             heading_vector = heading_vector / np.linalg.norm(heading_vector)

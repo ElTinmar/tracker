@@ -8,37 +8,6 @@ from .core import DTYPE_EYE
 from geometry import transform2d
 import cv2
 
-TRY_NEW_BWAREA = True
-
-def get_eye_prop(
-        centroid: NDArray, 
-        inertia_tensor: NDArray, 
-        origin: NDArray, 
-        resize: float,
-        transformation_matrix: NDArray
-    ) -> NDArray:
-
-    # fish must be vertical head up
-    heading = np.array([0, 1], dtype=np.single)
-
-    eye_dir = ellipse_direction(inertia_tensor, heading)
-    eye_angle = angle_between_vectors(eye_dir, heading)
-    eye_centroid = centroid + origin         
-    eye_dir_original_space = transform2d(transformation_matrix, eye_dir)
-    eye_centroid_original_space = transform2d(transformation_matrix, eye_centroid/resize)
-
-    eye =  np.array(
-        (
-            eye_dir, 
-            eye_angle, 
-            eye_centroid/resize,
-            eye_dir_original_space,
-            eye_centroid_original_space
-        ),
-        dtype = DTYPE_EYE
-    )
-    return eye
-
 def get_eye_prop_cv2(
         centroid: NDArray, 
         principal_axis: Optional[NDArray], 
@@ -107,27 +76,15 @@ def find_eyes_and_swimbladder(
     for t in thresholds:
 
         # actual tracking starts here
-        if TRY_NEW_BWAREA:
-            mask = cv2.compare(image, t, cv2.CMP_GT)
-            bwfun = bwareafilter_props_cv2
-        else:
-            mask = 1.0*(image >= t)
-            bwfun = bwareafilter_props
-
-        props = bwfun(
+        mask = cv2.compare(image, t, cv2.CMP_GT)
+        props = bwareafilter_props_cv2(
             mask, 
             min_size = eye_size_lo_px, 
             max_size = eye_size_hi_px
         )
         if len(props) == 3:
             found_eyes_and_sb = True
-
-            if TRY_NEW_BWAREA:
-                bwfun = bwareafilter_cv2
-            else:
-                bwfun = bwareafilter
-                
-            mask = bwfun(
+            mask = bwareafilter_cv2(
                 mask, 
                 min_size = eye_size_lo_px, 
                 max_size = eye_size_hi_px
