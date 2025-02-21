@@ -10,7 +10,10 @@ def get_blob_coordinates(
         resize: float
     ) -> NDArray:
     
-    if centroid is not None:
+    if centroid is None:
+        # skimage RegionProperties store coordinates as (row, col), we want (x,y)
+        track_coords = np.fliplr(props[0].coords)
+    else:
         # in case of multiple tracking, there may be other blobs
         track_coords = None
         min_dist = None
@@ -21,13 +24,11 @@ def get_blob_coordinates(
             dist = np.linalg.norm(fish_centroid/resize - centroid)
             if (min_dist is None) or (dist < min_dist): 
                 track_coords = fish_coords
-                min_dist = dist
-    else:
-        track_coords = np.fliplr(props[0].coords)
+                min_dist = dist        
     
     return track_coords
 
-def get_orientation(coordinates: NDArray) -> Tuple[NDArray, NDArray]:
+def get_orientation(coordinates: NDArray) -> Optional[Tuple[NDArray, NDArray]]:
     '''
     get blob main axis using PCA
     '''

@@ -1,4 +1,4 @@
-from image_tools import  bwareafilter_props, bwareafilter_props_cv2
+from image_tools import  bwareafilter_props_cv2
 import numpy as np
 from numpy.typing import NDArray
 from typing import Optional
@@ -12,10 +12,10 @@ class BodyTracker_CPU(BodyTracker):
         
     def track(
             self,
-            image: NDArray, 
+            image: Optional[NDArray], 
             centroid: Optional[NDArray] = None,
             transformation_matrix: Optional[NDArray] = Affine2DTransform.identity()
-        ) -> NDArray:
+        ) -> Optional[NDArray]:
         '''
         centroid: centroid of the fish to track if it's already known.
         Useful when tracking multiple fish to discriminate between nearby blobs
@@ -30,16 +30,15 @@ class BodyTracker_CPU(BodyTracker):
         
         # pre-process image: crop/resize/tune intensity
         (origin, image_crop, image_processed) = prepare_image(
-            image=image,
-            source_crop_dimension_px=self.tracking_param.source_crop_dimension_px,
-            target_crop_dimension_px=self.tracking_param.crop_dimension_px, 
-            vertical_offset_px=0,
-            centroid=centroid,
-            contrast=self.tracking_param.body_contrast,
-            gamma=self.tracking_param.body_gamma,
-            brightness=self.tracking_param.body_brightness,
-            blur_sz_px=self.tracking_param.blur_sz_px,
-            median_filter_sz_px=self.tracking_param.median_filter_sz_px
+            image = image,
+            source_crop_dimension_px = self.tracking_param.source_crop_dimension_px,
+            target_crop_dimension_px = self.tracking_param.crop_dimension_px, 
+            centroid = centroid,
+            contrast = self.tracking_param.body_contrast,
+            gamma = self.tracking_param.body_gamma,
+            brightness = self.tracking_param.body_brightness,
+            blur_sz_px = self.tracking_param.blur_sz_px,
+            median_filter_sz_px = self.tracking_param.median_filter_sz_px
         )
     
         # actual tracking starts here
@@ -54,12 +53,8 @@ class BodyTracker_CPU(BodyTracker):
             max_width = self.tracking_param.max_body_width_px
         )
         
-        angle_rad = None
-        principal_components = None
-        centroid_coords = None
-        centroid_ori = None
-
-        if props != []:
+        angle_rad, principal_components, centroid_coords, centroid_ori = None, None, None, None
+        if props:
             coordinates = get_blob_coordinates(centroid, props, self.tracking_param.resize)
             if coordinates.shape[0] > 1:
                 (principal_components, centroid_coords) = get_orientation(coordinates)

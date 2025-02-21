@@ -8,15 +8,19 @@ def prepare_image(
         image: NDArray,
         source_crop_dimension_px: Tuple[int, int],
         target_crop_dimension_px: Tuple[int, int], 
-        vertical_offset_px: int,
-        centroid: NDArray,
-        contrast: float,
-        gamma: float,
-        brightness: float,
-        blur_sz_px: float,
-        median_filter_sz_px: float
+        vertical_offset_px: int = 0,
+        centroid: Optional[NDArray] = None,
+        contrast: float = 1,
+        gamma: float = 1,
+        brightness: float = 0,
+        blur_sz_px: Optional[int] = None,
+        median_filter_sz_px: Optional[int] = None,
     ) -> Optional[Tuple[NDArray, NDArray, NDArray]]:
     '''crop, resize and enhance image before tracking'''
+
+    # TODO make sure this is ok
+    if centroid is None:
+        centroid = np.array(image.shape) // 2
     
     # crop to get fixed image size 
     # NOTE: this may affect the distribution of pixel values on the edges
