@@ -3,7 +3,8 @@ import numpy as np
 from typing import Optional
 from .core import TailTracker
 from .utils import tail_skeleton_ball
-from tracker.prepare_image import prepare_image
+from tracker.prepare_image import crop, resize
+from image_tools import enhance
 
 class TailTracker_CPU(TailTracker):
 
@@ -22,17 +23,25 @@ class TailTracker_CPU(TailTracker):
             return None
         
         # pre-process image: crop/resize/tune intensity
-        (origin, image_crop, image_processed) = prepare_image(
-            image=image,
-            source_crop_dimension_px=self.tracking_param.source_crop_dimension_px,
-            target_crop_dimension_px=self.tracking_param.crop_dimension_px, 
-            vertical_offset_px=self.tracking_param.crop_offset_tail_px,
-            centroid=centroid,
-            contrast=self.tracking_param.tail_contrast,
-            gamma=self.tracking_param.tail_gamma,
-            brightness=self.tracking_param.tail_brightness,
-            blur_sz_px=self.tracking_param.blur_sz_px,
-            median_filter_sz_px=self.tracking_param.median_filter_sz_px
+        (origin, image_crop) = crop(
+            image = image,
+            source_crop_dimension_px = self.tracking_param.source_crop_dimension_px,
+            target_crop_dimension_px = self.tracking_param.crop_dimension_px, 
+            centroid = centroid
+        )
+
+        image_resized = resize(
+            image = image_crop,
+            target_crop_dimension_px = self.tracking_param.crop_dimension_px, 
+        )
+
+        image_processed = enhance(
+            image_resized,
+            contrast = self.tracking_param.body_contrast,
+            gamma = self.tracking_param.body_gamma,
+            brightness = self.tracking_param.body_brightness,
+            blur_sz_px = self.tracking_param.blur_sz_px,
+            median_filter_sz_px = self.tracking_param.median_filter_sz_px
         )
 
         skeleton, skeleton_interp = tail_skeleton_ball(

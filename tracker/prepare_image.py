@@ -2,20 +2,13 @@ from typing import Tuple, Optional
 import numpy as np
 from numpy.typing import NDArray
 import cv2
-from image_tools import  enhance
 
-def prepare_image(
+def crop(
         image: NDArray,
         source_crop_dimension_px: Tuple[int, int],
-        target_crop_dimension_px: Tuple[int, int], 
         vertical_offset_px: int = 0,
         centroid: Optional[NDArray] = None,
-        contrast: float = 1,
-        gamma: float = 1,
-        brightness: float = 0,
-        blur_sz_px: Optional[int] = None,
-        median_filter_sz_px: Optional[int] = None,
-    ) -> Optional[Tuple[NDArray, NDArray, NDArray]]:
+    ) -> Optional[Tuple[NDArray, NDArray]]:
     '''crop, resize and enhance image before tracking'''
 
     # TODO make sure this is ok
@@ -43,21 +36,18 @@ def prepare_image(
     if image_crop.size == 0:
         return None
 
+    return (origin, image_crop)
+
+def resize(
+        image: NDArray,
+        target_crop_dimension_px: Tuple[int, int], 
+    ) -> NDArray:
+
     # resize image
-    image_processed = cv2.resize(
-        image_crop, 
+    image_resized = cv2.resize(
+        image, 
         target_crop_dimension_px, 
         interpolation=cv2.INTER_NEAREST
     )
+    return image_resized
 
-    # tune image contrast and gamma
-    image_processed = enhance(
-        image_processed,
-        contrast,
-        gamma,
-        brightness,
-        blur_sz_px,
-        median_filter_sz_px
-    )
-
-    return (origin, image_crop, image_processed)

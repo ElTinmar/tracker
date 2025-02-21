@@ -1,10 +1,10 @@
-from image_tools import  bwareafilter_props_cv2
+from image_tools import  bwareafilter_props_cv2, enhance
 import numpy as np
 from numpy.typing import NDArray
 from typing import Optional
 from .core import BodyTracker
 from .utils import get_orientation, get_blob_coordinates
-from tracker.prepare_image import prepare_image
+from tracker.prepare_image import crop, resize
 from geometry import transform2d, Affine2DTransform
 import cv2
 
@@ -29,18 +29,27 @@ class BodyTracker_CPU(BodyTracker):
             return None
         
         # pre-process image: crop/resize/tune intensity
-        (origin, image_crop, image_processed) = prepare_image(
+        (origin, image_crop) = crop(
             image = image,
             source_crop_dimension_px = self.tracking_param.source_crop_dimension_px,
             target_crop_dimension_px = self.tracking_param.crop_dimension_px, 
-            centroid = centroid,
+            centroid = centroid
+        )
+
+        image_resized = resize(
+            image = image_crop,
+            target_crop_dimension_px = self.tracking_param.crop_dimension_px, 
+        )
+
+        image_processed = enhance(
+            image_resized,
             contrast = self.tracking_param.body_contrast,
             gamma = self.tracking_param.body_gamma,
             brightness = self.tracking_param.body_brightness,
             blur_sz_px = self.tracking_param.blur_sz_px,
             median_filter_sz_px = self.tracking_param.median_filter_sz_px
         )
-    
+
         # actual tracking starts here
         mask = cv2.compare(image_processed, self.tracking_param.body_intensity, cv2.CMP_GT)
         props = bwareafilter_props_cv2(
