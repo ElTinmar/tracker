@@ -1,4 +1,4 @@
-from image_tools import bwareafilter_centroids, bwareafilter_centroids_cv2, enhance, im2uint8
+from image_tools import bwareafilter_centroids_cv2, enhance
 import numpy as np
 from numpy.typing import NDArray
 import cv2
@@ -34,13 +34,13 @@ class AnimalTracker_CPU(AnimalTracker):
 
         mask = cv2.compare(image_processed, self.tracking_param.animal_intensity, cv2.CMP_GT)
         centroids = bwareafilter_centroids_cv2(
-                mask, 
-                min_size = self.tracking_param.min_animal_size_px,
-                max_size = self.tracking_param.max_animal_size_px, 
-                min_length = self.tracking_param.min_animal_length_px,
-                max_length = self.tracking_param.max_animal_length_px,
-                min_width = self.tracking_param.min_animal_width_px,
-                max_width = self.tracking_param.max_animal_width_px
+            mask, 
+            min_size = self.tracking_param.min_animal_size_px,
+            max_size = self.tracking_param.max_animal_size_px, 
+            min_length = self.tracking_param.min_animal_length_px,
+            max_length = self.tracking_param.max_animal_length_px,
+            min_width = self.tracking_param.min_animal_width_px,
+            max_width = self.tracking_param.max_animal_width_px
         )     
         
         if centroids.size != 0:
@@ -79,5 +79,4 @@ class AnimalTracker_CPU(AnimalTracker):
             ), 
             dtype=self.tracking_param.dtype()
         )
-
         return res

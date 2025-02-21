@@ -23,7 +23,6 @@ def prepare_image(
         centroid = np.array(image.shape) // 2
     
     # crop to get fixed image size 
-    # NOTE: this may affect the distribution of pixel values on the edges
     w, h = source_crop_dimension_px
     origin = np.asarray((-w//2, -h//2+vertical_offset_px))
     left, bottom = centroid.astype(np.int32) + origin 
@@ -37,7 +36,7 @@ def prepare_image(
     if (bottom+pad_bottom >= top-pad_top) or (left+pad_left >= right-pad_right):
         return None
     
-    image_crop = np.zeros((h,w), dtype=image.dtype)
+    image_crop = np.zeros((h, w), dtype=image.dtype)
     image_crop[pad_bottom:h-pad_top, pad_left:w-pad_right] = image[bottom+pad_bottom:top-pad_top, left+pad_left:right-pad_right]
     
     # TODO is this still necessary?
