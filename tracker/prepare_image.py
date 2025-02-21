@@ -1,4 +1,4 @@
-from typing import Tuple
+from typing import Tuple, Optional
 import numpy as np
 from numpy.typing import NDArray
 import cv2
@@ -15,7 +15,7 @@ def prepare_image(
         brightness: float,
         blur_sz_px: float,
         median_filter_sz_px: float
-    ) -> Tuple[NDArray, NDArray, NDArray]:
+    ) -> Optional[Tuple[NDArray, NDArray, NDArray]]:
     '''crop, resize and enhance image before tracking'''
     
     # crop to get fixed image size 
@@ -25,16 +25,18 @@ def prepare_image(
     left, bottom = centroid.astype(np.int32) + origin 
     right, top = left+w, bottom+h
 
-    pad_left = 0 if left>=0 else -left
-    pad_right = right-image.shape[1] if right>=image.shape[1] else 0
-    pad_bottom = 0 if bottom>=0 else -bottom
-    pad_top = top-image.shape[0] if top>=image.shape[0] else 0
+    pad_left = max(0, -left)
+    pad_right = max(0, right - image.shape[1])
+    pad_bottom = max(0, -bottom)
+    pad_top = max(0, top - image.shape[0])
 
     if (bottom+pad_bottom >= top-pad_top) or (left+pad_left >= right-pad_right):
         return None
     
     image_crop = np.zeros((h,w), dtype=image.dtype)
     image_crop[pad_bottom:h-pad_top, pad_left:w-pad_right] = image[bottom+pad_bottom:top-pad_top, left+pad_left:right-pad_right]
+    
+    # TODO is this still necessary?
     if image_crop.size == 0:
         return None
 
