@@ -28,7 +28,8 @@ def get_blob_coordinates(
     
     return track_coords
 
-def get_orientation(coordinates: NDArray) -> Optional[Tuple[NDArray, NDArray]]:
+# TODO output type incorrect (see how crop is handled) 
+def get_orientation(coordinates: NDArray) -> Optional[Tuple[NDArray, NDArray]]: 
     '''
     get blob main axis using PCA
     '''
