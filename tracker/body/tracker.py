@@ -29,11 +29,16 @@ class BodyTracker_CPU(BodyTracker):
             return None
         
         # pre-process image: crop/resize/tune intensity
-        (origin, image_crop) = crop(
+        cropping = crop(
             image = image,
             source_crop_dimension_px = self.tracking_param.source_crop_dimension_px,
             centroid = centroid
         )
+        
+        if cropping is None:
+            return None
+        
+        origin, image_crop = cropping
 
         image_resized = resize(
             image = image_crop,
