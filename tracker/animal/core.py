@@ -31,6 +31,8 @@ class AnimalTrackerParamTracking:
     max_animal_width_mm: float = 3.0
     downsample_fullres: float = 0.25
     num_animals: int = 1
+    do_resize: bool = True
+    do_enhance: bool = True
 
     def mm2px(self, val_mm):
         val_px = int(val_mm * self.target_pix_per_mm) 

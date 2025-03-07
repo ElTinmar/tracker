@@ -5,13 +5,15 @@ from .core import TailTracker
 from .utils import tail_skeleton_ball
 from tracker.prepare_image import crop, resize
 from image_tools import enhance
+from geometry import Affine2DTransform
 
 class TailTracker_CPU(TailTracker):
 
     def track(
             self,
             image: NDArray, 
-            centroid: Optional[NDArray] # TODO maybe provide a transformation from local to global coordinates and store both in result
+            centroid: Optional[NDArray], 
+            transformation_matrix: Optional[NDArray] = Affine2DTransform.identity()
         ) -> Optional[NDArray]:
         """
         output coordinates: 

@@ -71,3 +71,44 @@ def resize(
     )
     return image_resized
 
+def preprocess_image(
+        image: NDArray, 
+        centroid: NDArray, 
+        params
+    ) -> Optional[Tuple[NDArray, NDArray, NDArray, NDArray]]:
+        
+    # pre-process image: crop/resize/tune intensity
+    if params.do_crop:
+        cropping = crop(
+            image = image,
+            crop_dimension_px = params.source_crop_dimension_px,
+            centroid = centroid
+        )
+        
+        if cropping is None:
+            return None
+        
+        origin, image_crop = cropping
+    else:
+        origin = np.zeros((2,)) # TODO check that 
+        image_crop = image
+
+    if params.do_resize:
+        image_resized = resize(
+            image = image_crop,
+            target_dimension_px = params.crop_dimension_px, 
+        )
+    else:
+        image_resized = image_crop
+
+    if self.tracking_param.do_enhance:
+        image_processed = enhance(
+            image = image_resized,
+            contrast = self.tracking_param.body_contrast,
+            gamma = self.tracking_param.body_gamma,
+            brightness = self.tracking_param.body_brightness,
+            blur_size_px = self.tracking_param.blur_sz_px,
+            medfilt_size_px = self.tracking_param.median_filter_sz_px
+        )
+    else:
+        image_processed = image_resized

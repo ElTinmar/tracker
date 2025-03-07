@@ -12,25 +12,27 @@ class AnimalTracker_CPU(AnimalTracker):
         if (image is None) or (image.size == 0):
             return None
         
-        if self.tracking_param.resize != 1:
+        if self.tracking_param.do_resize:
             image_processed = cv2.resize(
                 image, 
                 self.tracking_param.image_shape[::-1], # transform shape (row, col) to width, height
                 cv2.INTER_NEAREST
             )
-        else:
-            image_processed = image
-        
-        # tune image contrast and gamma
-        image_processed = enhance(
-            image_processed,
-            self.tracking_param.animal_contrast,
-            self.tracking_param.animal_gamma,
-            self.tracking_param.animal_brightness,
-            self.tracking_param.blur_sz_px,
-            self.tracking_param.median_filter_sz_px
-        )
+        else: 
+            image_resized = image
 
+        if self.tracking_param.do_enhance:
+        # tune image contrast and gamma
+            image_processed = enhance(
+                image_resized,
+                self.tracking_param.animal_contrast,
+                self.tracking_param.animal_gamma,
+                self.tracking_param.animal_brightness,
+                self.tracking_param.blur_sz_px,
+                self.tracking_param.median_filter_sz_px
+            )
+        else:
+            image_processed = image_resized
 
         mask = cv2.compare(image_processed, self.tracking_param.animal_intensity, cv2.CMP_GT)
         centroids = bwareafilter_centroids_cv2(

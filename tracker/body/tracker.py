@@ -29,30 +29,40 @@ class BodyTracker_CPU(BodyTracker):
             return None
         
         # pre-process image: crop/resize/tune intensity
-        cropping = crop(
-            image = image,
-            crop_dimension_px = self.tracking_param.source_crop_dimension_px,
-            centroid = centroid
-        )
-        
-        if cropping is None:
-            return None
-        
-        origin, image_crop = cropping
+        if self.tracking_param.do_crop:
+            cropping = crop(
+                image = image,
+                crop_dimension_px = self.tracking_param.source_crop_dimension_px,
+                centroid = centroid
+            )
+            
+            if cropping is None:
+                return None
+            
+            origin, image_crop = cropping
+        else:
+            origin = np.zeros((2,)) # TODO check that 
+            image_crop = image
 
-        image_resized = resize(
-            image = image_crop,
-            target_dimension_px = self.tracking_param.crop_dimension_px, 
-        )
+        if self.tracking_param.do_resize:
+            image_resized = resize(
+                image = image_crop,
+                target_dimension_px = self.tracking_param.crop_dimension_px, 
+            )
+        else:
+            image_resized = image_crop
 
-        image_processed = enhance(
-            image = image_resized,
-            contrast = self.tracking_param.body_contrast,
-            gamma = self.tracking_param.body_gamma,
-            brightness = self.tracking_param.body_brightness,
-            blur_size_px = self.tracking_param.blur_sz_px,
-            medfilt_size_px = self.tracking_param.median_filter_sz_px
-        )
+        if self.tracking_param.do_enhance:
+            image_processed = enhance(
+                image = image_resized,
+                contrast = self.tracking_param.body_contrast,
+                gamma = self.tracking_param.body_gamma,
+                brightness = self.tracking_param.body_brightness,
+                blur_size_px = self.tracking_param.blur_sz_px,
+                medfilt_size_px = self.tracking_param.median_filter_sz_px
+            )
+        else:
+            image_processed = image_resized
 
         # actual tracking starts here
         mask = cv2.compare(image_processed, self.tracking_param.body_intensity, cv2.CMP_GT)
