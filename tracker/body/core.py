@@ -59,7 +59,7 @@ body_coordinates = np.dtype([
 @dataclass
 class BodyTrackerParamOverlay:
     pix_per_mm: float = 40.0
-    heading_len_mm: float = 3
+    heading_len_mm: float = 1
     heading_color_BGR: tuple = (0,128,255)
     lateral_color_BGR: tuple = (128,64,128)
     thickness: int = 1
