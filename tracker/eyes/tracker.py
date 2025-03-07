@@ -40,7 +40,7 @@ class EyesTracker_CPU(EyesTracker):
 
         image_resized = resize(
             image = image_crop,
-            target_crop_dimension_px = self.tracking_param.crop_dimension_px, 
+            target_dimension_px = self.tracking_param.crop_dimension_px, 
         )
 
         image_processed = enhance(

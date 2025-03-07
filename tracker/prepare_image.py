@@ -39,13 +39,13 @@ def crop(
 
 def resize(
         image: NDArray,
-        target_crop_dimension_px: Tuple[int, int], 
+        target_dimension_px: Tuple[int, int], 
     ) -> NDArray:
 
     # resize image
     image_resized = cv2.resize(
         image, 
-        target_crop_dimension_px, 
+        target_dimension_px, 
         interpolation=cv2.INTER_NEAREST
     )
     return image_resized
