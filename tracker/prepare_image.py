@@ -2,7 +2,7 @@ from typing import Tuple, Optional
 import numpy as np
 from numpy.typing import NDArray
 import cv2
-from core import ParamTracking
+from tracker.core import ParamTracking
 from image_tools import enhance
 
 def crop(
