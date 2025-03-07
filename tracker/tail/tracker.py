@@ -25,8 +25,8 @@ class TailTracker_CPU(TailTracker):
         # pre-process image: crop/resize/tune intensity
         cropping = crop(
             image = image,
-            source_crop_dimension_px = self.tracking_param.source_crop_dimension_px,
-            vertical_offset_px=self.tracking_param.crop_offset_tail_px,
+            crop_dimension_px = self.tracking_param.source_crop_dimension_px,
+            vertical_offset_px = self.tracking_param.crop_offset_tail_px,
             centroid = centroid
         )
 
