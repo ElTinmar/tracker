@@ -113,6 +113,10 @@ class BodyTrackerParamTracking:
         ])
         return dt
 
+body_coordinates = np.dtype([
+    ('heading', np.float32, (2,2)),
+    ('centroid', np.float32, (2,)),
+])
 
 @dataclass
 class BodyTrackerParamOverlay:
