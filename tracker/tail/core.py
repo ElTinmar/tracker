@@ -12,12 +12,12 @@ class TailTrackerParamTracking(ParamTracking):
     ball_radius_mm: float = 0.05 
      
     @property
-    def length_px(self):
-        return self.mm2px(self.length_mm)
+    def length_px(self) -> int:
+        return self.target_mm2px(self.length_mm)
     
     @property
-    def ball_radius_px(self):
-        return self.mm2px(self.ball_radius_mm) 
+    def ball_radius_px(self) -> int:
+        return self.target_mm2px(self.ball_radius_mm) 
     
     def dtype(self) -> np.dtype:
         dt = np.dtype([
@@ -45,7 +45,7 @@ class TailTrackerParamOverlay:
         return int(val_mm * self.pix_per_mm) 
 
     @property
-    def ball_radius_px(self):
+    def ball_radius_px(self) -> int:
         return self.mm2px(self.ball_radius_mm) 
 
 class TailTracker(Tracker):

@@ -6,6 +6,7 @@ from .utils import tail_skeleton_ball
 from tracker.prepare_image import crop, resize
 from image_tools import enhance
 from geometry import Affine2DTransform
+from tracker.prepare_image import preprocess_image
 
 class TailTracker_CPU(TailTracker):
 
@@ -24,39 +25,18 @@ class TailTracker_CPU(TailTracker):
         if (image is None) or (image.size == 0) or (centroid is None):
             return None
         
-        # pre-process image: crop/resize/tune intensity
-        cropping = crop(
-            image = image,
-            crop_dimension_px = self.tracking_param.source_crop_dimension_px,
-            vertical_offset_px = self.tracking_param.crop_offset_tail_px,
-            centroid = centroid
-        )
-
-        if cropping is None:
+        preprocess = preprocess_image(image, centroid, self.tracking_param)
+        if preprocess is None:
             return None
         
-        origin, image_crop = cropping
-
-        image_resized = resize(
-            image = image_crop,
-            target_dimension_px = self.tracking_param.crop_dimension_px, 
-        )
-
-        image_processed = enhance(
-            image_resized,
-            contrast = self.tracking_param.tail_contrast,
-            gamma = self.tracking_param.tail_gamma,
-            brightness = self.tracking_param.tail_brightness,
-            blur_size_px = self.tracking_param.blur_sz_px,
-            medfilt_size_px = self.tracking_param.median_filter_sz_px
-        )
+        image_crop, image_resized, image_processed = preprocess
 
         skeleton, skeleton_interp = tail_skeleton_ball(
             image = image_processed,
             ball_radius_px = self.tracking_param.ball_radius_px,
             arc_angle_deg = self.tracking_param.arc_angle_deg,
-            tail_length_px = self.tracking_param.tail_length_px,
-            n_tail_points = self.tracking_param.n_tail_points,
+            tail_length_px = self.tracking_param.length_px,
+            n_tail_points = self.tracking_param.n_points,
             n_pts_arc = self.tracking_param.n_pts_arc,
             n_pts_interp = self.tracking_param.n_pts_interp,
             origin = origin*self.tracking_param.resize,

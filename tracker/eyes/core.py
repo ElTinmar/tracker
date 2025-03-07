@@ -19,12 +19,12 @@ class EyesTrackerParamTracking(ParamTracking):
     thresh_hi: float = 1.0
     
     @property
-    def size_lo_px(self):
-        return self.mm2px(self.size_lo_mm)
+    def size_lo_px(self) -> int:
+        return self.target_mm2px(self.size_lo_mm)
     
     @property
-    def size_hi_px(self):
-        return self.mm2px(self.size_hi_mm)
+    def size_hi_px(self) -> int:
+        return self.target_mm2px(self.size_hi_mm)
     
     def dtype(self) -> np.dtype:
         dt = np.dtype([
@@ -55,11 +55,11 @@ class EyesTrackerParamOverlay:
         return val_px
     
     @property
-    def eye_len_px(self):
+    def eye_len_px(self) -> int:
         return self.mm2px(self.eye_len_mm)
     
     @property
-    def arrow_radius_px(self):
+    def arrow_radius_px(self) -> int:
         return self.mm2px(self.arrow_radius_mm)
     
 class EyesTracker(Tracker):

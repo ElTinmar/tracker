@@ -12,28 +12,28 @@ class BodyTrackerParamTracking(ParamTracking):
     max_width_mm: float = 3.0
     
     @property
-    def min_size_px(self):
-        return self.mm2px(self.min_size_mm)
+    def min_size_px(self) -> int:
+        return self.target_mm2px(self.min_size_mm)
     
     @property
-    def max_size_px(self):
-        return self.mm2px(self.max_size_mm) 
+    def max_size_px(self) -> int:
+        return self.target_mm2px(self.max_size_mm) 
         
     @property
-    def min_length_px(self):
-        return self.mm2px(self.min_length_mm)
+    def min_length_px(self) -> int:
+        return self.target_mm2px(self.min_length_mm)
     
     @property
-    def max_length_px(self):
-        return self.mm2px(self.max_length_mm)
+    def max_length_px(self) -> int:
+        return self.target_mm2px(self.max_length_mm)
 
     @property
-    def min_width_px(self):
-        return self.mm2px(self.min_width_mm)
+    def min_width_px(self) -> int:
+        return self.target_mm2px(self.min_width_mm)
     
     @property
-    def max_width_px(self):
-        return self.mm2px(self.max_width_mm)
+    def max_width_px(self) -> int:
+        return self.target_mm2px(self.max_width_mm)
     
     def dtype(self) -> np.dtype:
         dt = np.dtype([
@@ -69,11 +69,11 @@ class BodyTrackerParamOverlay:
         return val_px
 
     @property
-    def heading_len_px(self):
+    def heading_len_px(self) -> int:
         return self.mm2px(self.heading_len_mm)
 
     @property
-    def arrow_radius_px(self):
+    def arrow_radius_px(self) -> int:
         return self.mm2px(self.arrow_radius_mm)
 
 class BodyTracker(Tracker):

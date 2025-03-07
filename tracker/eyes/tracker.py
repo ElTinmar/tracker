@@ -25,50 +25,55 @@ class EyesTracker_CPU(EyesTracker):
         if (image is None) or (image.size == 0) or (centroid is None):
             return None
         
-        image_crop, image_resized, image_processed = preprocess_image(image, centroid, self.tracking_param)
+        preprocess = preprocess_image(image, centroid, self.tracking_param)
+        if preprocess is None:
+            return None
+        
+        image_crop, image_resized, image_processed = preprocess
 
         # sweep threshold to obtain 3 connected component within size range (include swim bladder)
         found_eyes_and_sb, props, mask = find_eyes_and_swimbladder(
             image_processed, 
-            self.tracking_param.eye_dyntresh_res, 
-            self.tracking_param.eye_size_lo_px, 
-            self.tracking_param.eye_size_hi_px,
-            self.tracking_param.eye_thresh_lo,
-            self.tracking_param.eye_thresh_hi
+            self.tracking_param.dyntresh_res, 
+            self.tracking_param.size_lo_px, 
+            self.tracking_param.size_hi_px,
+            self.tracking_param.thresh_lo,
+            self.tracking_param.thresh_hi
         )
 
-        # find eye angles
+        if not found_eyes_and_sb:
+            return None 
+
         left_eye = None
         right_eye = None
         heading_vector = None
         
-        if found_eyes_and_sb: 
-            # identify left eye, right eye and swimbladder
-            blob_centroids = np.array([blob.centroid[::-1] for blob in props])
-            sb_idx, left_idx, right_idx = assign_features(blob_centroids)
-            centroid_left = np.asarray(props[left_idx].centroid[::-1], dtype=np.float32)
-            centroid_right = np.asarray(props[right_idx].centroid[::-1], dtype=np.float32)
-            centroid_sb = np.asarray(props[sb_idx].centroid[::-1], dtype=np.float32)
-                
-            # compute eye orientation
-            left_eye = get_eye_prop_cv2(
-                centroid_left, 
-                props[left_idx].principal_axis, 
-                origin*self.tracking_param.resize,
-                self.tracking_param.resize,
-                transformation_matrix
-            )
-            right_eye = get_eye_prop_cv2(
-                centroid_right, 
-                props[right_idx].principal_axis,
-                origin*self.tracking_param.resize,
-                self.tracking_param.resize,
-                transformation_matrix
-            )
+        # identify left eye, right eye and swimbladder
+        blob_centroids = np.array([blob.centroid[::-1] for blob in props])
+        sb_idx, left_idx, right_idx = assign_features(blob_centroids)
+        centroid_left = np.asarray(props[left_idx].centroid[::-1], dtype=np.float32)
+        centroid_right = np.asarray(props[right_idx].centroid[::-1], dtype=np.float32)
+        centroid_sb = np.asarray(props[sb_idx].centroid[::-1], dtype=np.float32)
+            
+        # compute eye orientation
+        left_eye = get_eye_prop_cv2(
+            centroid_left, 
+            props[left_idx].principal_axis, 
+            origin*self.tracking_param.resize,
+            self.tracking_param.resize,
+            transformation_matrix
+        )
+        right_eye = get_eye_prop_cv2(
+            centroid_right, 
+            props[right_idx].principal_axis,
+            origin*self.tracking_param.resize,
+            self.tracking_param.resize,
+            transformation_matrix
+        )
 
-            heading_vector = (centroid_left + centroid_right)/2 - centroid_sb
-            heading_vector = heading_vector / np.linalg.norm(heading_vector)
-            #heading_vector_original_space = 
+        heading_vector = (centroid_left + centroid_right)/2 - centroid_sb
+        heading_vector = heading_vector / np.linalg.norm(heading_vector)
+        #heading_vector_original_space = 
 
         res = np.array(
             (

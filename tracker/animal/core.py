@@ -4,14 +4,6 @@ from tracker.core import Tracker, TrackingOverlay
 import numpy as np
 from tracker.core import ParamTracking
 
-class Assignment(Protocol):
-
-    def update(self):
-        ...
-    
-    def get_ID(self):
-        ...
-
 @dataclass
 class AnimalTrackerParamTracking(ParamTracking):        
     source_image_shape: Tuple[int, int] # height, width
@@ -40,28 +32,29 @@ class AnimalTrackerParamTracking(ParamTracking):
         ) 
 
     @property
-    def min_size_px(self):
-        return self.mm2px(self.min_size_mm)
+    def min_size_px(self) -> int:
+        return self.target_mm2px(self.min_size_mm)
     
     @property
-    def max_size_px(self):
-        return self.mm2px(self.max_size_mm) 
+    def max_size_px(self) -> int:
+        return self.target_mm2px(self.max_size_mm) 
         
     @property
-    def min_length_px(self):
-        return self.mm2px(self.min_length_mm)
+    def min_length_px(self) -> int:
+        return self.target_mm2px(self.min_length_mm)
     
     @property
-    def max_length_px(self):
-        return self.mm2px(self.max_length_mm)
+    def max_length_px(self) -> int:
+        return self.target_mm2px(self.max_length_mm)
 
     @property
-    def min_width_px(self):
-        return self.mm2px(self.min_width_mm)
+    def min_width_px(self) -> int:
+        return self.target_mm2px(self.min_width_mm)
     
     @property
-    def max_width_px(self):
-        return self.mm2px(self.max_width_mm)
+    def max_width_px(self) -> int:
+        return self.target_mm2px(self.max_width_mm)
+
     
     def dtype(self) -> np.dtype:
         dt = np.dtype([
@@ -69,14 +62,17 @@ class AnimalTrackerParamTracking(ParamTracking):
             ('num_animals', int),
             ('identities', int, (self.num_animals,)),
             ('indices', int, (self.num_animals,)),
-            ('centroids', np.float32, (self.num_animals, 2)),
+            ('centroids_resized', np.float32, (self.num_animals, 2)),
+            ('centroids_cropped', np.float32, (self.num_animals, 2)),
+            ('centroids_input', np.float32, (self.num_animals, 2)),
+            ('centroids_global', np.float32, (self.num_animals, 2)),
             ('mask', np.bool_, self.image_shape),
             ('image', np.float32, self.image_shape),
             ('image_fullres', np.float32, self.downsampled_shape),
             ('downsample_ratio', np.float32)
         ])
         return dt
-
+        
 @dataclass
 class AnimalTrackerParamOverlay:
     pix_per_mm: float = 40.0
@@ -94,7 +90,15 @@ class AnimalTrackerParamOverlay:
     def radius_px(self):
         return self.mm2px(self.radius_mm)
     
+
+class Assignment(Protocol):
+
+    def update(self):
+        ...
     
+    def get_ID(self):
+        ...
+
 class AnimalTracker(Tracker):
 
     def __init__(
@@ -105,7 +109,6 @@ class AnimalTracker(Tracker):
 
         self.tracking_param = tracking_param
         self.assignment = assignment
-
 
 class AnimalOverlay(TrackingOverlay):
 

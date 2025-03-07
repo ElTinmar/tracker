@@ -28,30 +28,36 @@ class BodyTracker_CPU(BodyTracker):
         if (image is None) or (image.size == 0):
             return None
         
-        image_crop, image_resized, image_processed = preprocess_image(image, centroid, self.tracking_param)
+        preprocess = preprocess_image(image, centroid, self.tracking_param)
+        if preprocess is None:
+            return None
+        
+        image_crop, image_resized, image_processed = preprocess
 
-        mask = cv2.compare(image_processed, self.tracking_param.body_intensity, cv2.CMP_GT)
+        mask = cv2.compare(image_processed, self.tracking_param.intensity, cv2.CMP_GT)
         props = bwareafilter_props_cv2(
             mask, 
-            min_size = self.tracking_param.min_body_size_px,
-            max_size = self.tracking_param.max_body_size_px, 
-            min_length = self.tracking_param.min_body_length_px,
-            max_length = self.tracking_param.max_body_length_px,
-            min_width = self.tracking_param.min_body_width_px,
-            max_width = self.tracking_param.max_body_width_px
+            min_size = self.tracking_param.min_size_px,
+            max_size = self.tracking_param.max_size_px, 
+            min_length = self.tracking_param.min_length_px,
+            max_length = self.tracking_param.max_length_px,
+            min_width = self.tracking_param.min_width_px,
+            max_width = self.tracking_param.max_width_px
         )
+
+        if not props:
+            return None
         
         angle_rad, principal_components, centroid_coords, centroid_ori = None, None, None, None
-        if props:
-            coordinates = get_blob_coordinates(centroid, props, self.tracking_param.resize)
-            if coordinates.shape[0] > 1:
-                (principal_components, centroid_coords) = get_orientation(coordinates)
+        coordinates = get_blob_coordinates(centroid, props, self.tracking_param.resize)
+        if coordinates.shape[0] > 1:
+            (principal_components, centroid_coords) = get_orientation(coordinates)
 
-                if principal_components is not None:
-                    angle_rad = np.arctan2(principal_components[1,1], principal_components[0,1])
-                
-                if (centroid is not None) and (centroid_coords is not None):
-                    centroid_ori = origin + centroid + centroid_coords / self.tracking_param.resize 
+            if principal_components is not None:
+                angle_rad = np.arctan2(principal_components[1,1], principal_components[0,1])
+            
+            if (centroid is not None) and (centroid_coords is not None):
+                centroid_ori = origin + centroid + centroid_coords / self.tracking_param.resize 
 
         res = np.array(
             (

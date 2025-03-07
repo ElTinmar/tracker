@@ -5,7 +5,7 @@ import cv2
 from typing import Optional
 from .core import AnimalTracker
 from tracker.prepare_image import preprocess_image
-from geometry import Affine2DTransform
+from geometry import transform2d, Affine2DTransform
 
 class AnimalTracker_CPU(AnimalTracker):
     
@@ -19,29 +19,39 @@ class AnimalTracker_CPU(AnimalTracker):
         if (image is None) or (image.size == 0):
             return None
         
-        image_crop, image_resized, image_processed = preprocess_image(image, centroid, self.tracking_param)
+        preprocess = preprocess_image(image, centroid, self.tracking_param)
+        
+        if preprocess is None:
+            return None
+        
+        image_crop, image_resized, image_processed = preprocess
 
         mask = cv2.compare(image_processed, self.tracking_param.intensity, cv2.CMP_GT)
         centroids_resized = bwareafilter_centroids_cv2(
             mask, 
-            min_size = self.tracking_param.min_animal_size_px,
-            max_size = self.tracking_param.max_animal_size_px, 
-            min_length = self.tracking_param.min_animal_length_px,
-            max_length = self.tracking_param.max_animal_length_px,
-            min_width = self.tracking_param.min_animal_width_px,
-            max_width = self.tracking_param.max_animal_width_px
+            min_size = self.tracking_param.min_size_px,
+            max_size = self.tracking_param.max_size_px, 
+            min_length = self.tracking_param.min_length_px,
+            max_length = self.tracking_param.max_length_px,
+            min_width = self.tracking_param.min_width_px,
+            max_width = self.tracking_param.max_width_px
         )     
         
         if centroids_resized.size == 0:
             return None
         
-        centroids_cropped = centroids_resized/self.tracking_param.resize 
+        # transform coordinates
+        centroids_cropped = transform2d(self.tracking_param.T_resized_to_crop, centroids_resized)
+        centroids_input = transform2d(self.tracking_param.T_crop_to_input, centroids_cropped)
+        centroids_global = transform2d(transformation_matrix, centroids_input)
 
         # identity assignment
-        self.assignment.update(centroids)
+        self.assignment.update(centroids_global) 
         identities = self.assignment.get_ID()
-        indices_tokeep = self.assignment.get_kept_centroids()   
-        centroids = self.assignment.get_centroids()
+
+        # TODO make sure that ordering of centroids in all coordinate system is ok 
+        indices_tokeep = self.assignment.get_kept_centroids() # TODO violates protocol
+        centroids_global = self.assignment.get_centroids() # TODO violates protocol
 
         # Downsample image export. This is a bit easier on RAM
         image_export = cv2.resize(
@@ -56,7 +66,10 @@ class AnimalTracker_CPU(AnimalTracker):
                 self.tracking_param.num_animals,
                 identities,
                 indices_tokeep, 
-                centroids, 
+                centroids_resized,
+                centroids_cropped,
+                centroids_input,
+                centroids_global, 
                 mask, 
                 image_processed,
                 image_export,
