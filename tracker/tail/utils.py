@@ -27,7 +27,6 @@ def tail_skeleton_max(
         tail_length_px: int,
         n_tail_points: int,
         n_pts_arc: int,
-        dist_swim_bladder_px: int,
         n_pts_interp: int,
         origin: NDArray,
         resize: float,
@@ -44,7 +43,7 @@ def tail_skeleton_max(
         start_angle = -np.pi/2 # we are expecting to see the fish head-up and tail-down (-90 deg) 
         arc = np.linspace(-arc_rad, arc_rad, n_pts_arc) + start_angle
         x = w//2 
-        y = dist_swim_bladder_px
+        y = 0
         points = [[x, y]]
         for j in range(n_tail_points):
             try:
@@ -125,7 +124,6 @@ def tail_skeleton_ball(
         tail_length_px: int,
         n_tail_points: int,
         n_pts_arc: int,
-        dist_swim_bladder_px: int,
         n_pts_interp: int,
         origin: NDArray,
         resize: float,
@@ -141,7 +139,7 @@ def tail_skeleton_ball(
         spacing = float(tail_length_px) / n_tail_points
         start_angle = -np.pi/2 # we are expecting to see the fish head-up and tail-down (-90 deg) 
         start_x = w//2 
-        start_y = dist_swim_bladder_px
+        start_y = 0
 
         skeleton = get_skeleton_ball(
             arc_rad, 

@@ -123,14 +123,6 @@ class TailTrackerWidget(QWidget):
         self.n_pts_interp.setSingleStep(1)
         self.n_pts_interp.valueChanged.connect(self.update_tracker)
 
-        # dist_swim_bladder_mm  
-        self.dist_swim_bladder_mm = LabeledDoubleSpinBox(self)
-        self.dist_swim_bladder_mm.setText('Offset tail Y (mm)')
-        self.dist_swim_bladder_mm.setRange(0,3)
-        self.dist_swim_bladder_mm.setValue(0.2)
-        self.dist_swim_bladder_mm.setSingleStep(0.025)
-        self.dist_swim_bladder_mm.valueChanged.connect(self.update_tracker)
-
         #ksize_blur_mm 
         self.blur_sz_mm = LabeledDoubleSpinBox(self)
         self.blur_sz_mm.setText('blur size (mm)')
@@ -191,7 +183,6 @@ class TailTrackerWidget(QWidget):
         parameters.addWidget(self.n_pts_arc)
         parameters.addWidget(self.n_pts_interp)
         parameters.addWidget(self.tail_length_mm)
-        parameters.addWidget(self.dist_swim_bladder_mm)
         parameters.addWidget(self.crop_dimension_x_mm)
         parameters.addWidget(self.crop_dimension_y_mm)
         parameters.addWidget(self.crop_offset_tail_mm)
@@ -225,7 +216,6 @@ class TailTrackerWidget(QWidget):
             n_pts_arc = self.n_pts_arc.value(),
             n_pts_interp = self.n_pts_interp.value(), 
             tail_length_mm = self.tail_length_mm.value(),
-            dist_swim_bladder_mm = self.dist_swim_bladder_mm.value(),
             crop_dimension_mm = (self.crop_dimension_x_mm.value(), self.crop_dimension_y_mm.value()),
             crop_offset_tail_mm = self.crop_offset_tail_mm.value(),
             blur_sz_mm = self.blur_sz_mm.value(),

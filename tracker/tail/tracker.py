@@ -58,7 +58,6 @@ class TailTracker_CPU(TailTracker):
             tail_length_px = self.tracking_param.tail_length_px,
             n_tail_points = self.tracking_param.n_tail_points,
             n_pts_arc = self.tracking_param.n_pts_arc,
-            dist_swim_bladder_px = self.tracking_param.dist_swim_bladder_px,
             n_pts_interp = self.tracking_param.n_pts_interp,
             origin = origin*self.tracking_param.resize,
             resize = self.tracking_param.resize,

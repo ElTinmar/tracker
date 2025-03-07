@@ -121,7 +121,6 @@ tail_tracker = TailTracker_CPU(
         n_pts_arc=20,
         n_pts_interp=40,
         tail_length_mm=3.0,
-        dist_swim_bladder_mm=0.0,
         blur_sz_mm=0.06,
         median_filter_sz_mm=0,
         tail_brightness=0.0,

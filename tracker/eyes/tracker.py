@@ -6,7 +6,7 @@ from .utils import get_eye_prop_cv2, find_eyes_and_swimbladder, assign_features
 from tracker.prepare_image import crop, resize
 from geometry import Affine2DTransform
 from image_tools import enhance
-
+from tracker.prepare_image import preprocess_image
 
 class EyesTracker_CPU(EyesTracker):
 
@@ -25,32 +25,7 @@ class EyesTracker_CPU(EyesTracker):
         if (image is None) or (image.size == 0) or (centroid is None):
             return None
         
-        # pre-process image: crop/resize/tune intensity
-        cropping = crop(
-            image = image,
-            crop_dimension_px = self.tracking_param.source_crop_dimension_px,
-            vertical_offset_px=self.tracking_param.crop_offset_px, 
-            centroid = centroid
-        )
-
-        if cropping is None:
-            return None
-        
-        origin, image_crop = cropping
-
-        image_resized = resize(
-            image = image_crop,
-            target_dimension_px = self.tracking_param.crop_dimension_px, 
-        )
-
-        image_processed = enhance(
-            image_resized,
-            contrast = self.tracking_param.eye_contrast,
-            gamma = self.tracking_param.eye_gamma,
-            brightness = self.tracking_param.eye_brightness,
-            blur_size_px = self.tracking_param.blur_sz_px,
-            medfilt_size_px = self.tracking_param.median_filter_sz_px
-        )
+        image_crop, image_resized, image_processed = preprocess_image(image, centroid, self.tracking_param)
 
         # sweep threshold to obtain 3 connected component within size range (include swim bladder)
         found_eyes_and_sb, props, mask = find_eyes_and_swimbladder(
