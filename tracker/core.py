@@ -37,7 +37,7 @@ class ParamTracking:
         return self.target_mm2px(self.median_filter_sz_mm) 
 
     @property
-    def crop_offset_px(self):
+    def crop_offset_y_px(self):
         return self.target_mm2px(self.crop_offset_y_mm) 
 
     @property

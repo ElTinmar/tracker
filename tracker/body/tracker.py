@@ -4,7 +4,7 @@ from numpy.typing import NDArray
 from typing import Optional
 from .core import BodyTracker
 from .utils import get_orientation, get_blob_coordinates
-from tracker.prepare_image import crop, resize
+from tracker.prepare_image import preprocess_image
 from geometry import transform2d, Affine2DTransform
 import cv2
 
@@ -28,43 +28,8 @@ class BodyTracker_CPU(BodyTracker):
         if (image is None) or (image.size == 0):
             return None
         
-        # pre-process image: crop/resize/tune intensity
-        if self.tracking_param.do_crop:
-            cropping = crop(
-                image = image,
-                crop_dimension_px = self.tracking_param.source_crop_dimension_px,
-                centroid = centroid
-            )
-            
-            if cropping is None:
-                return None
-            
-            origin, image_crop = cropping
-        else:
-            origin = np.zeros((2,)) # TODO check that 
-            image_crop = image
+        image_crop, image_resized, image_processed = preprocess_image(image, centroid, self.tracking_param)
 
-        if self.tracking_param.do_resize:
-            image_resized = resize(
-                image = image_crop,
-                target_dimension_px = self.tracking_param.crop_dimension_px, 
-            )
-        else:
-            image_resized = image_crop
-
-        if self.tracking_param.do_enhance:
-            image_processed = enhance(
-                image = image_resized,
-                contrast = self.tracking_param.body_contrast,
-                gamma = self.tracking_param.body_gamma,
-                brightness = self.tracking_param.body_brightness,
-                blur_size_px = self.tracking_param.blur_sz_px,
-                medfilt_size_px = self.tracking_param.median_filter_sz_px
-            )
-        else:
-            image_processed = image_resized
-
-        # actual tracking starts here
         mask = cv2.compare(image_processed, self.tracking_param.body_intensity, cv2.CMP_GT)
         props = bwareafilter_props_cv2(
             mask, 

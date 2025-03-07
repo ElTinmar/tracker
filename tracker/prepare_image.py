@@ -2,13 +2,15 @@ from typing import Tuple, Optional
 import numpy as np
 from numpy.typing import NDArray
 import cv2
+from core import ParamTracking
+from image_tools import enhance
 
 def crop(
         image: NDArray,
         crop_dimension_px: Tuple[int, int],
         vertical_offset_px: int = 0,
         centroid: Optional[NDArray] = None,
-    ) -> Optional[Tuple[NDArray, NDArray]]:
+    ) -> Optional[NDArray]:
     """
     Crops a fixed-size region from an image, optionally centered around a given centroid.
 
@@ -22,15 +24,13 @@ def crop(
         Optional[Tuple[NDArray, NDArray]]: (origin, cropped image), or None if invalid crop.
     """
 
-    # TODO make sure this is ok
     if centroid is None:
         centroid = np.array(image.shape[:2]) // 2
         centroid = centroid[::-1] # convert to (x, y)
     
     # crop to get fixed image size 
     w, h = crop_dimension_px
-    origin = np.asarray((-w//2, -h//2+vertical_offset_px))
-    left, bottom = centroid.astype(np.int32) + origin 
+    left, bottom = centroid.astype(np.int32) + np.asarray((-w//2, -h//2+vertical_offset_px)) 
     right, top = left+w, bottom+h
 
     pad_left = max(0, -left)
@@ -44,7 +44,7 @@ def crop(
     image_crop = np.zeros((h, w), dtype=image.dtype)
     image_crop[pad_bottom:h-pad_top, pad_left:w-pad_right] = image[bottom+pad_bottom:top-pad_top, left+pad_left:right-pad_right]
 
-    return (origin, image_crop)
+    return image_crop
 
 def resize(
         image: NDArray,
@@ -74,41 +74,41 @@ def resize(
 def preprocess_image(
         image: NDArray, 
         centroid: NDArray, 
-        params
-    ) -> Optional[Tuple[NDArray, NDArray, NDArray, NDArray]]:
+        params: ParamTracking
+    ) -> Optional[Tuple[NDArray, NDArray, NDArray]]:
         
-    # pre-process image: crop/resize/tune intensity
+    # crop -----------------------
     if params.do_crop:
-        cropping = crop(
+        image_crop = crop(
             image = image,
-            crop_dimension_px = params.source_crop_dimension_px,
+            crop_dimension_px = params.crop_dimension_px,
             centroid = centroid
         )
         
-        if cropping is None:
+        if image_crop is None:
             return None
-        
-        origin, image_crop = cropping
     else:
-        origin = np.zeros((2,)) # TODO check that 
         image_crop = image
 
+    # resize ---------------------
     if params.do_resize:
         image_resized = resize(
             image = image_crop,
-            target_dimension_px = params.crop_dimension_px, 
+            target_dimension_px = params.resized_dimension_px, 
         )
     else:
         image_resized = image_crop
 
-    if self.tracking_param.do_enhance:
+    # enhance --------------------
+    if params.do_enhance:
         image_processed = enhance(
             image = image_resized,
-            contrast = self.tracking_param.body_contrast,
-            gamma = self.tracking_param.body_gamma,
-            brightness = self.tracking_param.body_brightness,
-            blur_size_px = self.tracking_param.blur_sz_px,
-            medfilt_size_px = self.tracking_param.median_filter_sz_px
+            contrast = params.contrast,
+            gamma = params.gamma,
+            blur_size_px = params.blur_sz_px,
+            medfilt_size_px = params.median_filter_sz_px
         )
     else:
         image_processed = image_resized
+
+    return (image_crop, image_resized, image_processed)
