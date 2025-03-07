@@ -5,18 +5,18 @@ from typing import Optional, Tuple
 
 @dataclass
 class ParamTracking:
-    pix_per_mm: float = 40.0
-    target_pix_per_mm: float = 20.0
-    crop_dimension_mm: Tuple[float, float] = (5.5, 5.5) 
-    crop_offset_y_mm: float = 0.0
-    intensity: float = 0.1
-    gamma: float = 1.0
-    contrast: float = 1.0
-    blur_sz_mm: float = 0.05
-    median_filter_sz_mm: float = 0.15
-    do_crop: bool = True
-    do_resize: bool = True
-    do_enhance: bool = True
+    pix_per_mm: float
+    target_pix_per_mm: float
+    crop_dimension_mm: Tuple[float, float]
+    crop_offset_y_mm: float
+    intensity: float
+    gamma: float
+    contrast: float
+    blur_sz_mm: float
+    median_filter_sz_mm: float
+    do_crop: bool
+    do_resize: bool
+    do_enhance: bool
 
     def target_mm2px(self, val_mm: float) -> int:
         return int(val_mm * self.target_pix_per_mm) 
