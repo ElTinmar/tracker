@@ -9,10 +9,23 @@ def crop(
         vertical_offset_px: int = 0,
         centroid: Optional[NDArray] = None,
     ) -> Optional[Tuple[NDArray, NDArray]]:
+    """
+    Crops a fixed-size region from an image, optionally centered around a given centroid.
+
+    Args:
+        image (NDArray): Input image as a NumPy array (H, W) or (H, W, C).
+        crop_dimension_px (Tuple[int, int]): Target crop size as (width, height).
+        vertical_offset_px (int): Vertical offset for cropping, default is 0.
+        centroid (Optional[NDArray]): (x, y) center of crop; if None, defaults to image center.
+
+    Returns:
+        Optional[Tuple[NDArray, NDArray]]: (origin, cropped image), or None if invalid crop.
+    """
 
     # TODO make sure this is ok
     if centroid is None:
-        centroid = np.array(image.shape) // 2
+        centroid = np.array(image.shape[:2]) // 2
+        centroid = centroid[::-1] # convert to (x, y)
     
     # crop to get fixed image size 
     w, h = crop_dimension_px
@@ -30,10 +43,6 @@ def crop(
     
     image_crop = np.zeros((h, w), dtype=image.dtype)
     image_crop[pad_bottom:h-pad_top, pad_left:w-pad_right] = image[bottom+pad_bottom:top-pad_top, left+pad_left:right-pad_right]
-    
-    # TODO is this still necessary?
-    if image_crop.size == 0:
-        return None
 
     return (origin, image_crop)
 
@@ -41,8 +50,20 @@ def resize(
         image: NDArray,
         target_dimension_px: Tuple[int, int], 
     ) -> NDArray:
+    """
+    Resize an image to the specified dimensions.
 
-    # resize image
+    Args:
+        image (NDArray): Input image as a NumPy array (H, W, C) or (H, W).
+        target_dimension_px (Tuple[int, int]): Target dimensions as (width, height).
+
+    Returns:
+        NDArray: The resized image.
+    """
+
+    if image.shape[:2] == target_dimension_px[::-1]:
+        return image
+
     image_resized = cv2.resize(
         image, 
         target_dimension_px, 
