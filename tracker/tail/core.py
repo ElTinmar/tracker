@@ -5,15 +5,15 @@ from tracker.core import Tracker, TrackingOverlay, ParamTracking
 @dataclass
 class TailTrackerParamTracking(ParamTracking):
     arc_angle_deg: float = 120.0
-    n_tail_points: int = 12
+    n_points: int = 12
     n_pts_arc: int = 20
     n_pts_interp: int = 40
-    tail_length_mm: float = 2.6
+    length_mm: float = 2.6
     ball_radius_mm: float = 0.05 
      
     @property
-    def tail_length_px(self):
-        return self.mm2px(self.tail_length_mm)
+    def length_px(self):
+        return self.mm2px(self.length_mm)
     
     @property
     def ball_radius_px(self):
@@ -22,11 +22,11 @@ class TailTrackerParamTracking(ParamTracking):
     def dtype(self) -> np.dtype:
         dt = np.dtype([
             ('empty', bool),
-            ('num_tail_pts', int),
-            ('num_tail_interp_pts', int),
+            ('num_pts', int),
+            ('num_interp_pts', int),
             ('centroid', np.float32, (2,)),
             ('origin',  np.float32, (2,)),
-            ('skeleton',  np.float32, (self.n_tail_points,2)),
+            ('skeleton',  np.float32, (self.n_points,2)),
             ('skeleton_interp',  np.float32, (self.n_pts_interp,2)),
             ('image',  np.float32, self.resized_dimension_px[::-1]),
             ('image_fullres',  np.float32, self.crop_dimension_px[::-1])
@@ -36,7 +36,7 @@ class TailTrackerParamTracking(ParamTracking):
 @dataclass
 class TailTrackerParamOverlay:
     pix_per_mm: float = 40
-    color_tail_BGR: tuple = (255, 128, 128)
+    color_BGR: tuple = (255, 128, 128)
     thickness: int = 1
     ball_radius_mm: float = 0.1 
     alpha: float = 0.5

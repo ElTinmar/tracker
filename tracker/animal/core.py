@@ -15,12 +15,12 @@ class Assignment(Protocol):
 @dataclass
 class AnimalTrackerParamTracking(ParamTracking):        
     source_image_shape: Tuple[int, int] # height, width
-    min_animal_size_mm: float = 10.0
-    max_animal_size_mm: float = 100.0
-    min_animal_length_mm: float = 2.0
-    max_animal_length_mm: float = 6.0
-    min_animal_width_mm: float = 1.0
-    max_animal_width_mm: float = 3.0
+    min_size_mm: float = 10.0
+    max_size_mm: float = 100.0
+    min_length_mm: float = 2.0
+    max_length_mm: float = 6.0
+    min_width_mm: float = 1.0
+    max_width_mm: float = 3.0
     downsample_fullres: float = 0.25
     num_animals: int = 1
 
@@ -40,28 +40,28 @@ class AnimalTrackerParamTracking(ParamTracking):
         ) 
 
     @property
-    def min_animal_size_px(self):
-        return self.mm2px(self.min_animal_size_mm)
+    def min_size_px(self):
+        return self.mm2px(self.min_size_mm)
     
     @property
-    def max_animal_size_px(self):
-        return self.mm2px(self.max_animal_size_mm) 
+    def max_size_px(self):
+        return self.mm2px(self.max_size_mm) 
         
     @property
-    def min_animal_length_px(self):
-        return self.mm2px(self.min_animal_length_mm)
+    def min_length_px(self):
+        return self.mm2px(self.min_length_mm)
     
     @property
-    def max_animal_length_px(self):
-        return self.mm2px(self.max_animal_length_mm)
+    def max_length_px(self):
+        return self.mm2px(self.max_length_mm)
 
     @property
-    def min_animal_width_px(self):
-        return self.mm2px(self.min_animal_width_mm)
+    def min_width_px(self):
+        return self.mm2px(self.min_width_mm)
     
     @property
-    def max_animal_width_px(self):
-        return self.mm2px(self.max_animal_width_mm)
+    def max_width_px(self):
+        return self.mm2px(self.max_width_mm)
     
     def dtype(self) -> np.dtype:
         dt = np.dtype([

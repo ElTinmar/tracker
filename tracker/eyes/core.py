@@ -12,19 +12,19 @@ DTYPE_EYE = np.dtype([
 
 @dataclass
 class EyesTrackerParamTracking(ParamTracking):
-    eye_dyntresh_res: int = 20
-    eye_size_lo_mm: float = 1.0
-    eye_size_hi_mm: float = 10.0
-    eye_thresh_lo: float = 0.0
-    eye_thresh_hi: float = 1.0
+    dyntresh_res: int = 20
+    size_lo_mm: float = 1.0
+    size_hi_mm: float = 10.0
+    thresh_lo: float = 0.0
+    thresh_hi: float = 1.0
     
     @property
-    def eye_size_lo_px(self):
-        return self.mm2px(self.eye_size_lo_mm)
+    def size_lo_px(self):
+        return self.mm2px(self.size_lo_mm)
     
     @property
-    def eye_size_hi_px(self):
-        return self.mm2px(self.eye_size_hi_mm)
+    def size_hi_px(self):
+        return self.mm2px(self.size_hi_mm)
     
     def dtype(self) -> np.dtype:
         dt = np.dtype([
@@ -44,8 +44,8 @@ class EyesTrackerParamTracking(ParamTracking):
 class EyesTrackerParamOverlay:
     pix_per_mm: float = 40.0
     eye_len_mm: float = 0.25
-    color_eye_left_BGR: tuple = (255, 255, 128)
-    color_eye_right_BGR: tuple = (128, 255, 255)
+    color_left_BGR: tuple = (255, 255, 128)
+    color_right_BGR: tuple = (128, 255, 255)
     thickness: int = 1
     arrow_radius_mm: float = 0.1
     alpha: float = 0.5
