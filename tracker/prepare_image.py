@@ -5,7 +5,7 @@ import cv2
 
 def crop(
         image: NDArray,
-        source_crop_dimension_px: Tuple[int, int],
+        crop_dimension_px: Tuple[int, int],
         vertical_offset_px: int = 0,
         centroid: Optional[NDArray] = None,
     ) -> Optional[Tuple[NDArray, NDArray]]:
@@ -15,7 +15,7 @@ def crop(
         centroid = np.array(image.shape) // 2
     
     # crop to get fixed image size 
-    w, h = source_crop_dimension_px
+    w, h = crop_dimension_px
     origin = np.asarray((-w//2, -h//2+vertical_offset_px))
     left, bottom = centroid.astype(np.int32) + origin 
     right, top = left+w, bottom+h
