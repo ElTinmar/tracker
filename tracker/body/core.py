@@ -1,5 +1,3 @@
-from numpy.typing import NDArray
-from typing import Optional, Tuple
 import numpy as np
 from dataclasses import dataclass
 from tracker.core import Tracker, TrackingOverlay, ParamTracking
@@ -45,9 +43,9 @@ class BodyTrackerParamTracking(ParamTracking):
             ('centroid_original_space', np.float32, (2,)),
             ('origin', np.float32, (2,)),
             ('angle_rad', np.float32),
-            ('mask', np.bool_, self.crop_dimension_px[::-1]),
-            ('image', np.float32, self.crop_dimension_px[::-1]),
-            ('image_fullres', np.float32, self.source_crop_dimension_px[::-1]),
+            ('mask', np.bool_, self.resized_dimension_px[::-1]),
+            ('image', np.float32, self.resized_dimension_px[::-1]),
+            ('image_fullres', np.float32, self.crop_dimension_px[::-1]),
         ])
         return dt
 

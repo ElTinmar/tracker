@@ -1,7 +1,5 @@
 from dataclasses import dataclass
-from numpy.typing import NDArray
 import numpy as np
-from typing import Tuple
 from tracker.core import Tracker, TrackingOverlay, ParamTracking
 
 DTYPE_EYE = np.dtype([
@@ -36,9 +34,9 @@ class EyesTrackerParamTracking(ParamTracking):
             ('origin',  np.int32, (2,)),
             ('left_eye', DTYPE_EYE),
             ('right_eye', DTYPE_EYE),
-            ('mask',  np.bool_, self.crop_dimension_px[::-1]),
-            ('image',  np.float32, self.crop_dimension_px[::-1]),
-            ('image_fullres',  np.float32, self.source_crop_dimension_px[::-1]),
+            ('mask',  np.bool_, self.resized_dimension_px[::-1]),
+            ('image',  np.float32, self.resized_dimension_px[::-1]),
+            ('image_fullres',  np.float32, self.crop_dimension_px[::-1]),
         ])
         return dt
     

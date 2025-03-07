@@ -1,6 +1,5 @@
 from dataclasses import dataclass
 import numpy as np
-from typing import Tuple
 from tracker.core import Tracker, TrackingOverlay, ParamTracking
 
 @dataclass
@@ -29,8 +28,8 @@ class TailTrackerParamTracking(ParamTracking):
             ('origin',  np.float32, (2,)),
             ('skeleton',  np.float32, (self.n_tail_points,2)),
             ('skeleton_interp',  np.float32, (self.n_pts_interp,2)),
-            ('image',  np.float32, self.crop_dimension_px[::-1]),
-            ('image_fullres',  np.float32, self.source_crop_dimension_px[::-1])
+            ('image',  np.float32, self.resized_dimension_px[::-1]),
+            ('image_fullres',  np.float32, self.crop_dimension_px[::-1])
         ])
         return dt
 

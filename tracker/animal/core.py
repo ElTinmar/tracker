@@ -1,5 +1,4 @@
-from typing import Optional, Protocol, Tuple
-from numpy.typing import NDArray
+from typing import Protocol, Tuple
 from dataclasses import dataclass
 from tracker.core import Tracker, TrackingOverlay
 import numpy as np
