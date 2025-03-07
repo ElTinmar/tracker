@@ -1,4 +1,4 @@
-from image_tools import  bwareafilter_props_cv2, enhance
+from image_tools import  bwareafilter_props_cv2
 import numpy as np
 from numpy.typing import NDArray
 from typing import Optional
@@ -65,7 +65,6 @@ class BodyTracker_CPU(BodyTracker):
                 np.zeros((2,2), np.float32) if principal_components is None else principal_components, 
                 np.zeros((1,2), np.float32) if centroid_coords is None else centroid_coords / self.tracking_param.resize,
                 np.zeros((1,2), np.float32) if centroid_ori is None else transform2d(transformation_matrix, centroid_ori),
-                np.zeros((1,2), np.float32) if origin is None else origin,
                 0.0 if angle_rad is None else angle_rad, 
                 mask, 
                 image_processed,

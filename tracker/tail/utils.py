@@ -21,57 +21,6 @@ def interpolate_skeleton(skeleton: NDArray, n_pts_interp: int) -> NDArray:
 
     return skeleton_interp
 
-def tail_skeleton_max(
-        image: NDArray,
-        arc_angle_deg: float,
-        tail_length_px: int,
-        n_tail_points: int,
-        n_pts_arc: int,
-        n_pts_interp: int,
-        origin: NDArray,
-        resize: float,
-        w: float
-    ) -> Tuple[NDArray,NDArray]: 
-        '''
-        Sweep a point along an arc and pick the point with max instensity.
-        Carry on until you're done.
-        '''
-        
-        # track max intensity along tail
-        arc_rad = math.radians(arc_angle_deg)/2
-        spacing = float(tail_length_px) / n_tail_points
-        start_angle = -np.pi/2 # we are expecting to see the fish head-up and tail-down (-90 deg) 
-        arc = np.linspace(-arc_rad, arc_rad, n_pts_arc) + start_angle
-        x = w//2 
-        y = 0
-        points = [[x, y]]
-        for j in range(n_tail_points):
-            try:
-                # Find the x and y values of the arc centered around current x and y
-                xs = x + spacing * np.cos(arc)
-                ys = y - spacing * np.sin(arc)
-                # Convert them to integer, because of definite pixels
-                xs, ys = xs.astype(int), ys.astype(int)
-                # Find the index of the minimum or maximum pixel intensity along arc
-                idx = np.argmax(image[ys, xs])
-                # Update new x, y points
-                x = xs[idx]
-                y = ys[idx]
-                # Create a new arc centered around current angle
-                arc = np.linspace(arc[idx] - arc_rad, arc[idx] + arc_rad, n_pts_arc)
-                # Add point to list
-                points.append([x, y])
-            except IndexError:
-                points.append(points[-1])
-
-        skeleton = np.array(points).astype('float') + origin  #NOTE adding origin introduces a discrepancy with body coordinate system  
-        skeleton = skeleton / resize
-        
-        # interpolate
-        skeleton_interp = interpolate_skeleton(skeleton, n_pts_interp)
-
-        return (skeleton, skeleton_interp)
-
 @njit(cache=True)
 def get_skeleton_ball(
         arc_rad, 
@@ -125,8 +74,6 @@ def tail_skeleton_ball(
         n_tail_points: int,
         n_pts_arc: int,
         n_pts_interp: int,
-        origin: NDArray,
-        resize: float,
         w: float
     ) -> Tuple[NDArray,NDArray]: 
         '''
@@ -152,11 +99,9 @@ def tail_skeleton_ball(
             image,
             ball_radius_px
         )
-
-        skeleton = np.array(skeleton).astype('float') + origin
-        skeleton = skeleton / resize
         
         # interpolate
+        skeleton = np.array(skeleton).astype('float')
         skeleton_interp = interpolate_skeleton(skeleton, n_pts_interp)
 
         return (skeleton, skeleton_interp)

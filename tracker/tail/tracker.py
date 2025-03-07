@@ -3,10 +3,8 @@ import numpy as np
 from typing import Optional
 from .core import TailTracker
 from .utils import tail_skeleton_ball
-from tracker.prepare_image import crop, resize
-from image_tools import enhance
-from geometry import Affine2DTransform
 from tracker.prepare_image import preprocess_image
+from geometry import transform2d, Affine2DTransform
 
 class TailTracker_CPU(TailTracker):
 
@@ -31,7 +29,8 @@ class TailTracker_CPU(TailTracker):
         
         image_crop, image_resized, image_processed = preprocess
 
-        skeleton, skeleton_interp = tail_skeleton_ball(
+        # track
+        skeleton_resized, skeleton_interp_resized = tail_skeleton_ball(
             image = image_processed,
             ball_radius_px = self.tracking_param.ball_radius_px,
             arc_angle_deg = self.tracking_param.arc_angle_deg,
@@ -39,21 +38,32 @@ class TailTracker_CPU(TailTracker):
             n_tail_points = self.tracking_param.n_tail_points,
             n_pts_arc = self.tracking_param.n_pts_arc,
             n_pts_interp = self.tracking_param.n_pts_interp,
-            origin = origin*self.tracking_param.resize,
-            resize = self.tracking_param.resize,
-            w = self.tracking_param.crop_dimension_px[0]
+            w = self.tracking_param.resized_dimension_px[0] 
         )
+
+        # transform coordinates
+        skeleton_cropped = transform2d(self.tracking_param.T_resized_to_crop, skeleton_resized)
+        skeleton_input = transform2d(self.tracking_param.T_crop_to_input, skeleton_cropped)
+        skeleton_global = transform2d(transformation_matrix, skeleton_input)
+
+        skeleton_interp_cropped = transform2d(self.tracking_param.T_resized_to_crop, skeleton_interp_resized)
+        skeleton_interp_input = transform2d(self.tracking_param.T_crop_to_input, skeleton_interp_cropped)
+        skeleton_interp_global = transform2d(transformation_matrix, skeleton_interp_input)
 
         # save result to numpy structured array
         res = np.array(
             (
-                skeleton is None,
                 self.tracking_param.n_tail_points,
                 self.tracking_param.n_pts_interp,
-                np.zeros((1,2), np.float32) if centroid is None else centroid, 
-                np.zeros((1,2), np.float32) if origin is None else origin,
-                np.zeros((self.tracking_param.n_tail_points,2), np.float32) if skeleton is None else skeleton,
-                np.zeros((self.tracking_param.n_pts_interp,2), np.float32) if skeleton_interp is None else skeleton_interp,
+                centroid, 
+                skeleton_resized,
+                skeleton_cropped,
+                skeleton_input,
+                skeleton_global,
+                skeleton_interp_resized,
+                skeleton_interp_cropped,
+                skeleton_interp_input,
+                skeleton_interp_global,
                 image_processed,
                 image_crop
             ), 

@@ -21,15 +21,19 @@ class TailTrackerParamTracking(ParamTracking):
     
     def dtype(self) -> np.dtype:
         dt = np.dtype([
-            ('empty', bool),
             ('num_pts', int),
             ('num_interp_pts', int),
             ('centroid', np.float32, (2,)),
-            ('origin',  np.float32, (2,)),
-            ('skeleton',  np.float32, (self.n_points,2)),
-            ('skeleton_interp',  np.float32, (self.n_pts_interp,2)),
-            ('image',  np.float32, self.resized_dimension_px[::-1]),
-            ('image_fullres',  np.float32, self.crop_dimension_px[::-1])
+            ('skeleton_resized',  np.float32, (self.n_tail_points,2)),
+            ('skeleton_cropped',  np.float32, (self.n_tail_points,2)),
+            ('skeleton_input',  np.float32, (self.n_tail_points,2)),
+            ('skeleton_global',  np.float32, (self.n_tail_points,2)),
+            ('skeleton_interp_resized',  np.float32, (self.n_pts_interp,2)),
+            ('skeleton_interp_cropped',  np.float32, (self.n_pts_interp,2)),
+            ('skeleton_interp_input',  np.float32, (self.n_pts_interp,2)),
+            ('skeleton_interp_global',  np.float32, (self.n_pts_interp,2)),
+            ('image_processed',  np.float32, self.resized_dimension_px[::-1]),
+            ('image_crop',  np.float32, self.crop_dimension_px[::-1])
         ])
         return dt
 

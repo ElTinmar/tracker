@@ -3,9 +3,7 @@ from numpy.typing import NDArray
 from typing import Optional
 from .core import EyesTracker, DTYPE_EYE
 from .utils import get_eye_prop_cv2, find_eyes_and_swimbladder, assign_features
-from tracker.prepare_image import crop, resize
 from geometry import Affine2DTransform
-from image_tools import enhance
 from tracker.prepare_image import preprocess_image
 
 class EyesTracker_CPU(EyesTracker):
@@ -77,10 +75,8 @@ class EyesTracker_CPU(EyesTracker):
 
         res = np.array(
             (
-                centroid is None,
-                np.zeros((1,2), np.float32) if centroid is None else centroid,
+                centroid,
                 np.zeros((1,2), np.float32) if heading_vector is None else heading_vector,
-                np.zeros((1,2), np.int32) if origin is None else origin,
                 np.zeros(1,dtype=DTYPE_EYE) if left_eye is None else left_eye, 
                 np.zeros(1,dtype=DTYPE_EYE) if right_eye is None else right_eye,                
                 mask, 
