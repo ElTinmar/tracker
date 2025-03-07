@@ -5,15 +5,15 @@ from tracker.core import Tracker, TrackingOverlay, ParamTracking
 @dataclass
 class TailTrackerParamTracking(ParamTracking):
     arc_angle_deg: float = 120.0
-    n_points: int = 12
+    n_tail_points: int = 12
     n_pts_arc: int = 20
     n_pts_interp: int = 40
-    length_mm: float = 2.6
+    tail_length_mm: float = 2.6
     ball_radius_mm: float = 0.05 
      
     @property
-    def length_px(self) -> int:
-        return self.target_mm2px(self.length_mm)
+    def tail_length_px(self) -> int:
+        return self.target_mm2px(self.tail_length_mm)
     
     @property
     def ball_radius_px(self) -> int:
