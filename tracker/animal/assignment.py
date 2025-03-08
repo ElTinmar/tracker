@@ -5,16 +5,15 @@ from numpy.typing import NDArray
 
 class GridAssignment:
     '''
-    Use a Lookup Table to determine centroid identity. The LUT
-    must contains all integers in [0,num_animals)
-    - If exactly one blob is found in one LUT cell, nothing to do.
+    Use a Lookup Table and previous position to determine centroid identity. 
+    The LUT must contains all integers in [0,num_animals)
+    - If exactly one blob is found in one LUT cell, take that position
     - If two blobs or more are found in one LUT cell, 
-      keep only the blob closest to previous position.
-    - If no blob is found in one LUT cell, keep the previous centroid.
+      keep only the blob closest to previous position.image_fullres
+    - If no blob is found in one LUT cell, use previous poisiton.
     This enforces that num_animals centroids are returned whatever
     happens.
-    Centroids are initialized to the center of mass of LUT cells,
-    which can cause issues. 
+    Centroids are initialized to the center of mass of LUT cells.
     '''
 
     def __init__(self, LUT: NDArray, num_animals: int = 1) -> None:
