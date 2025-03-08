@@ -2,6 +2,7 @@ from typing import Protocol, Tuple
 from dataclasses import dataclass
 from tracker.core import Tracker, TrackingOverlay
 import numpy as np
+from numpy.typing import NDArray
 from tracker.core import ParamTracking
 
 @dataclass
@@ -93,11 +94,9 @@ class AnimalTrackerParamOverlay:
 
 class Assignment(Protocol):
 
-    def update(self):
+    def update(self, centroids: NDArray) -> Tuple[NDArray, NDArray]:
         ...
-    
-    def get_ID(self):
-        ...
+
 
 class AnimalTracker(Tracker):
 

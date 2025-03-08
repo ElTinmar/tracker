@@ -46,12 +46,10 @@ class AnimalTracker_CPU(AnimalTracker):
         centroids_global = transform2d(transformation_matrix, centroids_input)
 
         # identity assignment
-        self.assignment.update(centroids_global) 
-        identities = self.assignment.get_ID()
-
-        # TODO make sure that ordering of centroids in all coordinate system is ok 
-        indices_tokeep = self.assignment.get_kept_centroids() # TODO violates protocol
-        centroids_global = self.assignment.get_centroids() # TODO violates protocol
+        centroids_global = self.assignment.update(centroids_global) 
+        centroids_input = transform2d(np.linalg.inv(transformation_matrix), centroids_global)
+        centroids_cropped = transform2d(np.linalg.inv(self.tracking_param.T_crop_to_input), centroids_global)
+        centroids_resized = transform2d(np.linalg.inv(self.tracking_param.T_resized_to_crop), centroids_cropped)
 
         # Downsample image export. This is a bit easier on RAM
         image_export = cv2.resize(
@@ -62,10 +60,7 @@ class AnimalTracker_CPU(AnimalTracker):
 
         res = np.array(
             (
-                identities is None,
                 self.tracking_param.num_animals,
-                identities,
-                indices_tokeep, 
                 centroids_resized,
                 centroids_cropped,
                 centroids_input,
