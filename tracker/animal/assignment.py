@@ -3,49 +3,60 @@ from scipy.optimize import linear_sum_assignment
 from scipy.spatial.distance import cdist
 from numpy.typing import NDArray
 
-'''
-Assign identity to tracked objects frame after frame
-'''
-
-# TODO enforce num_animals. The assignment must always 
-# return nun_animals. No more no less. 
-
 class GridAssignment:
-    def __init__(self, LUT, num_animals: int = 1):
-        self.ID = None
-        self.LUT = LUT
-        self.centroids = None
-        self.indices = None
+    '''
+    Use a Lookup Table to determine centroid identity. The LUT
+    must contains all integers in [0,num_animals)
+    - If exactly one blob is found in one LUT cell, nothing to do.
+    - If two blobs or more are found in one LUT cell, 
+      keep only the blob closest to previous position.
+    - If no blob is found in one LUT cell, keep the previous centroid.
+    This enforces that num_animals centroids are returned whatever
+    happens.
+    Centroids are initialized to the center of mass of LUT cells,
+    which can cause issues. 
+    '''
+
+    def __init__(self, LUT: NDArray, num_animals: int = 1) -> None:
+
         self.num_animals = num_animals
 
-    def update(self, centroids: NDArray):
-        IDs = []
-        for x, y in centroids:
-            IDs.append(int(self.LUT[int(y), int(x)]))
+        if set(LUT.flatten()) != set(range(num_animals)):
+            raise ValueError(f"invalid LUT")
         
-        # look for duplicated IDs and chose the best among those
+        self.LUT = LUT 
+        
+        # initialize centroids to LUT cell centers 
+        self.centroids = np.zeros((num_animals,2))
+        for i in range(num_animals):
+            y, x = np.where(LUT == i)
+            self.centroids[i] = [np.mean(x), np.mean(y)]
+
+    def update(self, centroids: NDArray) -> NDArray:
+        """
+        returns centroids with shape (num_animals, 2) after removing duplicates,
+        and using previous centroid position for missing data.
+        """        
+
+        IDs = [int(self.LUT[int(y), int(x)]) for x, y in centroids]
         unique_ids = sorted(set(IDs))
+
+        # look for duplicated IDs and chose the best among those
+        
         idx_to_keep = []
         for id in unique_ids:
             indices = [i for i,x in enumerate(IDs) if x==id]
-            if len(indices) > 1 and (self.centroids is not None) and (id < self.centroids.shape[0]): 
+            if len(indices) > 1: 
                 dist = cdist(centroids[indices, :], [self.centroids[id,:]])
                 id_shortest_distance = np.argmin(dist)
                 idx_to_keep.append(indices[id_shortest_distance])
             else:
                 idx_to_keep.append(indices[0])
 
-        self.ID = np.array(unique_ids)
-        self.centroids = centroids[idx_to_keep,:] if idx_to_keep != [] else np.array([])
-        self.indices = np.arange(len(idx_to_keep))
+        new_centroids = self.centroids.copy()
+        new_centroids[unique_ids] = centroids[idx_to_keep] 
+        self.centroids = new_centroids 
 
-    def get_ID(self) -> NDArray:
-        return self.ID
-    
-    def get_kept_centroids(self) -> NDArray:
-        return self.indices
-    
-    def get_centroids(self) -> NDArray:
         return self.centroids
     
 class LinearSumAssignment:
