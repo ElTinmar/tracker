@@ -18,7 +18,6 @@ class AnimalTrackerParamTracking(ParamTracking):
     num_animals: int = 1
     intensity: float = 0.2
 
-
     @property
     def image_shape(self) -> Tuple[int, int]:
         # some video codec require height, width to be divisible by 2
@@ -61,10 +60,7 @@ class AnimalTrackerParamTracking(ParamTracking):
     
     def dtype(self) -> np.dtype:
         dt = np.dtype([
-            ('empty', bool),
             ('num_animals', int),
-            ('identities', int, (self.num_animals,)),
-            ('indices', int, (self.num_animals,)),
             ('centroids_resized', np.float32, (self.num_animals, 2)),
             ('centroids_cropped', np.float32, (self.num_animals, 2)),
             ('centroids_input', np.float32, (self.num_animals, 2)),

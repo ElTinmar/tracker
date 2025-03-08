@@ -58,15 +58,21 @@ class ParamTracking:
 
     @property
     def T_resized_to_crop(self) -> NDArray:
-        return Affine2DTransform.scaling(1/self.resize, 1/self.resize)
+        if self.do_resize:
+            return Affine2DTransform.scaling(1/self.resize, 1/self.resize)
+        else:
+            return Affine2DTransform.identity()
 
     @property
     def T_crop_to_input(self) -> NDArray:
-        return Affine2DTransform.translation(
-            -self.crop_dimension_px[0]//2, 
-            -self.crop_dimension_px[1]//2 + self.crop_offset_y_px, 
-        )
-    
+        if self.do_crop:
+            return Affine2DTransform.translation(
+                -self.crop_dimension_px[0]//2, 
+                -self.crop_dimension_px[1]//2 + self.crop_offset_y_px, 
+            )
+        else:
+            return Affine2DTransform.identity()
+        
 class Tracker(ABC):
     
     @abstractmethod
@@ -83,7 +89,6 @@ class Tracker(ABC):
         return numpy structured array
         '''
         
-
 class TrackingOverlay(ABC):
 
     @abstractmethod

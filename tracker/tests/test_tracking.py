@@ -75,7 +75,7 @@ animal_tracker = AnimalTracker_CPU(
         do_crop=False,
         do_resize=True,
         do_enhance=True, 
-        crop_dimension_mm=(width,height), # this is actually important
+        crop_dimension_mm=(width/PIX_PER_MM,height/PIX_PER_MM), 
         crop_offset_y_mm=0
     )
 )
