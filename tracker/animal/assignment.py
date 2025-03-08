@@ -59,7 +59,7 @@ class GridAssignment:
     
 class LinearSumAssignment:
     '''
-    We are using the Hungarian algorithm to solve the assignemnt problem.
+    Using the Hungarian algorithm to identify blobs across frames.
     '''
 
     def __init__(self, distance_threshold, num_animals: int = 1):
