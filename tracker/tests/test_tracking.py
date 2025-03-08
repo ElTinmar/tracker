@@ -58,57 +58,67 @@ animal_tracker = AnimalTracker_CPU(
     tracking_param=AnimalTrackerParamTracking(
         pix_per_mm=PIX_PER_MM,
         target_pix_per_mm=5,
-        animal_intensity=0.15,
-        animal_brightness=0.0,
-        animal_gamma=1.0,
-        animal_contrast=1.0,
-        min_animal_size_mm=0.0,
-        max_animal_size_mm=300.0,
-        min_animal_length_mm=0,
-        max_animal_length_mm=0,
-        min_animal_width_mm=0,
-        max_animal_width_mm=0,
+        intensity=0.15,
+        gamma=1.0,
+        contrast=1.0,
+        min_size_mm=0.0,
+        max_size_mm=300.0,
+        min_length_mm=0,
+        max_length_mm=0,
+        min_width_mm=0,
+        max_width_mm=0,
         blur_sz_mm=0.6,
         median_filter_sz_mm=0,
         downsample_fullres=1.0,
         num_animals=1,
-        source_image_shape=(height, width)
+        source_image_shape=(height, width),
+        do_crop=False,
+        do_resize=True,
+        do_enhance=True, 
+        crop_dimension_mm=(width,height), # this is actually important
+        crop_offset_y_mm=0
     )
 )
 body_tracker = BodyTracker_CPU(
     BodyTrackerParamTracking(
         pix_per_mm=PIX_PER_MM,
         target_pix_per_mm=10,
-        body_intensity=0.15,
-        body_brightness=0.0,
-        body_gamma=1.0,
-        body_contrast=3.0,
-        min_body_size_mm=2.0,
-        max_body_size_mm=300.0,
-        min_body_length_mm=0,
-        max_body_length_mm=0,
-        min_body_width_mm=0,
-        max_body_width_mm=0,
+        intensity=0.15,
+        gamma=1.0,
+        contrast=3.0,
+        min_size_mm=2.0,
+        max_size_mm=300.0,
+        min_length_mm=0,
+        max_length_mm=0,
+        min_width_mm=0,
+        max_width_mm=0,
         blur_sz_mm=0.6,
         median_filter_sz_mm=0,
+        do_crop=True,
+        do_resize=True,
+        do_enhance=True,
+        crop_dimension_mm=(5,5),
+        crop_offset_y_mm=0
     )
 )
 eyes_tracker = EyesTracker_CPU(
     EyesTrackerParamTracking(
         pix_per_mm=PIX_PER_MM,
         target_pix_per_mm=40,
-        eye_thresh_lo=0.2,
-        eye_thresh_hi=0.8,
-        eye_brightness=0.0,
-        eye_gamma=2.0,
-        eye_dyntresh_res=5,
-        eye_contrast=5.0,
-        eye_size_lo_mm=0.1,
-        eye_size_hi_mm=30.0,
+        thresh_lo=0.2,
+        thresh_hi=0.8,
+        gamma=2.0,
+        dyntresh_res=5,
+        contrast=5.0,
+        size_lo_mm=0.1,
+        size_hi_mm=30.0,
         blur_sz_mm=0.1,
         median_filter_sz_mm=0,
-        crop_dimension_mm=(1.0,1.5),
-        crop_offset_mm=-0.75
+        do_crop=True,
+        do_resize=True,
+        do_enhance=True,
+        crop_dimension_mm=(1,1.5),
+        crop_offset_y_mm=0
     )
 )
 tail_tracker = TailTracker_CPU(
@@ -123,11 +133,13 @@ tail_tracker = TailTracker_CPU(
         tail_length_mm=3.0,
         blur_sz_mm=0.06,
         median_filter_sz_mm=0,
-        tail_brightness=0.0,
-        tail_contrast=3.0,
-        tail_gamma=0.75,
+        contrast=3.0,
+        gamma=0.75,
+        do_crop=True,
+        do_resize=True,
+        do_enhance=True,
         crop_dimension_mm=(3.5,3.5),
-        crop_offset_tail_mm=1.75
+        crop_offset_y_mm=0
     )
 )
 

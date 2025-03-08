@@ -16,6 +16,8 @@ class AnimalTrackerParamTracking(ParamTracking):
     max_width_mm: float = 3.0
     downsample_fullres: float = 0.25
     num_animals: int = 1
+    intensity: float = 0.2
+
 
     @property
     def image_shape(self) -> Tuple[int, int]:

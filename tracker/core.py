@@ -10,7 +10,6 @@ class ParamTracking:
     target_pix_per_mm: float
     crop_dimension_mm: Tuple[float, float]
     crop_offset_y_mm: float
-    intensity: float
     gamma: float
     contrast: float
     blur_sz_mm: float
