@@ -126,5 +126,4 @@ class LinearSumAssignment:
             self.centroids = centroids
             self.indices = np.arange(self.num_animals)
 
-            
         return self.centroids

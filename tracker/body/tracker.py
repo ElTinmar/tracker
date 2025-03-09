@@ -28,13 +28,12 @@ class BodyTracker_CPU(BodyTracker):
         if (image is None) or (image.size == 0):
             return None
         
-        preprocess = preprocess_image(image, centroid, self.tracking_param)
-        if preprocess is None:
-            return None
+        preproc = preprocess_image(image, centroid, self.tracking_param)
         
-        image_crop, image_resized, image_processed = preprocess
+        if preproc is None:
+            return None
 
-        mask = cv2.compare(image_processed, self.tracking_param.intensity, cv2.CMP_GT)
+        mask = cv2.compare(preproc.image_processed, self.tracking_param.intensity, cv2.CMP_GT)
         props = bwareafilter_props_cv2(
             mask, 
             min_size = self.tracking_param.min_size_px,
@@ -67,8 +66,8 @@ class BodyTracker_CPU(BodyTracker):
                 np.zeros((1,2), np.float32) if centroid_ori is None else transform2d(transformation_matrix, centroid_ori),
                 0.0 if angle_rad is None else angle_rad, 
                 mask, 
-                image_processed,
-                image_crop
+                preproc.image_processed,
+                preproc.image_crop
             ), 
             dtype=self.tracking_param.dtype()
         )

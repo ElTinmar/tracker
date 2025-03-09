@@ -19,14 +19,12 @@ class AnimalTracker_CPU(AnimalTracker):
         if (image is None) or (image.size == 0):
             return None
         
-        preprocess = preprocess_image(image, centroid, self.tracking_param)
+        preproc = preprocess_image(image, centroid, self.tracking_param)
         
-        if preprocess is None:
+        if preproc is None:
             return None
         
-        image_crop, image_resized, image_processed = preprocess
-
-        mask = cv2.compare(image_processed, self.tracking_param.intensity, cv2.CMP_GT)
+        mask = cv2.compare(preproc.image_processed, self.tracking_param.intensity, cv2.CMP_GT)
         centroids_resized = bwareafilter_centroids_cv2(
             mask, 
             min_size = self.tracking_param.min_size_px,
@@ -39,17 +37,17 @@ class AnimalTracker_CPU(AnimalTracker):
         
         if centroids_resized.size == 0:
             return None
-        
+
         # transform coordinates
-        centroids_cropped = transform2d(self.tracking_param.T_resized_to_crop, centroids_resized)
-        centroids_input = transform2d(self.tracking_param.T_crop_to_input, centroids_cropped)
+        centroids_cropped = transform2d(preproc.resize_transform, centroids_resized)
+        centroids_input = transform2d(preproc.crop_transform, centroids_cropped)
         centroids_global = transform2d(transformation_matrix, centroids_input)
 
         # identity assignment
         centroids_global = self.assignment.update(centroids_global) 
         centroids_input = transform2d(np.linalg.inv(transformation_matrix), centroids_global)
-        centroids_cropped = transform2d(np.linalg.inv(self.tracking_param.T_crop_to_input), centroids_global)
-        centroids_resized = transform2d(np.linalg.inv(self.tracking_param.T_resized_to_crop), centroids_cropped)
+        centroids_cropped = transform2d(np.linalg.inv(preproc.crop_transform), centroids_input)
+        centroids_resized = transform2d(np.linalg.inv(preproc.resize_transform), centroids_cropped)
 
         # Downsample image export. This is a bit easier on RAM
         image_export = cv2.resize(
@@ -66,7 +64,7 @@ class AnimalTracker_CPU(AnimalTracker):
                 centroids_input,
                 centroids_global, 
                 mask, 
-                image_processed,
+                preproc.image_processed,
                 image_export,
                 self.tracking_param.downsample_fullres
             ), 

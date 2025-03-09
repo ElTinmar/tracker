@@ -1,16 +1,17 @@
-from typing import Tuple, Optional
+from typing import NamedTuple, Tuple, Optional
 import numpy as np
 from numpy.typing import NDArray
 import cv2
 from tracker.core import ParamTracking
 from image_tools import enhance
+from geometry import Affine2DTransform
 
 def crop(
         image: NDArray,
         crop_dimension_px: Tuple[int, int],
         vertical_offset_px: int = 0,
         centroid: Optional[NDArray] = None,
-    ) -> Optional[NDArray]:
+    ) -> Optional[Tuple[NDArray, NDArray]]:
     """
     Crops a fixed-size region from an image, optionally centered around a given centroid.
 
@@ -23,6 +24,9 @@ def crop(
     Returns:
         Optional[Tuple[NDArray, NDArray]]: (origin, cropped image), or None if invalid crop.
     """
+
+    if image.shape[:2] == crop_dimension_px[::-1]:
+        return image, Affine2DTransform.identity()
 
     if centroid is None:
         centroid = np.array(image.shape[:2]) // 2
@@ -41,15 +45,25 @@ def crop(
     if (bottom+pad_bottom >= top-pad_top) or (left+pad_left >= right-pad_right):
         return None
     
-    image_crop = np.zeros((h, w), dtype=image.dtype)
-    image_crop[pad_bottom:h-pad_top, pad_left:w-pad_right] = image[bottom+pad_bottom:top-pad_top, left+pad_left:right-pad_right]
+    if image.ndim == 2: 
+        image_crop = np.zeros((h, w), dtype=image.dtype)
+    else: 
+        image_crop = np.zeros((h, w, image.shape[-1]), dtype=image.dtype)
 
-    return image_crop
+    image_crop[pad_bottom:h-pad_top, pad_left:w-pad_right] = image[
+        bottom+pad_bottom:top-pad_top, 
+        left+pad_left:right-pad_right
+    ]
+
+    # cropped space to input space
+    crop_transform = Affine2DTransform.translation(left, bottom)
+
+    return image_crop, crop_transform
 
 def resize(
         image: NDArray,
         target_dimension_px: Tuple[int, int], 
-    ) -> NDArray:
+    ) -> Tuple[NDArray]:
     """
     Resize an image to the specified dimensions.
 
@@ -62,53 +76,65 @@ def resize(
     """
 
     if image.shape[:2] == target_dimension_px[::-1]:
-        return image
+        return image, Affine2DTransform.identity()
 
     image_resized = cv2.resize(
         image, 
         target_dimension_px, 
         interpolation=cv2.INTER_NEAREST
     )
-    return image_resized
+
+    # resized space to input space
+    sx = image.shape[1] / target_dimension_px[0]
+    sy = image.shape[0] / target_dimension_px[1]
+    resize_transform =  Affine2DTransform.scaling(sx, sy)
+
+    return image_resized, resize_transform
+
+class Preprocessing(NamedTuple):
+    image_crop: NDArray
+    image_resized: NDArray
+    image_processed: NDArray
+    crop_transform: NDArray
+    resize_transform: NDArray
 
 def preprocess_image(
         image: NDArray, 
         centroid: NDArray, 
         params: ParamTracking
-    ) -> Optional[Tuple[NDArray, NDArray, NDArray]]:
+    ) -> Optional[Preprocessing]:
         
     # crop -----------------------
-    if params.do_crop:
-        image_crop = crop(
-            image = image,
-            crop_dimension_px = params.crop_dimension_px,
-            centroid = centroid
-        )
-        
-        if image_crop is None:
-            return None
-    else:
-        image_crop = image
+    cropping = crop(
+        image = image,
+        crop_dimension_px = params.crop_dimension_px,
+        centroid = centroid
+    )
+    
+    if cropping is None:
+        return None
+
+    image_crop, crop_transform = cropping
 
     # resize ---------------------
-    if params.do_resize:
-        image_resized = resize(
-            image = image_crop,
-            target_dimension_px = params.resized_dimension_px, 
-        )
-    else:
-        image_resized = image_crop
+    image_resized, resize_transform = resize(
+        image = image_crop,
+        target_dimension_px = params.resized_dimension_px, 
+    )
 
     # enhance --------------------
-    if params.do_enhance:
-        image_processed = enhance(
-            image = image_resized,
-            contrast = params.contrast,
-            gamma = params.gamma,
-            blur_size_px = params.blur_sz_px,
-            medfilt_size_px = params.median_filter_sz_px
-        )
-    else:
-        image_processed = image_resized
+    image_processed = enhance(
+        image = image_resized,
+        contrast = params.contrast,
+        gamma = params.gamma,
+        blur_size_px = params.blur_sz_px,
+        medfilt_size_px = params.median_filter_sz_px
+    )
 
-    return (image_crop, image_resized, image_processed)
+    return Preprocessing(
+        image_crop, 
+        image_resized, 
+        image_processed,
+        crop_transform,
+        resize_transform
+    )

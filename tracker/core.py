@@ -2,7 +2,6 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from numpy.typing import NDArray 
 from typing import Optional, Tuple
-from geometry import Affine2DTransform
 
 @dataclass
 class ParamTracking:
@@ -14,9 +13,6 @@ class ParamTracking:
     contrast: float
     blur_sz_mm: float
     median_filter_sz_mm: float
-    do_crop: bool
-    do_resize: bool
-    do_enhance: bool
 
     def target_mm2px(self, val_mm: float) -> int:
         return int(val_mm * self.target_pix_per_mm) 
@@ -55,23 +51,6 @@ class ParamTracking:
             2* (self.source_mm2px(self.crop_dimension_mm[0])//2),
             2* (self.source_mm2px(self.crop_dimension_mm[1])//2)
         ) 
-
-    @property
-    def T_resized_to_crop(self) -> NDArray:
-        if self.do_resize:
-            return Affine2DTransform.scaling(1/self.resize, 1/self.resize)
-        else:
-            return Affine2DTransform.identity()
-
-    @property
-    def T_crop_to_input(self) -> NDArray:
-        if self.do_crop:
-            return Affine2DTransform.translation(
-                -self.crop_dimension_px[0]//2, 
-                -self.crop_dimension_px[1]//2 + self.crop_offset_y_px, 
-            )
-        else:
-            return Affine2DTransform.identity()
         
 class Tracker(ABC):
     

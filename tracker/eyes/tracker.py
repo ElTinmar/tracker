@@ -23,15 +23,14 @@ class EyesTracker_CPU(EyesTracker):
         if (image is None) or (image.size == 0) or (centroid is None):
             return None
         
-        preprocess = preprocess_image(image, centroid, self.tracking_param)
-        if preprocess is None:
+        preproc = preprocess_image(image, centroid, self.tracking_param)
+        
+        if preproc is None:
             return None
         
-        image_crop, image_resized, image_processed = preprocess
-
         # sweep threshold to obtain 3 connected component within size range (include swim bladder)
         found_eyes_and_sb, props, mask = find_eyes_and_swimbladder(
-            image_processed, 
+            preproc.image_processed, 
             self.tracking_param.dyntresh_res, 
             self.tracking_param.size_lo_px, 
             self.tracking_param.size_hi_px,
@@ -80,8 +79,8 @@ class EyesTracker_CPU(EyesTracker):
                 np.zeros(1,dtype=DTYPE_EYE) if left_eye is None else left_eye, 
                 np.zeros(1,dtype=DTYPE_EYE) if right_eye is None else right_eye,                
                 mask, 
-                image_processed,
-                image_crop 
+                preproc.image_processed,
+                preproc.image_crop 
             ), 
             dtype = self.tracking_param.dtype()
         )

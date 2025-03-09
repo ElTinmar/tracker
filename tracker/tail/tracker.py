@@ -23,15 +23,14 @@ class TailTracker_CPU(TailTracker):
         if (image is None) or (image.size == 0) or (centroid is None):
             return None
         
-        preprocess = preprocess_image(image, centroid, self.tracking_param)
-        if preprocess is None:
-            return None
+        preproc = preprocess_image(image, centroid, self.tracking_param)
         
-        image_crop, image_resized, image_processed = preprocess
+        if preproc is None:
+            return None
 
         # track
         skeleton_resized, skeleton_interp_resized = tail_skeleton_ball(
-            image = image_processed,
+            image = preproc.image_processed,
             ball_radius_px = self.tracking_param.ball_radius_px,
             arc_angle_deg = self.tracking_param.arc_angle_deg,
             tail_length_px = self.tracking_param.tail_length_px,
@@ -42,12 +41,12 @@ class TailTracker_CPU(TailTracker):
         )
 
         # transform coordinates
-        skeleton_cropped = transform2d(self.tracking_param.T_resized_to_crop, skeleton_resized)
-        skeleton_input = transform2d(self.tracking_param.T_crop_to_input, skeleton_cropped)
+        skeleton_cropped = transform2d(preproc.resize_transform, skeleton_resized)
+        skeleton_input = transform2d(preproc.crop_transform, skeleton_cropped)
         skeleton_global = transform2d(transformation_matrix, skeleton_input)
 
-        skeleton_interp_cropped = transform2d(self.tracking_param.T_resized_to_crop, skeleton_interp_resized)
-        skeleton_interp_input = transform2d(self.tracking_param.T_crop_to_input, skeleton_interp_cropped)
+        skeleton_interp_cropped = transform2d(preproc.resize_transform, skeleton_interp_resized)
+        skeleton_interp_input = transform2d(preproc.crop_transform, skeleton_interp_cropped)
         skeleton_interp_global = transform2d(transformation_matrix, skeleton_interp_input)
 
         # save result to numpy structured array
@@ -64,8 +63,8 @@ class TailTracker_CPU(TailTracker):
                 skeleton_interp_cropped,
                 skeleton_interp_input,
                 skeleton_interp_global,
-                image_processed,
-                image_crop
+                preproc.image_processed,
+                preproc.image_crop
             ), 
             dtype= self.tracking_param.dtype()
         )
