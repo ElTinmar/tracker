@@ -49,9 +49,9 @@ class AnimalTracker_CPU(AnimalTracker):
         centroids_cropped = transform2d(np.linalg.inv(preproc.crop_transform), centroids_input)
         centroids_resized = transform2d(np.linalg.inv(preproc.resize_transform), centroids_cropped)
 
-        # Downsample image export (a bit easier on RAM). This is used for overlay
+        # Downsample image export (a bit easier on RAM). This is used for overlay instead of image_crop
         image_export = cv2.resize(
-            image,
+            preproc.image_crop,
             self.tracking_param.downsampled_shape[::-1], # transform shape (row, col) to width, height
             cv2.INTER_NEAREST
         )
@@ -63,11 +63,11 @@ class AnimalTracker_CPU(AnimalTracker):
                 centroids_cropped,
                 centroids_input,
                 centroids_global, 
+                self.tracking_param.downsample_fullres,
                 mask, 
                 preproc.image_processed,
-                image_export,
-                self.tracking_param.downsample_fullres
-            ), 
+                image_export
+            ),
             dtype=self.tracking_param.dtype()
         )
         return res

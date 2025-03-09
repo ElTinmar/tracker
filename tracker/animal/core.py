@@ -65,10 +65,10 @@ class AnimalTrackerParamTracking(ParamTracking):
             ('centroids_cropped', np.float32, (self.num_animals, 2)),
             ('centroids_input', np.float32, (self.num_animals, 2)),
             ('centroids_global', np.float32, (self.num_animals, 2)),
+            ('downsample_ratio', np.float32),
             ('mask', np.bool_, self.image_shape),
             ('image', np.float32, self.image_shape),
-            ('image_fullres', np.float32, self.downsampled_shape),
-            ('downsample_ratio', np.float32)
+            ('image_fullres', np.float32, self.downsampled_shape)
         ])
         return dt
         
