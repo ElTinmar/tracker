@@ -95,7 +95,6 @@ class Assignment(Protocol):
     def update(self, centroids: NDArray) -> Tuple[NDArray, NDArray]:
         ...
 
-
 class AnimalTracker(Tracker):
 
     def __init__(

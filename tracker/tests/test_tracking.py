@@ -22,7 +22,7 @@ VIDEOS = [
     ('toy_data/single_headembedded_544x380px_param_nobckg.avi', 100)
 ]
 # background subtracted video
-VIDEO_NUM = 1
+VIDEO_NUM = 0
 INPUT_VIDEO, PIX_PER_MM = VIDEOS[VIDEO_NUM]
 
 video_reader = InMemory_OpenCV_VideoReader()
@@ -40,6 +40,7 @@ fps = video_reader.get_fps()
 num_frames = video_reader.get_number_of_frame()
 
 LUT = np.zeros((height, width))
+num_animals = 1
 if VIDEO_NUM == 0:
     LUT[0:600,0:600] = 0
     LUT[0:600,600:1200] = 1
@@ -50,7 +51,9 @@ if VIDEO_NUM == 0:
     LUT[1200:1800,0:600] = 6
     LUT[1200:1800,600:1200] = 7
     LUT[1200:1800,1200:1800] = 8
-assignment = GridAssignment(LUT)
+    num_animals = 9
+
+assignment = GridAssignment(LUT, num_animals)
 
 # tracking 
 animal_tracker = AnimalTracker_CPU(
@@ -70,11 +73,8 @@ animal_tracker = AnimalTracker_CPU(
         blur_sz_mm=0.6,
         median_filter_sz_mm=0,
         downsample_fullres=1.0,
-        num_animals=1,
+        num_animals=num_animals,
         source_image_shape=(height, width),
-        do_crop=False,
-        do_resize=True,
-        do_enhance=True, 
         crop_dimension_mm=(width/PIX_PER_MM,height/PIX_PER_MM), 
         crop_offset_y_mm=0
     )
@@ -94,9 +94,6 @@ body_tracker = BodyTracker_CPU(
         max_width_mm=0,
         blur_sz_mm=0.6,
         median_filter_sz_mm=0,
-        do_crop=True,
-        do_resize=True,
-        do_enhance=True,
         crop_dimension_mm=(5,5),
         crop_offset_y_mm=0
     )
@@ -114,9 +111,6 @@ eyes_tracker = EyesTracker_CPU(
         size_hi_mm=30.0,
         blur_sz_mm=0.1,
         median_filter_sz_mm=0,
-        do_crop=True,
-        do_resize=True,
-        do_enhance=True,
         crop_dimension_mm=(1,1.5),
         crop_offset_y_mm=0
     )
@@ -135,9 +129,6 @@ tail_tracker = TailTracker_CPU(
         median_filter_sz_mm=0,
         contrast=3.0,
         gamma=0.75,
-        do_crop=True,
-        do_resize=True,
-        do_enhance=True,
         crop_dimension_mm=(3.5,3.5),
         crop_offset_y_mm=0
     )
