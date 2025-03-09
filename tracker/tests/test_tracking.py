@@ -72,9 +72,8 @@ animal_tracker = AnimalTracker_CPU(
         max_width_mm=0,
         blur_sz_mm=0.6,
         median_filter_sz_mm=0,
-        downsample_fullres=1.0,
+        downsample_fullres=0.25,
         num_animals=num_animals,
-        source_image_shape=(height, width),
         crop_dimension_mm=(width/PIX_PER_MM,height/PIX_PER_MM), 
         crop_offset_y_mm=0
     )

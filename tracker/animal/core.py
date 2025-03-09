@@ -7,7 +7,6 @@ from tracker.core import ParamTracking
 
 @dataclass
 class AnimalTrackerParamTracking(ParamTracking):        
-    source_image_shape: Tuple[int, int] # height, width
     min_size_mm: float = 10.0
     max_size_mm: float = 100.0
     min_length_mm: float = 2.0
@@ -17,20 +16,12 @@ class AnimalTrackerParamTracking(ParamTracking):
     downsample_fullres: float = 0.25
     num_animals: int = 1
     intensity: float = 0.2
-
-    @property
-    def image_shape(self) -> Tuple[int, int]:
-        # some video codec require height, width to be divisible by 2
-        return (
-            int(2*((self.resize * self.source_image_shape[0])//2)),
-            int(2*((self.resize * self.source_image_shape[1])//2))
-        ) 
     
     @property
     def downsampled_shape(self) -> Tuple[int, int]:
         return (
-            int(2*((self.downsample_fullres * self.source_image_shape[0])//2)),
-            int(2*((self.downsample_fullres * self.source_image_shape[1])//2))
+            int(2*((self.downsample_fullres * self.crop_dimension_px[1])//2)),
+            int(2*((self.downsample_fullres * self.crop_dimension_px[0])//2))
         ) 
 
     @property
@@ -57,7 +48,6 @@ class AnimalTrackerParamTracking(ParamTracking):
     def max_width_px(self) -> int:
         return self.target_mm2px(self.max_width_mm)
 
-    
     def dtype(self) -> np.dtype:
         dt = np.dtype([
             ('num_animals', int),
@@ -66,8 +56,8 @@ class AnimalTrackerParamTracking(ParamTracking):
             ('centroids_input', np.float32, (self.num_animals, 2)),
             ('centroids_global', np.float32, (self.num_animals, 2)),
             ('downsample_ratio', np.float32),
-            ('mask', np.bool_, self.image_shape),
-            ('image', np.float32, self.image_shape),
+            ('mask', np.bool_, self.resized_dimension_px[::-1]),
+            ('image', np.float32, self.resized_dimension_px[::-1]),
             ('image_fullres', np.float32, self.downsampled_shape)
         ])
         return dt
