@@ -9,7 +9,7 @@ class GridAssignment:
     The LUT must contains all integers in [0,num_animals)
     - If exactly one blob is found in one LUT cell, take that position
     - If two blobs or more are found in one LUT cell, 
-      keep only the blob closest to previous position.image_fullres
+      keep only the blob closest to previous position.
     - If no blob is found in one LUT cell, use previous poisiton.
     This enforces that num_animals centroids are returned whatever
     happens.
@@ -125,5 +125,6 @@ class LinearSumAssignment:
             self.ID = final_id
             self.centroids = centroids
             self.indices = np.arange(self.num_animals)
+
 
         return self.centroids
