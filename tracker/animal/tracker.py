@@ -14,15 +14,17 @@ class AnimalTracker_CPU(AnimalTracker):
         image: Optional[NDArray], 
         centroid: Optional[NDArray] = None, # centroid in global space
         transformation_matrix: Optional[NDArray] = Affine2DTransform.identity()
-    ) -> Optional[NDArray]:
+    ) -> NDArray:
+        
+        failed = np.zeros((1,), dtype=self.tracking_param.dtype)
 
         if (image is None) or (image.size == 0):
-            return None
+            return failed
         
         preproc = preprocess_image(image, centroid, self.tracking_param)
         
         if preproc is None:
-            return None
+            return failed
         
         mask = cv2.compare(preproc.image_processed, self.tracking_param.intensity, cv2.CMP_GT)
         centroids_resized = bwareafilter_centroids_cv2(
@@ -36,7 +38,7 @@ class AnimalTracker_CPU(AnimalTracker):
         )     
         
         if centroids_resized.size == 0:
-            return None
+            return failed
 
         # transform coordinates
         centroids_cropped = transform2d(preproc.resize_transform, centroids_resized)
@@ -69,6 +71,6 @@ class AnimalTracker_CPU(AnimalTracker):
                 preproc.image_processed,
                 image_downsampled
             ),
-            dtype=self.tracking_param.dtype()
+            dtype=self.tracking_param.dtype
         )
         return res
