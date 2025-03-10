@@ -12,7 +12,7 @@ class AnimalTracker_CPU(AnimalTracker):
     def track(
         self,
         image: Optional[NDArray], 
-        centroid: Optional[NDArray] = None,
+        centroid: Optional[NDArray] = None, # centroid in global space
         transformation_matrix: Optional[NDArray] = Affine2DTransform.identity()
     ) -> Optional[NDArray]:
 
@@ -43,8 +43,9 @@ class AnimalTracker_CPU(AnimalTracker):
         centroids_input = transform2d(preproc.crop_transform, centroids_cropped)
         centroids_global = transform2d(transformation_matrix, centroids_input)
 
-        # identity assignment
-        centroids_global = self.assignment.update(centroids_global) 
+        # identity assignment in global space
+        centroids_global = self.assignment.update(centroids_global)  
+
         centroids_input = transform2d(np.linalg.inv(transformation_matrix), centroids_global)
         centroids_cropped = transform2d(np.linalg.inv(preproc.crop_transform), centroids_input)
         centroids_resized = transform2d(np.linalg.inv(preproc.resize_transform), centroids_cropped)
