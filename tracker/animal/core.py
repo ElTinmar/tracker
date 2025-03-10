@@ -79,7 +79,6 @@ class AnimalTrackerParamOverlay:
     def radius_px(self):
         return self.mm2px(self.radius_mm)
     
-
 class Assignment(Protocol):
 
     def update(self, centroids: NDArray) -> Tuple[NDArray, NDArray]:
