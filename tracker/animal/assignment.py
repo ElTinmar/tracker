@@ -57,6 +57,7 @@ class GridAssignment:
 
         return self.centroids
     
+# TODO this is probably broken now, fix that
 class LinearSumAssignment:
     '''
     Using the Hungarian algorithm to identify blobs across frames.
