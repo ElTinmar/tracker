@@ -33,13 +33,11 @@ class MultiFishOverlay_opencv(MultiFishOverlay):
             overlay = self.overlay_param.animal.overlay(overlay, tracking['animals'], T_scale)         
 
             # loop over animals
-            for idx, id in zip(tracking['animals']['indices'], tracking['animals']['identities']):
+            for idx, _ in enumerate(tracking['animals']['centroids']):
 
                 if (
                         (self.overlay_param.body is not None) 
                         and ('body' in tracking.dtype.fields) 
-                        and (tracking['body'][idx] is not None) 
-                        and (tracking['body'][idx]['centroid'] is not None)
                     ):
 
                     # transformation matrix from coord system 1. to coord system 2., just a translation  
@@ -64,7 +62,6 @@ class MultiFishOverlay_opencv(MultiFishOverlay):
                     if (
                             (self.overlay_param.eyes is not None) 
                             and ('eyes' in tracking.dtype.fields)
-                            and (tracking['eyes'][idx] is not None)
                         ):
 
                         overlay = self.overlay_param.eyes.overlay(
@@ -77,7 +74,6 @@ class MultiFishOverlay_opencv(MultiFishOverlay):
                     if (
                             (self.overlay_param.tail is not None) 
                             and ('tail' in tracking.dtype.fields)
-                            and (tracking['tail'][idx]  is not None)
                         ):
 
                         overlay = self.overlay_param.tail.overlay(

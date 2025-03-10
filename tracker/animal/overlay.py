@@ -1,10 +1,13 @@
 from image_tools import im2uint8, im2rgb
-from geometry import to_homogeneous, Affine2DTransform
+from geometry import transform2d, Affine2DTransform
 import numpy as np
 from numpy.typing import NDArray
 import cv2
 from typing import Optional
 from .core import AnimalOverlay
+
+# TODO maybe one function for input / cropped / resized space?
+# no need to pass image as input, use image in tracking
 
 class AnimalOverlay_opencv(AnimalOverlay):
 
@@ -20,17 +23,14 @@ class AnimalOverlay_opencv(AnimalOverlay):
             overlay = im2rgb(im2uint8(image))
             original = overlay.copy()        
 
-            for idx, id in zip(tracking['indices'], tracking['identities']):
-
-                if np.isnan(tracking['centroids'][idx,:]).any():
-                    continue
+            for centroid in tracking['centroids_global']:
 
                 # draw centroid
-                x,y,_ = transformation_matrix @ to_homogeneous(tracking['centroids'][idx,:])
-
+                x,y = transform2d(transformation_matrix, centroid)
+                
                 overlay = cv2.circle(
                     overlay,
-                    (int(x),int(y)), 
+                    (int(centroid[0]),int(centroid[1])), 
                     self.overlay_param.radius_px, 
                     self.overlay_param.centroid_color_BGR, 
                     self.overlay_param.centroid_thickness
