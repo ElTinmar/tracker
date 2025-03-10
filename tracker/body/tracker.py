@@ -3,7 +3,7 @@ import numpy as np
 from numpy.typing import NDArray
 from typing import Optional
 from .core import BodyTracker
-from .utils import get_orientation, get_blob_coordinates
+from .utils import get_orientation, get_best_centroid_index
 from tracker.prepare_image import preprocess_image
 from geometry import transform2d, Affine2DTransform
 import cv2
@@ -13,7 +13,7 @@ class BodyTracker_CPU(BodyTracker):
     def track(
             self,
             image: Optional[NDArray], 
-            centroid: Optional[NDArray] = None,
+            centroid: Optional[NDArray] = None, # centroids in global space
             transformation_matrix: Optional[NDArray] = Affine2DTransform.identity()
         ) -> Optional[NDArray]:
         '''
@@ -47,24 +47,38 @@ class BodyTracker_CPU(BodyTracker):
         if not props:
             return None
         
-        angle_rad, principal_components, centroid_coords, centroid_ori = None, None, None, None
-        coordinates = get_blob_coordinates(centroid, props, self.tracking_param.resize)
-        if coordinates.shape[0] > 1:
-            (principal_components, centroid_coords) = get_orientation(coordinates)
+        centroids_resized = np.array([[blob.centroid[1], blob.centroid[0]] for blob in props]) #(row, col) to (x,y)
+        centroids_cropped = transform2d(preproc.resize_transform, centroids_resized)
+        centroids_input = transform2d(preproc.crop_transform, centroids_cropped)
+        centroids_global = transform2d(transformation_matrix, centroids_input)
 
-            if principal_components is not None:
-                angle_rad = np.arctan2(principal_components[1,1], principal_components[0,1])
-            
-            if (centroid is not None) and (centroid_coords is not None):
-                centroid_ori = origin + centroid + centroid_coords / self.tracking_param.resize 
+        # get coordinates of best centroid
+        index = get_best_centroid_index(centroids_global, centroid)
+        centroid_resized = centroids_resized[index]
+        centroid_cropped = centroids_cropped[index]
+        centroid_input = centroids_input[index]
+        centroid_global = centroids_global[index]
 
+        coordinates_resized = props[index].coords[::-1]
+        principal_components = get_orientation(coordinates_resized)
+        if principal_components is None:
+            return None
+        
+        principal_components_global = transform2d(transformation_matrix, principal_components)
+        
+        angle_rad = np.arctan2(principal_components[1,1], principal_components[0,1])
+        angle_rad_global = np.arctan2(principal_components_global[1,1], principal_components_global[0,1])
+        
         res = np.array(
             (
-                principal_components is None,
-                np.zeros((2,2), np.float32) if principal_components is None else principal_components, 
-                np.zeros((1,2), np.float32) if centroid_coords is None else centroid_coords / self.tracking_param.resize,
-                np.zeros((1,2), np.float32) if centroid_ori is None else transform2d(transformation_matrix, centroid_ori),
-                0.0 if angle_rad is None else angle_rad, 
+                principal_components, 
+                principal_components_global,
+                centroid_resized,
+                centroid_cropped,
+                centroid_input,
+                centroid_global,
+                angle_rad,
+                angle_rad_global,
                 mask, 
                 preproc.image_processed,
                 preproc.image_crop

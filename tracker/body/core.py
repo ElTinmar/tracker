@@ -38,22 +38,20 @@ class BodyTrackerParamTracking(ParamTracking):
     
     def dtype(self) -> np.dtype:
         dt = np.dtype([
-            ('empty', bool),
-            ('heading', np.float32, (2,2)),
-            ('centroid', np.float32, (2,)),
-            ('centroid_original_space', np.float32, (2,)),
-            ('origin', np.float32, (2,)),
+            ('principal_components', np.float32, (2,2)),
+            ('principal_components_global', np.float32, (2,2)),
+            ('centroid_resized', np.float32, (2,)),
+            ('centroid_cropped', np.float32, (2,)),
+            ('centroid_input', np.float32, (2,)),
+            ('centroid_resized', np.float32, (2,)),
+            ('centroid_global', np.float32, (2,)),
             ('angle_rad', np.float32),
+            ('angle_rad_global', np.float32),
             ('mask', np.bool_, self.resized_dimension_px[::-1]),
             ('image', np.float32, self.resized_dimension_px[::-1]),
             ('image_fullres', np.float32, self.crop_dimension_px[::-1]),
         ])
         return dt
-
-body_coordinates = np.dtype([
-    ('heading', np.float32, (2,2)),
-    ('centroid', np.float32, (2,)),
-])
 
 @dataclass
 class BodyTrackerParamOverlay:
