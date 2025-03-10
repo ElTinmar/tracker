@@ -172,7 +172,7 @@ try:
 
         # display tracking
         if DISPLAY:
-            oly = overlay.overlay(tracking['animals']['image_fullres'], tracking)
+            oly = overlay.overlay(tracking['animals']['image_downsampled'], tracking)
             r = cv2.resize(oly,(512, 512))
             cv2.imshow('overlay',r)
             cv2.waitKey(1)
