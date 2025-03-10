@@ -43,7 +43,6 @@ class BodyTrackerParamTracking(ParamTracking):
             ('centroid_resized', np.float32, (2,)),
             ('centroid_cropped', np.float32, (2,)),
             ('centroid_input', np.float32, (2,)),
-            ('centroid_resized', np.float32, (2,)),
             ('centroid_global', np.float32, (2,)),
             ('angle_rad', np.float32),
             ('angle_rad_global', np.float32),
