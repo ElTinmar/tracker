@@ -13,20 +13,22 @@ class EyesTracker_CPU(EyesTracker):
             image: NDArray, 
             centroid: Optional[NDArray], 
             transformation_matrix: Optional[NDArray] = Affine2DTransform.identity()
-        ) -> Optional[NDArray]:
+        ) -> NDArray:
         """
         output coordinates: 
             - (0,0) = fish centroid
             - scale of the full-resolution image, before resizing
         """
 
+        failed = np.zeros((1,), dtype=self.tracking_param.dtype)
+
         if (image is None) or (image.size == 0) or (centroid is None):
-            return None
+            return failed
         
         preproc = preprocess_image(image, centroid, self.tracking_param)
         
         if preproc is None:
-            return None
+            return failed
         
         # sweep threshold to obtain 3 connected component within size range (include swim bladder)
         found_eyes_and_sb, props, mask = find_eyes_and_swimbladder(
@@ -39,7 +41,7 @@ class EyesTracker_CPU(EyesTracker):
         )
 
         if not found_eyes_and_sb:
-            return None 
+            return failed 
         
         # identify left eye, right eye and swimbladder
         blob_centroids = np.array([blob.centroid[::-1] for blob in props])
@@ -69,7 +71,7 @@ class EyesTracker_CPU(EyesTracker):
                 preproc.image_processed,
                 preproc.image_crop 
             ), 
-            dtype = self.tracking_param.dtype()
+            dtype = self.tracking_param.dtype
         )
 
         return res

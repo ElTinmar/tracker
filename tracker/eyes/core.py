@@ -29,6 +29,7 @@ class EyesTrackerParamTracking(ParamTracking):
     def size_hi_px(self) -> int:
         return self.target_mm2px(self.size_hi_mm)
     
+    @property
     def dtype(self) -> np.dtype:
         dt = np.dtype([
             ('left_eye', DTYPE_EYE),

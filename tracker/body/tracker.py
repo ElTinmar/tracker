@@ -15,7 +15,7 @@ class BodyTracker_CPU(BodyTracker):
             image: Optional[NDArray], 
             centroid: Optional[NDArray] = None, # centroids in global space
             transformation_matrix: Optional[NDArray] = Affine2DTransform.identity()
-        ) -> Optional[NDArray]:
+        ) -> NDArray:
         '''
         centroid: centroid of the fish to track if it's already known.
         Useful when tracking multiple fish to discriminate between nearby blobs
@@ -25,13 +25,15 @@ class BodyTracker_CPU(BodyTracker):
             - scale of the full-resolution image, before resizing
         '''
 
+        failed = np.zeros((1,), dtype=self.tracking_param.dtype)
+
         if (image is None) or (image.size == 0):
-            return None
+            return failed
         
         preproc = preprocess_image(image, centroid, self.tracking_param)
         
         if preproc is None:
-            return None
+            return failed
 
         mask = cv2.compare(preproc.image_processed, self.tracking_param.intensity, cv2.CMP_GT)
         props = bwareafilter_props_cv2(
@@ -45,7 +47,7 @@ class BodyTracker_CPU(BodyTracker):
         )
 
         if not props:
-            return None
+            return failed
         
         centroids_resized = np.array([[blob.centroid[1], blob.centroid[0]] for blob in props]) #(row, col) to (x,y)
         centroids_cropped = transform2d(preproc.resize_transform, centroids_resized)
@@ -62,7 +64,7 @@ class BodyTracker_CPU(BodyTracker):
         coordinates_resized = props[index].coords[::-1]
         principal_components = get_orientation(coordinates_resized)
         if principal_components is None:
-            return None
+            return failed
         
         principal_components_global = transform2d(transformation_matrix, principal_components)
         
@@ -83,6 +85,6 @@ class BodyTracker_CPU(BodyTracker):
                 preproc.image_processed,
                 preproc.image_crop
             ), 
-            dtype=self.tracking_param.dtype()
+            dtype=self.tracking_param.dtype
         )
         return res

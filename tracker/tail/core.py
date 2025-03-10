@@ -19,6 +19,7 @@ class TailTrackerParamTracking(ParamTracking):
     def ball_radius_px(self) -> int:
         return self.target_mm2px(self.ball_radius_mm) 
     
+    @property
     def dtype(self) -> np.dtype:
         dt = np.dtype([
             ('num_pts', int),

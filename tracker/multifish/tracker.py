@@ -67,12 +67,14 @@ class MultiFishTracker_CPU(MultiFishTracker):
         try:
             res = np.array(
                 arr,
-                dtype=self.tracking_param.dtype()
+                dtype=self.tracking_param.dtype
             )
         except ValueError:
             # FIXME shape (0,) cannot be broadcast to (1,)
             # this may happen if you try to get eyes or tail without body
-            return
+            print(len(bodies), len(eyes), len(tails))
+            raise
+            return None
 
         return res 
     

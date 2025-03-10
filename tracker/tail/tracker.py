@@ -20,13 +20,15 @@ class TailTracker_CPU(TailTracker):
             - scale of the full-resolution image, before resizing
         """
 
+        failed = np.zeros((1,), dtype=self.tracking_param.dtype)
+
         if (image is None) or (image.size == 0) or (centroid is None):
-            return None
+            return failed
         
         preproc = preprocess_image(image, centroid, self.tracking_param)
         
         if preproc is None:
-            return None
+            return failed
 
         # track
         skeleton_resized, skeleton_interp_resized = tail_skeleton_ball(
@@ -66,7 +68,7 @@ class TailTracker_CPU(TailTracker):
                 preproc.image_processed,
                 preproc.image_crop
             ), 
-            dtype= self.tracking_param.dtype()
+            dtype= self.tracking_param.dtype
         )
 
         return res

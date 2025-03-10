@@ -36,6 +36,7 @@ class BodyTrackerParamTracking(ParamTracking):
     def max_width_px(self) -> int:
         return self.target_mm2px(self.max_width_mm)
     
+    @property
     def dtype(self) -> np.dtype:
         dt = np.dtype([
             ('principal_components', np.float32, (2,2)),
