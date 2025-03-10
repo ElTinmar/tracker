@@ -25,7 +25,7 @@ class BodyTracker_CPU(BodyTracker):
             - scale of the full-resolution image, before resizing
         '''
 
-        failed = np.zeros((), dtype=self.tracking_param.dtype)
+        failed = np.full((), np.nan, dtype=self.tracking_param.dtype)
 
         if (image is None) or (image.size == 0):
             return failed

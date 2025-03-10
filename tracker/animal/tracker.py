@@ -16,7 +16,7 @@ class AnimalTracker_CPU(AnimalTracker):
         transformation_matrix: Optional[NDArray] = Affine2DTransform.identity()
     ) -> NDArray:
         
-        failed = np.zeros((), dtype=self.tracking_param.dtype)
+        failed = np.full((), np.nan, dtype=self.tracking_param.dtype)
 
         if (image is None) or (image.size == 0):
             return failed
