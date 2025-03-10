@@ -47,8 +47,8 @@ class BodyTrackerParamTracking(ParamTracking):
             ('angle_rad', np.float32),
             ('angle_rad_global', np.float32),
             ('mask', np.bool_, self.resized_dimension_px[::-1]),
-            ('image', np.float32, self.resized_dimension_px[::-1]),
-            ('image_fullres', np.float32, self.crop_dimension_px[::-1]),
+            ('image_processed', np.float32, self.resized_dimension_px[::-1]),
+            ('image_crop', np.float32, self.crop_dimension_px[::-1]),
         ])
         return dt
 
