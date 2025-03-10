@@ -4,10 +4,13 @@ from tracker.core import Tracker, TrackingOverlay, ParamTracking
 
 DTYPE_EYE = np.dtype([
     ('direction', np.single, (2,)),
+    ('direction_global', np.single, (2,)),
     ('angle', np.single),
-    ('centroid', np.single, (2,)),
-    ('centroid_original_space', np.single, (2,)),
-    ('direction_original_space', np.single, (2,))
+    ('angle_global', np.single),
+    ('centroid_resized', np.single, (2,)),
+    ('centroid_cropped', np.single, (2,)),
+    ('centroid_input', np.single, (2,)),
+    ('centroid_global', np.single, (2,))
 ])
 
 @dataclass

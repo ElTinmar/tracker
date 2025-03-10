@@ -2,8 +2,8 @@ import numpy as np
 from numpy.typing import NDArray
 from typing import Optional
 from .core import EyesTracker, DTYPE_EYE
-from .utils import get_eye_prop_cv2, find_eyes_and_swimbladder, assign_features
-from geometry import Affine2DTransform
+from .utils import get_eye_properties, find_eyes_and_swimbladder, assign_features
+from geometry import transform2d, Affine2DTransform, angle_between_vectors
 from tracker.prepare_image import preprocess_image
 
 class EyesTracker_CPU(EyesTracker):
@@ -40,42 +40,29 @@ class EyesTracker_CPU(EyesTracker):
 
         if not found_eyes_and_sb:
             return None 
-
-        left_eye = None
-        right_eye = None
-        heading_vector = None
         
         # identify left eye, right eye and swimbladder
         blob_centroids = np.array([blob.centroid[::-1] for blob in props])
-        sb_idx, left_idx, right_idx = assign_features(blob_centroids)
-        centroid_left = np.asarray(props[left_idx].centroid[::-1], dtype=np.float32)
-        centroid_right = np.asarray(props[right_idx].centroid[::-1], dtype=np.float32)
-        centroid_sb = np.asarray(props[sb_idx].centroid[::-1], dtype=np.float32)
-            
-        # compute eye orientation
-        left_eye = get_eye_prop_cv2(
-            centroid_left, 
-            props[left_idx].principal_axis, 
-            origin*self.tracking_param.resize,
-            self.tracking_param.resize,
-            transformation_matrix
-        )
-        right_eye = get_eye_prop_cv2(
-            centroid_right, 
-            props[right_idx].principal_axis,
-            origin*self.tracking_param.resize,
-            self.tracking_param.resize,
-            transformation_matrix
+        swimbladder_idx, left_idx, right_idx = assign_features(blob_centroids)
+
+        vertical_axis = np.array([0, 1], dtype=np.single)
+        
+        left_eye = get_eye_properties(
+            props[left_idx], 
+            preproc, 
+            transformation_matrix, 
+            vertical_axis
         )
 
-        heading_vector = (centroid_left + centroid_right)/2 - centroid_sb
-        heading_vector = heading_vector / np.linalg.norm(heading_vector)
-        #heading_vector_original_space = 
+        right_eye = get_eye_properties(
+            props[right_idx], 
+            preproc, 
+            transformation_matrix, 
+            vertical_axis
+        )
 
         res = np.array(
             (
-                centroid,
-                np.zeros((1,2), np.float32) if heading_vector is None else heading_vector,
                 np.zeros(1,dtype=DTYPE_EYE) if left_eye is None else left_eye, 
                 np.zeros(1,dtype=DTYPE_EYE) if right_eye is None else right_eye,                
                 mask, 

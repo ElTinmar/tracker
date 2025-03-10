@@ -1,48 +1,53 @@
 from scipy.spatial.distance import pdist
 import numpy as np
-from numpy.typing import NDArray, ArrayLike
-from typing import Tuple, Optional
+from numpy.typing import NDArray
+from typing import Tuple, Optional, List
 from image_tools import bwareafilter_props_cv2, bwareafilter_cv2
 from geometry import angle_between_vectors
 from .core import DTYPE_EYE
 from geometry import transform2d
 import cv2
+from image_tools import RegionPropsLike
+from tracker.prepare_image import Preprocessing
 
-def get_eye_prop_cv2(
-        centroid: NDArray, 
-        principal_axis: Optional[NDArray], 
-        origin: NDArray, 
-        resize: float,
-        transformation_matrix: NDArray
+def get_eye_properties(
+        prop: RegionPropsLike,
+        preproc: Preprocessing,
+        transformation_matrix: NDArray,
+        reference_vector: NDArray
     ) -> Optional[NDArray]:
 
-    if principal_axis is None:
+    centroid_resized = np.asarray(prop.centroid[::-1], dtype=np.float32)
+    centroid_cropped = transform2d(preproc.resize_transform, centroid_resized)        
+    centroid_input = transform2d(preproc.crop_transform, centroid_cropped)
+    centroid_global = transform2d(transformation_matrix, centroid_input)
+    
+    direction = prop.principal_axis 
+    if direction is None:
         return None
+    
+    angle = angle_between_vectors(direction, reference_vector)
+    direction_global = transform2d(transformation_matrix, direction)
+    angle_global = angle_between_vectors(direction, reference_vector)
 
-    # fish must be vertical head up
-    heading = np.array([0, 1], dtype=np.single)
-
-    eye_angle = angle_between_vectors(principal_axis, heading)
-    eye_centroid = centroid + origin 
-    eye_dir_original_space = transform2d(transformation_matrix, principal_axis)
-    eye_centroid_original_space = transform2d(transformation_matrix, eye_centroid/resize)
     eye =  np.array(
         (
-            principal_axis, 
-            eye_angle, 
-            eye_centroid/resize,
-            eye_dir_original_space,
-            eye_centroid_original_space
+            direction, 
+            direction_global,
+            angle,
+            angle_global,
+            centroid_resized,
+            centroid_cropped,
+            centroid_input,
+            centroid_global,
         ),
         dtype = DTYPE_EYE
     )
     return eye
 
-def assign_features(blob_centroids: ArrayLike) -> Tuple[int, int, int]:
+def assign_features(centroids: NDArray) -> Tuple[int, int, int]:
     """From Duncan, returns indices of swimbladder, left eye and right eye"""
-    
-    centroids = np.asarray(blob_centroids)
-    
+        
     # find swimbladder
     distances = pdist(centroids)
     swimbladder_index = 2 - np.argmin(distances)
@@ -57,9 +62,9 @@ def assign_features(blob_centroids: ArrayLike) -> Tuple[int, int, int]:
     cross_product = np.cross(*eye_vectors)
     if cross_product < 0:
         eye_indices = eye_indices[::-1]
-    left_eye_index, right_eye_index = eye_indices
+    eye_index, right_eye_index = eye_indices
 
-    return swimbladder_index, left_eye_index, right_eye_index
+    return swimbladder_index, eye_index, right_eye_index
 
 def find_eyes_and_swimbladder(
         image: NDArray, 
@@ -68,9 +73,9 @@ def find_eyes_and_swimbladder(
         eye_size_hi_px: float,
         thresh_lo: float = 0,
         thresh_hi: float = 1,
-    ) -> Tuple:
+    ) -> Tuple[bool, List[RegionPropsLike], NDArray]:
     
-    # OPTIM this is slow
+    # TODO this is slow, try to optimize
     thresholds = np.linspace(thresh_lo,thresh_hi,eye_dyntresh_res)
     found_eyes_and_sb = False
     for t in thresholds:
