@@ -13,7 +13,7 @@ class TailTracker_CPU(TailTracker):
             image: NDArray, 
             centroid: Optional[NDArray], 
             transformation_matrix: Optional[NDArray] = Affine2DTransform.identity()
-        ) -> Optional[NDArray]:
+        ) -> NDArray:
         """
         output coordinates: 
             - (0,0) = fish centroid
