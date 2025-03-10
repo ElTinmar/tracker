@@ -5,8 +5,8 @@ import numpy as np
 from skimage.measure._regionprops import RegionProperties
 
 def get_best_centroid_index(
-        centroids: Optional[NDArray], 
-        centroid: List[RegionProperties],
+        centroids: NDArray, 
+        centroid: Optional[NDArray],
     ) -> int:
     
     if centroid is None:
