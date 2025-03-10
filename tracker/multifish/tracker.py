@@ -9,35 +9,35 @@ class MultiFishTracker_CPU(MultiFishTracker):
     def track(self, image: NDArray, centroid: Optional[NDArray] = None) -> Optional[NDArray]:
 
         if (image is None) or (image.size == 0):
-            return 
+            return None
 
         # get animal centroids (only crude location is necessary)
         animals = self.tracking_param.animal.track(image)
 
-        if (animals is None) or (animals['identities'] is None):
-            return
+        if animals is None:
+            return None
         
-        body = []
+        bodies = []
         eyes = []
-        tail = []
+        tails = []
 
         # loop over detected animals to get body, eyes and tail tracking
+        for centroid in animals['centroids_global']:
 
-        for id in animals['identities']:
             if self.tracking_param.body is not None:
 
                 # get more precise centroid and orientation of the animals
-                b = self.tracking_param.body.track(image, centroid=animals['centroids'][id,:])
-                body.append(b)
+                body = self.tracking_param.body.track(image, centroid=centroid)
+                bodies.append(body)
                 
                 # if body was found, track eyes and tail
-                if (b is not None) and (b['centroid'] is not None):
+                if body is not None:
                     
                     # rotate the animal so that it's vertical head up
                     image_rot, centroid_rot = imrotate(
-                        b['image_fullres'], 
-                        b['centroid'][0], b['centroid'][1], 
-                        np.rad2deg(b['angle_rad'])
+                        body['image_crop'], 
+                        body['centroid_cropped'][0], body['centroid_cropped'][1], 
+                        np.rad2deg(body['angle_rad'])
                     )
 
                     # track eyes
@@ -46,7 +46,7 @@ class MultiFishTracker_CPU(MultiFishTracker):
 
                     # track tail
                     if self.tracking_param.tail is not None:
-                        tail.append(self.tracking_param.tail.track(image_rot, centroid=centroid_rot))
+                        tails.append(self.tracking_param.tail.track(image_rot, centroid=centroid_rot))
 
         # compute additional features based on tracking
         if self.tracking_param.accumulator is not None:
@@ -56,13 +56,13 @@ class MultiFishTracker_CPU(MultiFishTracker):
         arr = (animals,)
 
         if self.tracking_param.body is not None:
-            arr += (body,)
+            arr += (bodies,)
 
         if self.tracking_param.eyes is not None:
             arr += (eyes,)
 
         if self.tracking_param.tail is not None:
-            arr += (tail,)
+            arr += (tails,)
 
         try:
             res = np.array(
