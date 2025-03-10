@@ -20,7 +20,7 @@ class TailTracker_CPU(TailTracker):
             - scale of the full-resolution image, before resizing
         """
 
-        failed = np.zeros((1,), dtype=self.tracking_param.dtype)
+        failed = np.zeros((), dtype=self.tracking_param.dtype)
 
         if (image is None) or (image.size == 0) or (centroid is None):
             return failed
