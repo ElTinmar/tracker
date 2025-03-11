@@ -111,10 +111,8 @@ class BodyOverlay_opencv(BodyOverlay):
         )
 
         overlay = cv2.addWeighted(
-            overlay, 
-            self.overlay_param.alpha, 
-            original, 
-            1 - self.overlay_param.alpha, 
+            overlay, self.overlay_param.alpha, 
+            original, 1 - self.overlay_param.alpha, 
             0
         )
         

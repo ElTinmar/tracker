@@ -85,10 +85,8 @@ class AnimalOverlay_opencv(AnimalOverlay):
             )
         
         overlay = cv2.addWeighted(
-            overlay, 
-            self.overlay_param.alpha, 
-            original, 
-            1 - self.overlay_param.alpha, 
+            overlay, self.overlay_param.alpha, 
+            original, 1 - self.overlay_param.alpha, 
             0
         )
 

@@ -1,9 +1,9 @@
 import cv2
 import numpy as np
 from numpy.typing import NDArray
-from typing import Optional
+from typing import Optional, Dict
 from image_tools import im2uint8, im2rgb
-from geometry import to_homogeneous, from_homogeneous, Affine2DTransform
+from geometry import transform2d, Affine2DTransform
 from .core import EyesOverlay
 
 def disp_eye(
@@ -26,7 +26,7 @@ def disp_eye(
 
     # compute transformation
     pts = np.vstack((pt1, pt2, pt3))
-    pts_ = from_homogeneous((transformation_matrix @ to_homogeneous(pts).T).T)
+    pts_ = transform2d(transformation_matrix, pts)
 
     overlay = cv2.line(
         overlay,
@@ -59,40 +59,110 @@ def disp_eye(
     
 class EyesOverlay_opencv(EyesOverlay):
 
-    def overlay(
+    def overlay_global(
             self,
             image: NDArray, 
-            tracking: Optional[NDArray], 
+            tracking: Optional[NDArray],
             transformation_matrix: NDArray = Affine2DTransform.identity()
         ) -> Optional[NDArray]:
+
+        if tracking is None:
+            return None
+        
+        centroid = {
+            'left_eye': tracking['left_eye']['centroid_global'],
+            'right_eye': tracking['right_eye']['centroid_global'],
+        }
+
+        direction = {
+            'left_eye': tracking['left_eye']['direction_global'],
+            'right_eye': tracking['right_eye']['direction_global'],
+        }
+            
+        return self._overlay(
+            centroid = centroid,
+            direction = direction,
+            image = image,
+            transformation_matrix = transformation_matrix
+        )
+    
+    def overlay_cropped(self, tracking: Optional[NDArray]) -> Optional[NDArray]:
+
+        if tracking is None:
+            return None
+
+        centroid = {
+            'left_eye': tracking['left_eye']['centroid_cropped'],
+            'right_eye': tracking['right_eye']['centroid_cropped'],
+        }
+
+        direction = {
+            'left_eye': tracking['left_eye']['direction_cropped'],
+            'right_eye': tracking['right_eye']['direction_cropped'],
+        }
+
+        return self._overlay(
+            centroid = centroid,
+            direction = direction,
+            image = tracking['image_cropped'],
+        )
+
+    def overlay_resized(self, tracking: Optional[NDArray]) -> Optional[NDArray]:
+        
+        if tracking is None:
+            return None
+
+        centroid = {
+            'left_eye': tracking['left_eye']['centroid_resized'],
+            'right_eye': tracking['right_eye']['centroid_resized'],
+        }
+
+        direction = {
+            'left_eye': tracking['left_eye']['direction_resized'],
+            'right_eye': tracking['right_eye']['direction_resized'],
+        }
+
+        return self._overlay(
+            centroid = centroid,
+            direction = direction,
+            image = tracking['image_resized'],
+        )
+    
+    def _overlay(
+            self,
+            image: NDArray, 
+            centroid: Dict[str, NDArray],
+            direction: Dict[str, NDArray],
+            transformation_matrix: NDArray = Affine2DTransform.identity()
+        ) -> NDArray:
 
         '''
         Coordinate system: origin = fish centroid, rotation = fish heading
         '''
 
-        if tracking is not None:
+        overlay = im2rgb(im2uint8(image))
+        original = overlay.copy()        
+        
+        it = zip(
+            ['left_eye', 'right_eye'], 
+            [self.overlay_param.color_left_BGR, self.overlay_param.color_right_BGR]
+        )
 
-            overlay = im2rgb(im2uint8(image))
-            original = overlay.copy()        
-            
-            it = zip(
-                ['left_eye', 'right_eye'], 
-                [self.overlay_param.color_eye_left_BGR, self.overlay_param.color_eye_right_BGR]
+        for eye, col in it:
+            overlay = disp_eye(
+                overlay, 
+                centroid[eye],
+                direction[eye],
+                transformation_matrix,
+                col, 
+                self.overlay_param.eye_len_px, 
+                self.overlay_param.thickness,
+                self.overlay_param.arrow_radius_px
             )
 
-            for eye, col in it:
-                if tracking[eye] is not None and tracking[eye]['direction'] is not None:
-                    overlay = disp_eye(
-                        overlay, 
-                        tracking[eye]['centroid'],
-                        tracking[eye]['direction'],
-                        transformation_matrix,
-                        col, 
-                        self.overlay_param.eye_len_px, 
-                        self.overlay_param.thickness,
-                        self.overlay_param.arrow_radius_px
-                    )
-
-            overlay = cv2.addWeighted(overlay, self.overlay_param.alpha, original, 1 - self.overlay_param.alpha, 0)
-            
-            return overlay
+        overlay = cv2.addWeighted(
+            overlay, self.overlay_param.alpha, 
+            original, 1 - self.overlay_param.alpha, 
+            0)
+        
+        return overlay
