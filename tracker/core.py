@@ -71,15 +71,18 @@ class Tracker(ABC):
 class TrackingOverlay(ABC):
 
     @abstractmethod
-    def overlay(
+    def overlay_global(
             self, 
             image: NDArray, 
             tracking: Optional[NDArray], 
             transformation_matrix: NDArray 
         ) -> Optional[NDArray]:
-        '''
-        image: image on which to overlay tracking results
-        tracking: tracking results as structured array
-        transformation_matrix: 3x3 coordinate transformation matrix from local to image coordinates
-        return image
-        '''
+        pass
+    
+    @abstractmethod
+    def overlay_cropped(self, tracking: Optional[NDArray]) -> Optional[NDArray]:
+        pass
+
+    @abstractmethod
+    def overlay_resized(self, tracking: Optional[NDArray]) -> Optional[NDArray]:
+        pass

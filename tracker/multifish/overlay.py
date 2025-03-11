@@ -30,7 +30,7 @@ class MultiFishOverlay_opencv(MultiFishOverlay):
             overlay = im2rgb(im2uint8(image))
 
             # overlay animal bounding boxes, coord system 1.
-            overlay = self.overlay_param.animal.overlay(overlay, tracking['animals'], T_scale)         
+            overlay = self.overlay_param.animal.overlay_global(overlay, tracking['animals'], T_scale)         
 
             # loop over animals
             for idx, _ in enumerate(tracking['animals']['centroids']):
@@ -45,7 +45,7 @@ class MultiFishOverlay_opencv(MultiFishOverlay):
                     T_bbox_to_image = Affine2DTransform.translation(tx,ty)
                     
                     # overlay body, coord. system 2.
-                    overlay = self.overlay_param.body.overlay(
+                    overlay = self.overlay_param.body.overlay_global(
                         overlay, 
                         tracking['body'][idx], # body coordinates in bbox
                         T_scale @ T_bbox_to_image
@@ -64,7 +64,7 @@ class MultiFishOverlay_opencv(MultiFishOverlay):
                             and ('eyes' in tracking.dtype.fields)
                         ):
 
-                        overlay = self.overlay_param.eyes.overlay(
+                        overlay = self.overlay_param.eyes.overlay_global(
                             overlay, 
                             tracking['eyes'][idx], # egocentric eye coordinates
                             T_egocentric_to_image
@@ -76,7 +76,7 @@ class MultiFishOverlay_opencv(MultiFishOverlay):
                             and ('tail' in tracking.dtype.fields)
                         ):
 
-                        overlay = self.overlay_param.tail.overlay(
+                        overlay = self.overlay_param.tail.overlay_global(
                             overlay, 
                             tracking['tail'][idx], # egocentric tail coordinates 
                             T_egocentric_to_image
