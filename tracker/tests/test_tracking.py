@@ -11,6 +11,7 @@ from tracker import (
 from tqdm import tqdm
 import numpy as np
 import cv2
+from geometry import Affine2DTransform
 
 DISPLAY=True
 
@@ -172,7 +173,12 @@ try:
 
         # display tracking
         if DISPLAY:
-            oly = overlay.overlay_global(tracking['animals']['image_downsampled'], tracking)
+            T_scale = Affine2DTransform.scaling(
+                tracking['animals']['downsample_ratio'],
+                tracking['animals']['downsample_ratio']
+            ) 
+
+            oly = overlay.overlay_global(tracking['animals']['image_downsampled'], tracking, T_scale)
             r = cv2.resize(oly,(512, 512))
             cv2.imshow('global',r)
             cv2.waitKey(1)
