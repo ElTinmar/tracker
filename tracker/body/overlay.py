@@ -1,5 +1,5 @@
 from image_tools import im2rgb, im2uint8
-from geometry import to_homogeneous, from_homogeneous, Affine2DTransform
+from geometry import transform2d, Affine2DTransform
 
 import numpy as np
 from numpy.typing import NDArray
@@ -30,53 +30,92 @@ def draw_arrow(image, src, dst, color, thickness, radius):
 
     return image
 
-
 class BodyOverlay_opencv(BodyOverlay):
 
-    def overlay(
+    def overlay_global(
             self,
             image: NDArray, 
-            tracking: Optional[NDArray], 
+            tracking: Optional[NDArray],
             transformation_matrix: NDArray = Affine2DTransform.identity()
         ) -> Optional[NDArray]:
 
-        '''
-        Coordinate system: origin = fish bounding box top left coordinates
-        '''
-
-        if (tracking is not None) and (tracking['centroid'] is not None):
-
-            overlay = im2rgb(im2uint8(image))
-            original = overlay.copy()        
+        if tracking is None:
+            return None
             
-            src = tracking['centroid']
-            front = self.overlay_param.heading_len_px * tracking['heading'][:,0]
-            right = self.overlay_param.heading_len_px/2 * tracking['heading'][:,1]
-            yy = src + front
-            xx = src + right
+        return self._overlay(
+            centroid = tracking['centroid_global'],
+            body_axes = tracking['body_axes_global'],
+            image = image,
+            transformation_matrix = transformation_matrix
+        )
+    
+    def overlay_cropped(self, tracking: Optional[NDArray]) -> Optional[NDArray]:
 
-            # compute transformation
-            pts = np.vstack((src, xx, yy))
-            pts_ = from_homogeneous((transformation_matrix @ to_homogeneous(pts).T).T)
+        if tracking is None:
+            return None
+        
+        return self._overlay(
+            image = tracking['image_cropped'],
+            centroid = tracking['centroid_cropped'],
+            body_axes = tracking['body_axes'],
+        )
 
-            overlay = draw_arrow(
-                overlay, 
-                pts_[0],
-                pts_[2], 
-                self.overlay_param.heading_color_BGR,
-                self.overlay_param.thickness,
-                self.overlay_param.arrow_radius_px
-            )
+    def overlay_resized(self, tracking: Optional[NDArray]) -> Optional[NDArray]:
+        
+        if tracking is None:
+            return None
 
-            overlay = draw_arrow(
-                overlay, 
-                pts_[0],
-                pts_[1], 
-                self.overlay_param.lateral_color_BGR,
-                self.overlay_param.thickness,
-                self.overlay_param.arrow_radius_px
-            )
-
-            overlay = cv2.addWeighted(overlay, self.overlay_param.alpha, original, 1 - self.overlay_param.alpha, 0)
+        return self._overlay(
+            image = tracking['image_resized'],
+            centroid = tracking['centroid_resized'],
+            body_axes = tracking['body_axes'],
+        )
             
-            return overlay
+    def _overlay(
+            self,
+            image: NDArray, 
+            centroid: NDArray,
+            body_axes: NDArray, 
+            transformation_matrix: NDArray = Affine2DTransform.identity()
+        ) -> Optional[NDArray]:
+
+
+        overlay = im2rgb(im2uint8(image))
+        original = overlay.copy()        
+        
+        front = self.overlay_param.heading_len_px * body_axes[:,0]
+        right = self.overlay_param.heading_len_px/2 * body_axes[:,1]
+        yy = centroid + front
+        xx = centroid + right
+
+        # compute transformation
+        pts = np.vstack((centroid, xx, yy))
+        pts_ = transform2d(transformation_matrix, pts)
+
+        overlay = draw_arrow(
+            overlay, 
+            pts_[0],
+            pts_[2], 
+            self.overlay_param.heading_color_BGR,
+            self.overlay_param.thickness,
+            self.overlay_param.arrow_radius_px
+        )
+
+        overlay = draw_arrow(
+            overlay, 
+            pts_[0],
+            pts_[1], 
+            self.overlay_param.lateral_color_BGR,
+            self.overlay_param.thickness,
+            self.overlay_param.arrow_radius_px
+        )
+
+        overlay = cv2.addWeighted(
+            overlay, 
+            self.overlay_param.alpha, 
+            original, 
+            1 - self.overlay_param.alpha, 
+            0
+        )
+        
+        return overlay

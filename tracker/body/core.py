@@ -39,8 +39,8 @@ class BodyTrackerParamTracking(ParamTracking):
     @property
     def dtype(self) -> np.dtype:
         dt = np.dtype([
-            ('principal_components', np.float32, (2,2)),
-            ('principal_components_global', np.float32, (2,2)),
+            ('body_axes', np.float32, (2,2)),
+            ('body_axes_global', np.float32, (2,2)),
             ('centroid_resized', np.float32, (2,)),
             ('centroid_cropped', np.float32, (2,)),
             ('centroid_input', np.float32, (2,)),

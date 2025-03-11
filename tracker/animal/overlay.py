@@ -18,7 +18,7 @@ class AnimalOverlay_opencv(AnimalOverlay):
         if tracking is None:
             return None
             
-        return self._overlay_centroids(
+        return self._overlay(
             centroids = tracking['centroids_global'],
             image = image,
             transformation_matrix = transformation_matrix
@@ -34,7 +34,7 @@ class AnimalOverlay_opencv(AnimalOverlay):
             tracking['downsample_ratio']
         )
 
-        return self._overlay_centroids(
+        return self._overlay(
             centroids = tracking['centroids_cropped'],
             image = tracking['image_downsampled'],
             transformation_matrix = S
@@ -45,12 +45,12 @@ class AnimalOverlay_opencv(AnimalOverlay):
         if tracking is None:
             return None
         
-        return self._overlay_centroids(
+        return self._overlay(
             centroids = tracking['centroids_resized'],
             image = tracking['image_processed']
         )
 
-    def _overlay_centroids(
+    def _overlay(
             self,
             centroids: NDArray,
             image: NDArray, 
@@ -84,7 +84,13 @@ class AnimalOverlay_opencv(AnimalOverlay):
                 cv2.LINE_AA
             )
         
-        overlay = cv2.addWeighted(overlay, self.overlay_param.alpha, original, 1 - self.overlay_param.alpha, 0)
+        overlay = cv2.addWeighted(
+            overlay, 
+            self.overlay_param.alpha, 
+            original, 
+            1 - self.overlay_param.alpha, 
+            0
+        )
 
         return overlay
     

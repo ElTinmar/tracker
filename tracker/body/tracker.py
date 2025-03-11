@@ -62,19 +62,19 @@ class BodyTracker_CPU(BodyTracker):
         centroid_global = centroids_global[index]
 
         coordinates_resized = props[index].coords[::-1]
-        principal_components = get_orientation(coordinates_resized)
-        if principal_components is None:
+        body_axes = get_orientation(coordinates_resized)
+        if body_axes is None:
             return failed
         
-        principal_components_global = transform2d(transformation_matrix, principal_components)
+        body_axes_global = transform2d(transformation_matrix, body_axes)
         
-        angle_rad = np.arctan2(principal_components[1,1], principal_components[0,1])
-        angle_rad_global = np.arctan2(principal_components_global[1,1], principal_components_global[0,1])
+        angle_rad = np.arctan2(body_axes[1,1], body_axes[0,1])
+        angle_rad_global = np.arctan2(body_axes_global[1,1], body_axes_global[0,1])
         
         res = np.array(
             (
-                principal_components, 
-                principal_components_global,
+                body_axes, 
+                body_axes_global,
                 centroid_resized,
                 centroid_cropped,
                 centroid_input,

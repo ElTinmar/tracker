@@ -32,14 +32,14 @@ def get_orientation(coordinates: NDArray) -> Optional[NDArray]:
     scores = pca.fit_transform(coordinates)
 
     # PCs are organized in rows, transform to columns
-    principal_components = pca.components_.T
+    body_axes = pca.components_.T
 
     # resolve 180 degrees ambiguity in first PC
     if abs(max(scores[:,0])) > abs(min(scores[:,0])):
-        principal_components[:,0] = - principal_components[:,0]
+        body_axes[:,0] = - body_axes[:,0]
 
     # make sure the second axis always points to the same side
-    if np.linalg.det(principal_components) < 0:
-        principal_components[:,1] = - principal_components[:,1]
+    if np.linalg.det(body_axes) < 0:
+        body_axes[:,1] = - body_axes[:,1]
     
-    return principal_components
+    return body_axes
