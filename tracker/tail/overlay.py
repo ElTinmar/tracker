@@ -43,7 +43,7 @@ class TailOverlay_opencv(TailOverlay):
 
         return self._overlay(
             image = tracking['image_processed'],
-            cskeleton = tracking['skeleton_resized'],
+            skeleton = tracking['skeleton_resized'],
             skeleton_interp = tracking['skeleton_interp_resized'],
         )
     
