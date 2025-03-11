@@ -10,7 +10,7 @@ class MultiFishOverlay_opencv(MultiFishOverlay):
     def overlay_cropped(self, tracking: Optional[NDArray]) -> Optional[NDArray]:
         pass
 
-    def overlay_resized(self, tracking: Optional[NDArray]) -> Optional[NDArray]:
+    def overlay_processed(self, tracking: Optional[NDArray]) -> Optional[NDArray]:
         pass
 
     def overlay_global(

@@ -107,7 +107,7 @@ class EyesOverlay_opencv(EyesOverlay):
             image = tracking['image_cropped'],
         )
 
-    def overlay_resized(self, tracking: Optional[NDArray]) -> Optional[NDArray]:
+    def overlay_processed(self, tracking: Optional[NDArray]) -> Optional[NDArray]:
         
         if tracking is None:
             return None

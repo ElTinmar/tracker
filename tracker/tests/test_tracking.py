@@ -187,15 +187,14 @@ try:
             cv2.imshow('tail_cropped', tail_overlay.overlay_cropped(tracking['tail'][fish]))
             cv2.waitKey(1)
 
-            cv2.imshow('body_resized', body_overlay.overlay_resized(tracking['body'][fish]))
+            cv2.imshow('body_resized', body_overlay.overlay_processed(tracking['body'][fish]))
             cv2.waitKey(1)
 
-            cv2.imshow('eyes_resized', eyes_overlay.overlay_resized(tracking['eyes'][fish]))
+            cv2.imshow('eyes_resized', eyes_overlay.overlay_processed(tracking['eyes'][fish]))
             cv2.waitKey(1)
             
-            cv2.imshow('tail_resized', tail_overlay.overlay_resized(tracking['tail'][fish]))
+            cv2.imshow('tail_resized', tail_overlay.overlay_processed(tracking['tail'][fish]))
             cv2.waitKey(1)
-
 
 finally:
     video_reader.close()

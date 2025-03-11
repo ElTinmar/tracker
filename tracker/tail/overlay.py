@@ -36,7 +36,7 @@ class TailOverlay_opencv(TailOverlay):
             skeleton_interp = tracking['skeleton_interp_cropped'],
         )
 
-    def overlay_resized(self, tracking: Optional[NDArray]) -> Optional[NDArray]:
+    def overlay_processed(self, tracking: Optional[NDArray]) -> Optional[NDArray]:
         
         if tracking is None:
             return None
