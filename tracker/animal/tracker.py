@@ -11,9 +11,9 @@ class AnimalTracker_CPU(AnimalTracker):
     
     def track(
         self,
-        image: Optional[NDArray], 
+        image: Optional[NDArray], # image in input space
         centroid: Optional[NDArray] = None, # centroid in global space
-        transformation_matrix: Optional[NDArray] = Affine2DTransform.identity()
+        transformation_matrix: Optional[NDArray] = Affine2DTransform.identity() # input to global space transform
     ) -> NDArray:
         
         failed = np.zeros((), dtype=self.tracking_param.dtype)
@@ -53,11 +53,18 @@ class AnimalTracker_CPU(AnimalTracker):
         centroids_resized = transform_point_2d(np.linalg.inv(preproc.resize_transform), centroids_cropped)
 
         # Downsample image export (a bit easier on RAM). This is used for overlay instead of image_cropped
+        # NOTE: it introduces a special case, not a big fan of this
         image_downsampled = cv2.resize(
             preproc.image_cropped,
             self.tracking_param.downsampled_shape[::-1], # transform shape (row, col) to width, height
             cv2.INTER_NEAREST
         )
+
+        pix_per_mm_global = self.tracking_param.pix_per_mm
+        pix_per_mm_input = 0
+        pix_per_mm_cropped = 0 
+        pix_per_mm_resized = 0
+        pix_per_mm_downsampled = 0
 
         res = np.array(
             (
@@ -69,7 +76,12 @@ class AnimalTracker_CPU(AnimalTracker):
                 self.tracking_param.downsample_fullres,
                 mask, 
                 preproc.image_processed,
-                image_downsampled
+                image_downsampled,
+                pix_per_mm_global,
+                pix_per_mm_input,
+                pix_per_mm_cropped,
+                pix_per_mm_resized,
+                pix_per_mm_downsampled
             ),
             dtype=self.tracking_param.dtype
         )
