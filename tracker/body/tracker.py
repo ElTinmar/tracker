@@ -83,7 +83,7 @@ class BodyTracker_CPU(BodyTracker):
                 angle_rad_global,
                 mask, 
                 preproc.image_processed,
-                preproc.image_crop
+                preproc.image_cropped
             ), 
             dtype=self.tracking_param.dtype
         )

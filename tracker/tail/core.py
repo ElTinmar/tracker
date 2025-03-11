@@ -34,7 +34,7 @@ class TailTrackerParamTracking(ParamTracking):
             ('skeleton_interp_input',  np.float32, (self.n_pts_interp,2)),
             ('skeleton_interp_global',  np.float32, (self.n_pts_interp,2)),
             ('image_processed',  np.float32, self.resized_dimension_px[::-1]),
-            ('image_crop',  np.float32, self.crop_dimension_px[::-1])
+            ('image_cropped',  np.float32, self.crop_dimension_px[::-1])
         ])
         return dt
 

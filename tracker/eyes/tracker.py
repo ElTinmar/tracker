@@ -69,7 +69,7 @@ class EyesTracker_CPU(EyesTracker):
                 np.zeros(1,dtype=DTYPE_EYE) if right_eye is None else right_eye,                
                 mask, 
                 preproc.image_processed,
-                preproc.image_crop 
+                preproc.image_cropped 
             ), 
             dtype = self.tracking_param.dtype
         )

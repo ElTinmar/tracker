@@ -66,7 +66,7 @@ class TailTracker_CPU(TailTracker):
                 skeleton_interp_input,
                 skeleton_interp_global,
                 preproc.image_processed,
-                preproc.image_crop
+                preproc.image_cropped
             ), 
             dtype= self.tracking_param.dtype
         )

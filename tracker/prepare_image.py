@@ -46,11 +46,11 @@ def crop(
         return None
     
     if image.ndim == 2: 
-        image_crop = np.zeros((h, w), dtype=image.dtype)
+        image_cropped = np.zeros((h, w), dtype=image.dtype)
     else: 
-        image_crop = np.zeros((h, w, image.shape[-1]), dtype=image.dtype)
+        image_cropped = np.zeros((h, w, image.shape[-1]), dtype=image.dtype)
 
-    image_crop[pad_bottom:h-pad_top, pad_left:w-pad_right] = image[
+    image_cropped[pad_bottom:h-pad_top, pad_left:w-pad_right] = image[
         bottom+pad_bottom:top-pad_top, 
         left+pad_left:right-pad_right
     ]
@@ -58,7 +58,7 @@ def crop(
     # cropped space to input space
     crop_transform = Affine2DTransform.translation(left, bottom)
 
-    return image_crop, crop_transform
+    return image_cropped, crop_transform
 
 def resize(
         image: NDArray,
@@ -92,7 +92,7 @@ def resize(
     return image_resized, resize_transform
 
 class Preprocessing(NamedTuple):
-    image_crop: NDArray
+    image_cropped: NDArray
     image_resized: NDArray
     image_processed: NDArray
     crop_transform: NDArray
@@ -114,11 +114,11 @@ def preprocess_image(
     if cropping is None:
         return None
 
-    image_crop, crop_transform = cropping
+    image_cropped, crop_transform = cropping
 
     # resize ---------------------
     image_resized, resize_transform = resize(
-        image = image_crop,
+        image = image_cropped,
         target_dimension_px = params.resized_dimension_px, 
     )
 
@@ -132,7 +132,7 @@ def preprocess_image(
     )
 
     return Preprocessing(
-        image_crop, 
+        image_cropped, 
         image_resized, 
         image_processed,
         crop_transform,
