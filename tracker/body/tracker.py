@@ -61,7 +61,7 @@ class BodyTracker_CPU(BodyTracker):
         centroid_input = centroids_input[index]
         centroid_global = centroids_global[index]
 
-        coordinates_resized = props[index].coords[::-1]
+        coordinates_resized = np.fliplr(props[index].coords)
         body_axes = get_orientation(coordinates_resized)
         if body_axes is None:
             return failed
