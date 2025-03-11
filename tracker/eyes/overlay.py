@@ -97,8 +97,8 @@ class EyesOverlay_opencv(EyesOverlay):
         }
 
         direction = {
-            'left_eye': tracking['left_eye']['direction_cropped'],
-            'right_eye': tracking['right_eye']['direction_cropped'],
+            'left_eye': tracking['left_eye']['direction'],
+            'right_eye': tracking['right_eye']['direction'],
         }
 
         return self._overlay(
@@ -118,8 +118,8 @@ class EyesOverlay_opencv(EyesOverlay):
         }
 
         direction = {
-            'left_eye': tracking['left_eye']['direction_resized'],
-            'right_eye': tracking['right_eye']['direction_resized'],
+            'left_eye': tracking['left_eye']['direction'],
+            'right_eye': tracking['right_eye']['direction'],
         }
 
         return self._overlay(
