@@ -36,19 +36,18 @@ class MultiFishTracker_CPU(MultiFishTracker):
                     np.rad2deg(body['angle_rad'])
                 )
 
-                # TODO fix this 
                 R = Affine2DTransform.rotation(body['angle_rad'])
-                tx, ty = centroid - body['centroid_cropped'] + centroid_rot 
-                T = Affine2DTransform.translation(tx, ty)
+                T = Affine2DTransform.translation(centroid[0], centroid[1])
+                T0 = Affine2DTransform.translation(-centroid_rot[0], -centroid_rot[1])
             
                 # track eyes
                 if self.tracking_param.eyes is not None:
-                    T_eyes = R @ T
+                    T_eyes = T @ R @ T0
                     eyes.append(self.tracking_param.eyes.track(image_rot, centroid_rot, T_eyes))
 
                 # track tail
                 if self.tracking_param.tail is not None:
-                    T_tail = R @ T
+                    T_tail = T @ R @ T0
                     tails.append(self.tracking_param.tail.track(image_rot, centroid_rot, T_tail))
 
         # compute additional features based on tracking
