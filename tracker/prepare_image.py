@@ -108,6 +108,7 @@ def preprocess_image(
     cropping = crop(
         image = image,
         crop_dimension_px = params.crop_dimension_px,
+        vertical_offset_px = params.crop_offset_y_px,
         centroid = centroid
     )
     
