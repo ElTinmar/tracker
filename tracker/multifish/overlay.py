@@ -7,7 +7,13 @@ from .core import MultiFishOverlay
 
 class MultiFishOverlay_opencv(MultiFishOverlay):
 
-    def overlay(
+    def overlay_cropped(self, tracking: Optional[NDArray]) -> Optional[NDArray]:
+        pass
+
+    def overlay_resized(self, tracking: Optional[NDArray]) -> Optional[NDArray]:
+        pass
+
+    def overlay_global(
             self, 
             image: NDArray, 
             tracking: Optional[NDArray], 
@@ -33,7 +39,7 @@ class MultiFishOverlay_opencv(MultiFishOverlay):
             overlay = self.overlay_param.animal.overlay_global(overlay, tracking['animals'], T_scale)         
 
             # loop over animals
-            for idx, _ in enumerate(tracking['animals']['centroids']):
+            for idx, _ in enumerate(tracking['animals']['centroids_global']):
 
                 if (
                         (self.overlay_param.body is not None) 
@@ -41,7 +47,7 @@ class MultiFishOverlay_opencv(MultiFishOverlay):
                     ):
 
                     # transformation matrix from coord system 1. to coord system 2., just a translation  
-                    tx, ty = tracking['animals']['centroids'][idx,:] - np.asarray(tracking['body'][idx]['image_fullres'].shape[::-1])//2 # dirty fix?
+                    tx, ty = tracking['animals']['centroids_global'][idx,:] - np.asarray(tracking['body'][idx]['image_cropped'].shape[::-1])//2 # dirty fix?
                     T_bbox_to_image = Affine2DTransform.translation(tx,ty)
                     
                     # overlay body, coord. system 2.
@@ -54,7 +60,7 @@ class MultiFishOverlay_opencv(MultiFishOverlay):
                     # transformation matrix from coord system 1. to coord system 3., rotation + translation
                     angle = tracking['body'][idx]['angle_rad']
                     rotation = Affine2DTransform.rotation(angle)
-                    tx, ty = tracking['body'][idx]['centroid']
+                    tx, ty = tracking['body'][idx]['centroid_resized']
                     T_fish_centroid_to_bbox = Affine2DTransform.translation(tx, ty)
                     T_egocentric_to_image = T_scale @ T_bbox_to_image @ T_fish_centroid_to_bbox @ rotation 
                     

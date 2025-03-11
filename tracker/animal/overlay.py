@@ -64,7 +64,7 @@ class AnimalOverlay_opencv(AnimalOverlay):
         for idx, centroid in enumerate(centroids):
 
             # draw centroid
-            x,y = transform2d(transformation_matrix, centroid)
+            x,y = transform2d(transformation_matrix, centroid).ravel()
             
             overlay = cv2.circle(
                 overlay,

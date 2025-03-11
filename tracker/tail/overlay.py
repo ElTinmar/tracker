@@ -19,8 +19,8 @@ class TailOverlay_opencv(TailOverlay):
             return None
             
         return self._overlay(
-            skeleton = tracking['skeleton'],
-            skeleton_interp = tracking['skeleton_interp'],
+            skeleton = tracking['skeleton_global'],
+            skeleton_interp = tracking['skeleton_interp_global'],
             image = image,
             transformation_matrix = transformation_matrix
         )

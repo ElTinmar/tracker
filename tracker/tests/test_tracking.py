@@ -172,12 +172,12 @@ try:
 
         # display tracking
         if DISPLAY:
-            oly = overlay.overlay(tracking['animals']['image_downsampled'], tracking)
+            oly = overlay.overlay_global(tracking['animals']['image_downsampled'], tracking)
             r = cv2.resize(oly,(512, 512))
             cv2.imshow('overlay',r)
             cv2.waitKey(1)
 
-        break
+        #break
 finally:
     video_reader.close()
     cv2.destroyAllWindows()
