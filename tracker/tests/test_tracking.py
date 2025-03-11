@@ -174,10 +174,21 @@ try:
         if DISPLAY:
             oly = overlay.overlay_global(tracking['animals']['image_downsampled'], tracking)
             r = cv2.resize(oly,(512, 512))
-            cv2.imshow('overlay',r)
+            cv2.imshow('global',r)
             cv2.waitKey(1)
 
-        #break
+            if VIDEO_NUM == 0:
+                fish = 4
+
+                cv2.imshow('body', body_overlay.overlay_cropped(tracking['body'][fish]))
+                cv2.waitKey(1)
+
+                cv2.imshow('eyes', eyes_overlay.overlay_cropped(tracking['eyes'][fish]))
+                cv2.waitKey(1)
+                
+                cv2.imshow('tail', tail_overlay.overlay_cropped(tracking['tail'][fish]))
+                cv2.waitKey(1)
+
 finally:
     video_reader.close()
     cv2.destroyAllWindows()
