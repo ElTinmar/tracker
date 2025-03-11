@@ -5,7 +5,7 @@ import cv2
 from typing import Optional
 from .core import AnimalTracker
 from tracker.prepare_image import preprocess_image
-from geometry import transform2d, Affine2DTransform
+from geometry import transform_point_2d, Affine2DTransform
 
 class AnimalTracker_CPU(AnimalTracker):
     
@@ -41,16 +41,16 @@ class AnimalTracker_CPU(AnimalTracker):
             return failed
 
         # transform coordinates
-        centroids_cropped = transform2d(preproc.resize_transform, centroids_resized)
-        centroids_input = transform2d(preproc.crop_transform, centroids_cropped)
-        centroids_global = transform2d(transformation_matrix, centroids_input)
+        centroids_cropped = transform_point_2d(preproc.resize_transform, centroids_resized)
+        centroids_input = transform_point_2d(preproc.crop_transform, centroids_cropped)
+        centroids_global = transform_point_2d(transformation_matrix, centroids_input)
 
         # identity assignment in global space
         centroids_global = self.assignment.update(centroids_global)  
 
-        centroids_input = transform2d(np.linalg.inv(transformation_matrix), centroids_global)
-        centroids_cropped = transform2d(np.linalg.inv(preproc.crop_transform), centroids_input)
-        centroids_resized = transform2d(np.linalg.inv(preproc.resize_transform), centroids_cropped)
+        centroids_input = transform_point_2d(np.linalg.inv(transformation_matrix), centroids_global)
+        centroids_cropped = transform_point_2d(np.linalg.inv(preproc.crop_transform), centroids_input)
+        centroids_resized = transform_point_2d(np.linalg.inv(preproc.resize_transform), centroids_cropped)
 
         # Downsample image export (a bit easier on RAM). This is used for overlay instead of image_cropped
         image_downsampled = cv2.resize(

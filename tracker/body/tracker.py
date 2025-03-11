@@ -5,7 +5,7 @@ from typing import Optional
 from .core import BodyTracker
 from .utils import get_orientation, get_best_centroid_index
 from tracker.prepare_image import preprocess_image
-from geometry import transform2d, Affine2DTransform
+from geometry import transform_point_2d, transform_vector_2d, Affine2DTransform
 import cv2
 
 class BodyTracker_CPU(BodyTracker):
@@ -50,9 +50,9 @@ class BodyTracker_CPU(BodyTracker):
             return failed
         
         centroids_resized = np.array([[blob.centroid[1], blob.centroid[0]] for blob in props]) #(row, col) to (x,y)
-        centroids_cropped = transform2d(preproc.resize_transform, centroids_resized)
-        centroids_input = transform2d(preproc.crop_transform, centroids_cropped)
-        centroids_global = transform2d(transformation_matrix, centroids_input)
+        centroids_cropped = transform_point_2d(preproc.resize_transform, centroids_resized)
+        centroids_input = transform_point_2d(preproc.crop_transform, centroids_cropped)
+        centroids_global = transform_point_2d(transformation_matrix, centroids_input)
 
         # get coordinates of best centroid
         index = get_best_centroid_index(centroids_global, centroid)
@@ -66,7 +66,7 @@ class BodyTracker_CPU(BodyTracker):
         if body_axes is None:
             return failed
         
-        body_axes_global = transform2d(transformation_matrix, body_axes)
+        body_axes_global = transform_vector_2d(transformation_matrix, body_axes) 
         
         angle_rad = np.arctan2(body_axes[1,1], body_axes[0,1])
         angle_rad_global = np.arctan2(body_axes_global[1,1], body_axes_global[0,1])

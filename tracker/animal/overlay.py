@@ -1,5 +1,5 @@
 from image_tools import im2uint8, im2rgb
-from geometry import transform2d, Affine2DTransform
+from geometry import transform_point_2d, Affine2DTransform
 import numpy as np
 from numpy.typing import NDArray
 import cv2
@@ -64,7 +64,7 @@ class AnimalOverlay_opencv(AnimalOverlay):
         for idx, centroid in enumerate(centroids):
 
             # draw centroid
-            x,y = transform2d(transformation_matrix, centroid).ravel()
+            x,y = transform_point_2d(transformation_matrix, centroid).ravel()
             
             overlay = cv2.circle(
                 overlay,

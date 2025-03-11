@@ -1,5 +1,5 @@
 from image_tools import im2rgb, im2uint8
-from geometry import transform2d, Affine2DTransform
+from geometry import transform_point_2d, Affine2DTransform
 
 import numpy as np
 from numpy.typing import NDArray
@@ -90,7 +90,7 @@ class BodyOverlay_opencv(BodyOverlay):
 
         # compute transformation
         pts = np.vstack((centroid, xx, yy))
-        pts_ = transform2d(transformation_matrix, pts)
+        pts_ = transform_point_2d(transformation_matrix, pts)
 
         overlay = draw_arrow(
             overlay, 

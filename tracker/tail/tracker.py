@@ -4,7 +4,7 @@ from typing import Optional
 from .core import TailTracker
 from .utils import tail_skeleton_ball
 from tracker.prepare_image import preprocess_image
-from geometry import transform2d, Affine2DTransform
+from geometry import transform_point_2d, Affine2DTransform
 
 class TailTracker_CPU(TailTracker):
 
@@ -43,13 +43,13 @@ class TailTracker_CPU(TailTracker):
         )
 
         # transform coordinates
-        skeleton_cropped = transform2d(preproc.resize_transform, skeleton_resized)
-        skeleton_input = transform2d(preproc.crop_transform, skeleton_cropped)
-        skeleton_global = transform2d(transformation_matrix, skeleton_input)
+        skeleton_cropped = transform_point_2d(preproc.resize_transform, skeleton_resized)
+        skeleton_input = transform_point_2d(preproc.crop_transform, skeleton_cropped)
+        skeleton_global = transform_point_2d(transformation_matrix, skeleton_input)
 
-        skeleton_interp_cropped = transform2d(preproc.resize_transform, skeleton_interp_resized)
-        skeleton_interp_input = transform2d(preproc.crop_transform, skeleton_interp_cropped)
-        skeleton_interp_global = transform2d(transformation_matrix, skeleton_interp_input)
+        skeleton_interp_cropped = transform_point_2d(preproc.resize_transform, skeleton_interp_resized)
+        skeleton_interp_input = transform_point_2d(preproc.crop_transform, skeleton_interp_cropped)
+        skeleton_interp_global = transform_point_2d(transformation_matrix, skeleton_interp_input)
 
         # save result to numpy structured array
         res = np.array(

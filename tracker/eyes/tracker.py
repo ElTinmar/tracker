@@ -3,7 +3,7 @@ from numpy.typing import NDArray
 from typing import Optional
 from .core import EyesTracker, DTYPE_EYE
 from .utils import get_eye_properties, find_eyes_and_swimbladder, assign_features
-from geometry import transform2d, Affine2DTransform, angle_between_vectors
+from geometry import transform_point_2d, Affine2DTransform, angle_between_vectors
 from tracker.prepare_image import preprocess_image
 
 class EyesTracker_CPU(EyesTracker):
