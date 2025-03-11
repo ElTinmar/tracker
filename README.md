@@ -14,8 +14,9 @@ and associated qt widgets to set parameters
 pip install git+https://github.com/ElTinmar/tracker.git@main
 ```
 
-# troubleshooting
+# coordinate system
 
-There seems to be a problem with the version of Glib used by rapids and distributed on ubuntu
-such that compiling opencv and using it with rapids is hard to pull off without 
-triggering all kinds of errors
+- global space: global coordinate system
+- input space: coordinate space of image given to tracker
+- cropped space: tracker crops to this space (translation)
+- resized space: tracker resizes to this space before tracking
