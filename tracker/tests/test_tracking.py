@@ -22,7 +22,7 @@ VIDEOS = [
     ('toy_data/single_headembedded_544x380px_param_nobckg.avi', 100)
 ]
 # background subtracted video
-VIDEO_NUM = 0
+VIDEO_NUM = 1
 INPUT_VIDEO, PIX_PER_MM = VIDEOS[VIDEO_NUM]
 
 video_reader = InMemory_OpenCV_VideoReader()
@@ -176,18 +176,16 @@ try:
             r = cv2.resize(oly,(512, 512))
             cv2.imshow('global',r)
             cv2.waitKey(1)
+            
+            fish = 0
+            cv2.imshow('body', body_overlay.overlay_cropped(tracking['body'][fish]))
+            cv2.waitKey(1)
 
-            if VIDEO_NUM == 0:
-                fish = 4
-
-                cv2.imshow('body', body_overlay.overlay_cropped(tracking['body'][fish]))
-                cv2.waitKey(1)
-
-                cv2.imshow('eyes', eyes_overlay.overlay_cropped(tracking['eyes'][fish]))
-                cv2.waitKey(1)
-                
-                cv2.imshow('tail', tail_overlay.overlay_cropped(tracking['tail'][fish]))
-                cv2.waitKey(1)
+            cv2.imshow('eyes', eyes_overlay.overlay_cropped(tracking['eyes'][fish]))
+            cv2.waitKey(1)
+            
+            cv2.imshow('tail', tail_overlay.overlay_cropped(tracking['tail'][fish]))
+            cv2.waitKey(1)
 
 finally:
     video_reader.close()
