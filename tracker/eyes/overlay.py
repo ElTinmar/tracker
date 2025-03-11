@@ -125,7 +125,7 @@ class EyesOverlay_opencv(EyesOverlay):
         return self._overlay(
             centroid = centroid,
             direction = direction,
-            image = tracking['image_resized'],
+            image = tracking['image_processed'],
         )
     
     def _overlay(

@@ -66,7 +66,7 @@ class BodyOverlay_opencv(BodyOverlay):
             return None
 
         return self._overlay(
-            image = tracking['image_resized'],
+            image = tracking['image_processed'],
             centroid = tracking['centroid_resized'],
             body_axes = tracking['body_axes'],
         )
