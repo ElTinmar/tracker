@@ -3,6 +3,7 @@ from typing import Optional
 from numpy.typing import NDArray
 from image_tools import imrotate
 from .core import MultiFishTracker
+from geometry import Affine2DTransform
 
 class MultiFishTracker_CPU(MultiFishTracker):
 
@@ -24,7 +25,8 @@ class MultiFishTracker_CPU(MultiFishTracker):
             if self.tracking_param.body is not None:
 
                 # get more precise centroid and orientation of the animals
-                body = self.tracking_param.body.track(image, centroid=centroid)
+                T_body = Affine2DTransform.identity()
+                body = self.tracking_param.body.track(image, centroid, T_body)
                 bodies.append(body)
                     
                 # rotate the animal so that it's vertical head up
@@ -33,14 +35,19 @@ class MultiFishTracker_CPU(MultiFishTracker):
                     body['centroid_cropped'][0], body['centroid_cropped'][1], 
                     np.rad2deg(body['angle_rad'])
                 )
-
+                R = Affine2DTransform.rotation(body['angle_rad'])
+                tx, ty = body['centroid_cropped'] - centroid 
+                T = Affine2DTransform.translation(tx, ty)
+            
                 # track eyes
                 if self.tracking_param.eyes is not None:
-                    eyes.append(self.tracking_param.eyes.track(image_rot, centroid=centroid_rot))
+                    T_eyes = T @ R
+                    eyes.append(self.tracking_param.eyes.track(image_rot, centroid_rot, T_eyes))
 
                 # track tail
                 if self.tracking_param.tail is not None:
-                    tails.append(self.tracking_param.tail.track(image_rot, centroid=centroid_rot))
+                    T_tail = T @ R
+                    tails.append(self.tracking_param.tail.track(image_rot, centroid_rot, T_tail))
 
         # compute additional features based on tracking
         if self.tracking_param.accumulator is not None:
