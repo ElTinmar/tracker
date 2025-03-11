@@ -5,8 +5,8 @@ from typing import Optional, Tuple
 
 @dataclass
 class ParamTracking:
-    pix_per_mm: float
-    target_pix_per_mm: float
+    pix_per_mm: float # actual resolution in global space
+    target_pix_per_mm: float # desired resolution for tracker
     crop_dimension_mm: Tuple[float, float]
     crop_offset_y_mm: float
     gamma: float
