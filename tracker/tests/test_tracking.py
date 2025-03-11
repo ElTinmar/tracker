@@ -111,7 +111,7 @@ eyes_tracker = EyesTracker_CPU(
         blur_sz_mm=0.1,
         median_filter_sz_mm=0,
         crop_dimension_mm=(1,1.5),
-        crop_offset_y_mm=0
+        crop_offset_y_mm=-0.5
     )
 )
 tail_tracker = TailTracker_CPU(
@@ -129,7 +129,7 @@ tail_tracker = TailTracker_CPU(
         contrast=3.0,
         gamma=0.75,
         crop_dimension_mm=(3.5,3.5),
-        crop_offset_y_mm=0
+        crop_offset_y_mm=3.5
     )
 )
 
