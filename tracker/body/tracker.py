@@ -14,7 +14,7 @@ class BodyTracker_CPU(BodyTracker):
             self,
             image: Optional[NDArray], 
             centroid: Optional[NDArray] = None, # centroids in global space
-            transformation_matrix: Optional[NDArray] = Affine2DTransform.identity()
+            T_input_to_global: Optional[NDArray] = Affine2DTransform.identity()
         ) -> NDArray:
         '''
         centroid: centroid of the fish to track if it's already known.
@@ -50,9 +50,9 @@ class BodyTracker_CPU(BodyTracker):
             return failed
         
         centroids_resized = np.array([[blob.centroid[1], blob.centroid[0]] for blob in props]) #(row, col) to (x,y)
-        centroids_cropped = transform_point_2d(preproc.resize_transform, centroids_resized)
-        centroids_input = transform_point_2d(preproc.crop_transform, centroids_cropped)
-        centroids_global = transform_point_2d(transformation_matrix, centroids_input)
+        centroids_cropped = transform_point_2d(preproc.T_resized_to_crop, centroids_resized)
+        centroids_input = transform_point_2d(preproc.T_cropped_to_input, centroids_cropped)
+        centroids_global = transform_point_2d(T_input_to_global, centroids_input)
 
         # get coordinates of best centroid
         index = get_best_centroid_index(centroids_global, centroid)
@@ -66,7 +66,7 @@ class BodyTracker_CPU(BodyTracker):
         if body_axes is None:
             return failed
         
-        body_axes_global = transform_vector_2d(transformation_matrix, body_axes) 
+        body_axes_global = transform_vector_2d(T_input_to_global, body_axes) 
         
         angle_rad = np.arctan2(body_axes[1,1], body_axes[0,1])
         angle_rad_global = np.arctan2(body_axes_global[1,1], body_axes_global[0,1])

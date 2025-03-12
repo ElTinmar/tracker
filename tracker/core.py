@@ -59,12 +59,12 @@ class Tracker(ABC):
             self, 
             image: NDArray,
             centroid: Optional[NDArray],
-            transformation_matrix: Optional[NDArray]
+            T_input_to_global: Optional[NDArray]
         ) -> Optional[NDArray]:
         '''
         image: image to track, preferably background subtracted
         centroid: centroid of object to track if known 
-        transformation_matrix: 3x3 coordinate transformation matrix from local to image coordinates
+        T_input_to_global: 3x3 coordinate transformation matrix from local to image coordinates
         return numpy structured array
         '''
         
@@ -75,7 +75,7 @@ class TrackingOverlay(ABC):
             self, 
             image: NDArray, 
             tracking: Optional[NDArray], 
-            transformation_matrix: NDArray 
+            T_input_to_global: NDArray 
         ) -> Optional[NDArray]:
         pass
     

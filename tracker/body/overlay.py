@@ -36,7 +36,7 @@ class BodyOverlay_opencv(BodyOverlay):
             self,
             image: NDArray, 
             tracking: Optional[NDArray],
-            transformation_matrix: NDArray = Affine2DTransform.identity()
+            T_input_to_global: NDArray = Affine2DTransform.identity()
         ) -> Optional[NDArray]:
 
         if tracking is None:
@@ -46,7 +46,7 @@ class BodyOverlay_opencv(BodyOverlay):
             centroid = tracking['centroid_global'],
             body_axes = tracking['body_axes_global'],
             image = image,
-            transformation_matrix = transformation_matrix
+            T_input_to_global = T_input_to_global
         )
     
     def overlay_cropped(self, tracking: Optional[NDArray]) -> Optional[NDArray]:
@@ -76,7 +76,7 @@ class BodyOverlay_opencv(BodyOverlay):
             image: NDArray, 
             centroid: NDArray,
             body_axes: NDArray, 
-            transformation_matrix: NDArray = Affine2DTransform.identity()
+            T_input_to_global: NDArray = Affine2DTransform.identity()
         ) -> Optional[NDArray]:
 
 
@@ -90,7 +90,7 @@ class BodyOverlay_opencv(BodyOverlay):
 
         # compute transformation
         pts = np.vstack((centroid, xx, yy))
-        pts_ = transform_point_2d(transformation_matrix, pts)
+        pts_ = transform_point_2d(T_input_to_global, pts)
 
         overlay = draw_arrow(
             overlay, 

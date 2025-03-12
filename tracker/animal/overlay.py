@@ -12,7 +12,7 @@ class AnimalOverlay_opencv(AnimalOverlay):
             self,
             image: NDArray, 
             tracking: Optional[NDArray],
-            transformation_matrix: NDArray = Affine2DTransform.identity()
+            T_input_to_global: NDArray = Affine2DTransform.identity()
         ) -> Optional[NDArray]:
 
         if tracking is None:
@@ -21,7 +21,7 @@ class AnimalOverlay_opencv(AnimalOverlay):
         return self._overlay(
             centroids = tracking['centroids_global'],
             image = image,
-            transformation_matrix = transformation_matrix
+            T_input_to_global = T_input_to_global
         )
 
     def overlay_cropped(self, tracking: Optional[NDArray]) -> Optional[NDArray]:
@@ -37,7 +37,7 @@ class AnimalOverlay_opencv(AnimalOverlay):
         return self._overlay(
             centroids = tracking['centroids_cropped'],
             image = tracking['image_downsampled'],
-            transformation_matrix = S
+            T_input_to_global = S
         )
 
     def overlay_processed(self, tracking: Optional[NDArray]) -> Optional[NDArray]:
@@ -54,7 +54,7 @@ class AnimalOverlay_opencv(AnimalOverlay):
             self,
             centroids: NDArray,
             image: NDArray, 
-            transformation_matrix: NDArray = Affine2DTransform.identity()
+            T_input_to_global: NDArray = Affine2DTransform.identity()
         ) -> NDArray:
 
 
@@ -64,7 +64,7 @@ class AnimalOverlay_opencv(AnimalOverlay):
         for idx, centroid in enumerate(centroids):
 
             # draw centroid
-            x,y = transform_point_2d(transformation_matrix, centroid).ravel()
+            x,y = transform_point_2d(T_input_to_global, centroid).ravel()
             
             overlay = cv2.circle(
                 overlay,

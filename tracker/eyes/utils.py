@@ -13,20 +13,20 @@ from tracker.prepare_image import Preprocessing
 def get_eye_properties(
         prop: RegionPropsLike,
         preproc: Preprocessing,
-        transformation_matrix: NDArray,
+        T_input_to_global: NDArray,
         reference_vector: NDArray
     ) -> Optional[NDArray]:
 
     centroid_resized = np.asarray(prop.centroid[::-1], dtype=np.float32)
-    centroid_cropped = transform_point_2d(preproc.resize_transform, centroid_resized)        
-    centroid_input = transform_point_2d(preproc.crop_transform, centroid_cropped)
-    centroid_global = transform_point_2d(transformation_matrix, centroid_input)
+    centroid_cropped = transform_point_2d(preproc.T_resized_to_crop, centroid_resized)        
+    centroid_input = transform_point_2d(preproc.T_cropped_to_input, centroid_cropped)
+    centroid_global = transform_point_2d(T_input_to_global, centroid_input)
     
     direction = prop.principal_axis 
     if direction is None:
         return None
     
-    direction_global = transform_vector_2d(transformation_matrix, direction) 
+    direction_global = transform_vector_2d(T_input_to_global, direction) 
     angle = angle_between_vectors(direction, reference_vector)
     angle_global = angle_between_vectors(direction_global, reference_vector)
 

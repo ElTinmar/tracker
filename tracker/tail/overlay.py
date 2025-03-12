@@ -12,7 +12,7 @@ class TailOverlay_opencv(TailOverlay):
             self,
             image: NDArray, 
             tracking: Optional[NDArray],
-            transformation_matrix: NDArray = Affine2DTransform.identity()
+            T_input_to_global: NDArray = Affine2DTransform.identity()
         ) -> Optional[NDArray]:
 
         if tracking is None:
@@ -22,7 +22,7 @@ class TailOverlay_opencv(TailOverlay):
             skeleton = tracking['skeleton_global'],
             skeleton_interp = tracking['skeleton_interp_global'],
             image = image,
-            transformation_matrix = transformation_matrix
+            T_input_to_global = T_input_to_global
         )
     
     def overlay_cropped(self, tracking: Optional[NDArray]) -> Optional[NDArray]:
@@ -52,13 +52,13 @@ class TailOverlay_opencv(TailOverlay):
             image: NDArray, 
             skeleton: NDArray,
             skeleton_interp: NDArray,
-            transformation_matrix: NDArray = Affine2DTransform.identity()
+            T_input_to_global: NDArray = Affine2DTransform.identity()
         ) -> NDArray:
                 
         overlay = im2rgb(im2uint8(image))
         original = overlay.copy()        
             
-        transformed_coord_interp = transform_point_2d(transformation_matrix, skeleton_interp)
+        transformed_coord_interp = transform_point_2d(T_input_to_global, skeleton_interp)
         tail_segments = zip(transformed_coord_interp[:-1,], transformed_coord_interp[1:,])
         for pt1, pt2 in tail_segments:
             overlay = cv2.line(
@@ -69,7 +69,7 @@ class TailOverlay_opencv(TailOverlay):
                 self.overlay_param.thickness
             )
 
-        transformed_coord = transform_point_2d(transformation_matrix, skeleton)
+        transformed_coord = transform_point_2d(T_input_to_global, skeleton)
         for pt in transformed_coord:
             overlay = cv2.circle(
                 overlay, 

@@ -12,7 +12,7 @@ class EyesTracker_CPU(EyesTracker):
             self,
             image: NDArray, 
             centroid: Optional[NDArray], 
-            transformation_matrix: Optional[NDArray] = Affine2DTransform.identity()
+            T_input_to_global: Optional[NDArray] = Affine2DTransform.identity()
         ) -> NDArray:
         """
         output coordinates: 
@@ -52,14 +52,14 @@ class EyesTracker_CPU(EyesTracker):
         left_eye = get_eye_properties(
             props[left_idx], 
             preproc, 
-            transformation_matrix, 
+            T_input_to_global, 
             vertical_axis
         )
 
         right_eye = get_eye_properties(
             props[right_idx], 
             preproc, 
-            transformation_matrix, 
+            T_input_to_global, 
             vertical_axis
         )
 

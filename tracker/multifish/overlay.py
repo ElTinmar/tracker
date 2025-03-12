@@ -17,13 +17,13 @@ class MultiFishOverlay_opencv(MultiFishOverlay):
             self, 
             image: NDArray, 
             tracking: Optional[NDArray], 
-            transformation_matrix: NDArray = Affine2DTransform.identity()
+            T_input_to_global: NDArray = Affine2DTransform.identity()
         ) -> NDArray:
 
         if (tracking is not None):
 
             overlay = im2rgb(im2uint8(image))
-            overlay = self.overlay_param.animal.overlay_global(overlay, tracking['animals'], transformation_matrix)         
+            overlay = self.overlay_param.animal.overlay_global(overlay, tracking['animals'], T_input_to_global)         
 
             for idx, _ in enumerate(tracking['animals']['centroids_global']):
 
@@ -31,21 +31,21 @@ class MultiFishOverlay_opencv(MultiFishOverlay):
                     overlay = self.overlay_param.body.overlay_global(
                         overlay, 
                         tracking['body'][idx], 
-                        transformation_matrix
+                        T_input_to_global
                     )
 
                     if (self.overlay_param.eyes is not None) and ('eyes' in tracking.dtype.fields):
                         overlay = self.overlay_param.eyes.overlay_global(
                             overlay, 
                             tracking['eyes'][idx],
-                            transformation_matrix
+                            T_input_to_global
                         )
                     
                     if (self.overlay_param.tail is not None) and ('tail' in tracking.dtype.fields):
                         overlay = self.overlay_param.tail.overlay_global(
                             overlay, 
                             tracking['tail'][idx],
-                            transformation_matrix
+                            T_input_to_global
                         )
 
             return overlay

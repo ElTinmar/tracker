@@ -56,9 +56,9 @@ def crop(
     ]
 
     # cropped space to input space
-    crop_transform = Affine2DTransform.translation(left, bottom)
+    T_cropped_to_input = Affine2DTransform.translation(left, bottom)
 
-    return image_cropped, crop_transform
+    return image_cropped, T_cropped_to_input
 
 def resize(
         image: NDArray,
@@ -87,16 +87,16 @@ def resize(
     # resized space to input space
     sx = image.shape[1] / target_dimension_px[0]
     sy = image.shape[0] / target_dimension_px[1]
-    resize_transform =  Affine2DTransform.scaling(sx, sy)
+    T_resized_to_crop =  Affine2DTransform.scaling(sx, sy)
 
-    return image_resized, resize_transform
+    return image_resized, T_resized_to_crop
 
 class Preprocessing(NamedTuple):
     image_cropped: NDArray
     image_resized: NDArray
     image_processed: NDArray
-    crop_transform: NDArray
-    resize_transform: NDArray
+    T_cropped_to_input: NDArray
+    T_resized_to_crop: NDArray
 
 def preprocess_image(
         image: NDArray, 
@@ -115,10 +115,10 @@ def preprocess_image(
     if cropping is None:
         return None
 
-    image_cropped, crop_transform = cropping
+    image_cropped, T_cropped_to_input = cropping
 
     # resize ---------------------
-    image_resized, resize_transform = resize(
+    image_resized, T_resized_to_crop = resize(
         image = image_cropped,
         target_dimension_px = params.resized_dimension_px, 
     )
@@ -136,6 +136,6 @@ def preprocess_image(
         image_cropped, 
         image_resized, 
         image_processed,
-        crop_transform,
-        resize_transform
+        T_cropped_to_input,
+        T_resized_to_crop
     )

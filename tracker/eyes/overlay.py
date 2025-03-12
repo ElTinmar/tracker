@@ -10,7 +10,7 @@ def disp_eye(
         image: NDArray, 
         eye_centroid: NDArray,
         eye_direction: NDArray,
-        transformation_matrix: NDArray,
+        T_input_to_global: NDArray,
         color: tuple, 
         eye_len_px: float, 
         thickness: int,
@@ -26,7 +26,7 @@ def disp_eye(
 
     # compute transformation
     pts = np.vstack((pt1, pt2, pt3))
-    pts_ = transform_point_2d(transformation_matrix, pts)
+    pts_ = transform_point_2d(T_input_to_global, pts)
 
     overlay = cv2.line(
         overlay,
@@ -63,7 +63,7 @@ class EyesOverlay_opencv(EyesOverlay):
             self,
             image: NDArray, 
             tracking: Optional[NDArray],
-            transformation_matrix: NDArray = Affine2DTransform.identity()
+            T_input_to_global: NDArray = Affine2DTransform.identity()
         ) -> Optional[NDArray]:
 
         if tracking is None:
@@ -83,7 +83,7 @@ class EyesOverlay_opencv(EyesOverlay):
             centroid = centroid,
             direction = direction,
             image = image,
-            transformation_matrix = transformation_matrix
+            T_input_to_global = T_input_to_global
         )
     
     def overlay_cropped(self, tracking: Optional[NDArray]) -> Optional[NDArray]:
@@ -133,7 +133,7 @@ class EyesOverlay_opencv(EyesOverlay):
             image: NDArray, 
             centroid: Dict[str, NDArray],
             direction: Dict[str, NDArray],
-            transformation_matrix: NDArray = Affine2DTransform.identity()
+            T_input_to_global: NDArray = Affine2DTransform.identity()
         ) -> NDArray:
 
         '''
@@ -153,7 +153,7 @@ class EyesOverlay_opencv(EyesOverlay):
                 overlay, 
                 centroid[eye],
                 direction[eye],
-                transformation_matrix,
+                T_input_to_global,
                 col, 
                 self.overlay_param.eye_len_px, 
                 self.overlay_param.thickness,

@@ -12,7 +12,7 @@ class TailTracker_CPU(TailTracker):
             self,
             image: NDArray, 
             centroid: Optional[NDArray], 
-            transformation_matrix: Optional[NDArray] = Affine2DTransform.identity()
+            T_input_to_global: Optional[NDArray] = Affine2DTransform.identity()
         ) -> NDArray:
         """
         output coordinates: 
@@ -43,13 +43,13 @@ class TailTracker_CPU(TailTracker):
         )
 
         # transform coordinates
-        skeleton_cropped = transform_point_2d(preproc.resize_transform, skeleton_resized)
-        skeleton_input = transform_point_2d(preproc.crop_transform, skeleton_cropped)
-        skeleton_global = transform_point_2d(transformation_matrix, skeleton_input)
+        skeleton_cropped = transform_point_2d(preproc.T_resized_to_crop, skeleton_resized)
+        skeleton_input = transform_point_2d(preproc.T_cropped_to_input, skeleton_cropped)
+        skeleton_global = transform_point_2d(T_input_to_global, skeleton_input)
 
-        skeleton_interp_cropped = transform_point_2d(preproc.resize_transform, skeleton_interp_resized)
-        skeleton_interp_input = transform_point_2d(preproc.crop_transform, skeleton_interp_cropped)
-        skeleton_interp_global = transform_point_2d(transformation_matrix, skeleton_interp_input)
+        skeleton_interp_cropped = transform_point_2d(preproc.T_resized_to_crop, skeleton_interp_resized)
+        skeleton_interp_input = transform_point_2d(preproc.T_cropped_to_input, skeleton_interp_cropped)
+        skeleton_interp_global = transform_point_2d(T_input_to_global, skeleton_interp_input)
 
         # save result to numpy structured array
         res = np.array(
