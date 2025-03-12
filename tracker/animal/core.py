@@ -59,7 +59,12 @@ class AnimalTrackerParamTracking(ParamTracking):
             ('downsample_ratio', np.float32),
             ('mask', np.bool_, self.resized_dimension_px[::-1]),
             ('image_processed', np.float32, self.resized_dimension_px[::-1]),
-            ('image_downsampled', np.float32, self.downsampled_shape)
+            ('image_downsampled', np.float32, self.downsampled_shape),
+            ('pix_per_mm_global', np.float32),
+            ('pix_per_mm_input', np.float32),
+            ('pix_per_mm_cropped', np.float32),
+            ('pix_per_mm_resized', np.float32),
+            ('pix_per_mm_downsampled', np.float32)
         ])
         return dt
         

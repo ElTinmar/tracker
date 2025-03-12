@@ -67,9 +67,9 @@ class AnimalTracker_CPU(AnimalTracker):
         # This works if isotropy is preserved (same x,y scale)
         # T_input_to_global could break that
         pix_per_mm_global = self.tracking_param.pix_per_mm
-        pix_per_mm_input = pix_per_mm_global * np.linalg.norm(T_global_to_input[:,0])
-        pix_per_mm_cropped = pix_per_mm_input * np.linalg.norm(T_input_to_cropped[:,0]) 
-        pix_per_mm_resized = pix_per_mm_cropped * np.linalg.norm(T_cropped_to_resized[:,0]) 
+        pix_per_mm_input = pix_per_mm_global * T_global_to_input.scale_factor
+        pix_per_mm_cropped = pix_per_mm_input * T_input_to_cropped.scale_factor
+        pix_per_mm_resized = pix_per_mm_cropped * T_cropped_to_resized.scale_factor
         pix_per_mm_downsampled = pix_per_mm_input * self.tracking_param.downsample_factor
 
         if not np.isclose(pix_per_mm_resized, self.tracking_param.target_pix_per_mm):
