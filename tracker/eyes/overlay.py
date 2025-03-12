@@ -83,6 +83,7 @@ class EyesOverlay_opencv(EyesOverlay):
             centroid = centroid,
             direction = direction,
             image = image,
+            pix_per_mm = tracking['pix_per_mm_global'],
             T_input_to_global = T_input_to_global
         )
     
@@ -104,6 +105,7 @@ class EyesOverlay_opencv(EyesOverlay):
         return self._overlay(
             centroid = centroid,
             direction = direction,
+            pix_per_mm = tracking['pix_per_mm_cropped'],
             image = tracking['image_cropped'],
         )
 
@@ -125,6 +127,7 @@ class EyesOverlay_opencv(EyesOverlay):
         return self._overlay(
             centroid = centroid,
             direction = direction,
+            pix_per_mm = tracking['pix_per_mm_resized'],
             image = tracking['image_processed'],
         )
     
@@ -133,6 +136,7 @@ class EyesOverlay_opencv(EyesOverlay):
             image: NDArray, 
             centroid: Dict[str, NDArray],
             direction: Dict[str, NDArray],
+            pix_per_mm: float,
             T_input_to_global: SimilarityTransform2D = SimilarityTransform2D.identity()
         ) -> NDArray:
 
@@ -142,6 +146,9 @@ class EyesOverlay_opencv(EyesOverlay):
 
         overlay = im2rgb(im2uint8(image))
         original = overlay.copy()        
+
+        eye_len_px = max(1,int(self.overlay_param.eye_len_mm * pix_per_mm))
+        arrow_radius_px = max(1,int(self.overlay_param.arrow_radius_mm * pix_per_mm))
         
         it = zip(
             ['left_eye', 'right_eye'], 
@@ -155,9 +162,9 @@ class EyesOverlay_opencv(EyesOverlay):
                 direction[eye],
                 T_input_to_global,
                 col, 
-                self.overlay_param.eye_len_px, 
+                eye_len_px, 
                 self.overlay_param.thickness,
-                self.overlay_param.arrow_radius_px
+                arrow_radius_px
             )
 
         overlay = cv2.addWeighted(

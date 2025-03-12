@@ -59,25 +59,12 @@ class BodyTrackerParamTracking(ParamTracking):
 
 @dataclass
 class BodyTrackerParamOverlay:
-    pix_per_mm: float = 40.0
     heading_len_mm: float = 1
     heading_color_BGR: tuple = (0,128,255)
     lateral_color_BGR: tuple = (128,64,128)
     thickness: int = 1
     arrow_radius_mm: float = 0.1
     alpha: float = 0.5
-
-    def mm2px(self, val_mm):
-        val_px = int(val_mm * self.pix_per_mm) 
-        return val_px
-
-    @property
-    def heading_len_px(self) -> int:
-        return self.mm2px(self.heading_len_mm)
-
-    @property
-    def arrow_radius_px(self) -> int:
-        return self.mm2px(self.arrow_radius_mm)
 
 class BodyTracker(Tracker):
 

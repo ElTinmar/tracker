@@ -44,18 +44,10 @@ class TailTrackerParamTracking(ParamTracking):
 
 @dataclass
 class TailTrackerParamOverlay:
-    pix_per_mm: float = 40
     color_BGR: tuple = (255, 128, 128)
     thickness: int = 1
     ball_radius_mm: float = 0.1 
     alpha: float = 0.5
-
-    def mm2px(self, val_mm: float) -> int:
-        return int(val_mm * self.pix_per_mm) 
-
-    @property
-    def ball_radius_px(self) -> int:
-        return self.mm2px(self.ball_radius_mm) 
 
 class TailTracker(Tracker):
 

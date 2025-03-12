@@ -46,6 +46,7 @@ class BodyOverlay_opencv(BodyOverlay):
             centroid = tracking['centroid_global'],
             body_axes = tracking['body_axes_global'],
             image = image,
+            pix_per_mm = tracking['pix_per_mm_global'],
             T_input_to_global = T_input_to_global
         )
     
@@ -58,6 +59,7 @@ class BodyOverlay_opencv(BodyOverlay):
             image = tracking['image_cropped'],
             centroid = tracking['centroid_cropped'],
             body_axes = tracking['body_axes'],
+            pix_per_mm = tracking['pix_per_mm_cropped'],
         )
 
     def overlay_processed(self, tracking: Optional[NDArray]) -> Optional[NDArray]:
@@ -69,6 +71,7 @@ class BodyOverlay_opencv(BodyOverlay):
             image = tracking['image_processed'],
             centroid = tracking['centroid_resized'],
             body_axes = tracking['body_axes'],
+            pix_per_mm = tracking['pix_per_mm_resized'],
         )
             
     def _overlay(
@@ -76,15 +79,19 @@ class BodyOverlay_opencv(BodyOverlay):
             image: NDArray, 
             centroid: NDArray,
             body_axes: NDArray, 
+            pix_per_mm: float,
             T_input_to_global: SimilarityTransform2D = SimilarityTransform2D.identity()
         ) -> Optional[NDArray]:
 
 
         overlay = im2rgb(im2uint8(image))
         original = overlay.copy()        
-        
-        front = self.overlay_param.heading_len_px * body_axes[:,0]
-        right = self.overlay_param.heading_len_px/2 * body_axes[:,1]
+
+        heading_len_px = max(1,int(self.overlay_param.heading_len_mm * pix_per_mm))
+        arrow_radius_px = max(1,int(self.overlay_param.arrow_radius_mm * pix_per_mm))
+
+        front = heading_len_px * body_axes[:,0]
+        right = heading_len_px/2 * body_axes[:,1]
         yy = centroid + front
         xx = centroid + right
 
@@ -98,7 +105,7 @@ class BodyOverlay_opencv(BodyOverlay):
             pts_[2], 
             self.overlay_param.heading_color_BGR,
             self.overlay_param.thickness,
-            self.overlay_param.arrow_radius_px
+            arrow_radius_px
         )
 
         overlay = draw_arrow(
@@ -107,7 +114,7 @@ class BodyOverlay_opencv(BodyOverlay):
             pts_[1], 
             self.overlay_param.lateral_color_BGR,
             self.overlay_param.thickness,
-            self.overlay_param.arrow_radius_px
+            arrow_radius_px
         )
 
         overlay = cv2.addWeighted(
