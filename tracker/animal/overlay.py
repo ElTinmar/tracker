@@ -22,7 +22,7 @@ class AnimalOverlay_opencv(AnimalOverlay):
             centroids = tracking['centroids_global'],
             image = image,
             pix_per_mm = tracking['pix_per_mm_global'],
-            T_input_to_global = T_input_to_global
+            transformation = T_input_to_global
         )
 
     def overlay_cropped(self, tracking: Optional[NDArray]) -> Optional[NDArray]:
@@ -36,7 +36,7 @@ class AnimalOverlay_opencv(AnimalOverlay):
             centroids = tracking['centroids_cropped'],
             image = tracking['image_downsampled'],
             pix_per_mm = tracking['pix_per_mm_downsampled'],
-            T_input_to_global = S
+            transformation = S
         )
 
     def overlay_processed(self, tracking: Optional[NDArray]) -> Optional[NDArray]:
@@ -55,7 +55,7 @@ class AnimalOverlay_opencv(AnimalOverlay):
             centroids: NDArray,
             image: NDArray, 
             pix_per_mm: float,
-            T_input_to_global: SimilarityTransform2D = SimilarityTransform2D.identity(),
+            transformation: SimilarityTransform2D = SimilarityTransform2D.identity(),
         ) -> NDArray:
 
 
@@ -65,9 +65,10 @@ class AnimalOverlay_opencv(AnimalOverlay):
         for idx, centroid in enumerate(centroids):
 
             # draw centroid
-            x,y = T_input_to_global.transform_points(centroid).ravel()
+            x,y = transformation.transform_points(centroid).ravel()
 
-            radius_px = max(1,int(self.overlay_param.radius_mm * pix_per_mm))
+            pix_per_mm_input =  pix_per_mm * transformation.inv().scale_factor
+            radius_px = max(1,int(self.overlay_param.radius_mm * pix_per_mm_input))
             
             overlay = cv2.circle(
                 overlay,

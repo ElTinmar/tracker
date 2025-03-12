@@ -23,7 +23,7 @@ class TailOverlay_opencv(TailOverlay):
             skeleton_interp = tracking['skeleton_interp_global'],
             image = image,
             pix_per_mm = tracking['pix_per_mm_global'],
-            T_input_to_global = T_input_to_global
+            transformation = T_input_to_global
         )
     
     def overlay_cropped(self, tracking: Optional[NDArray]) -> Optional[NDArray]:
@@ -56,15 +56,16 @@ class TailOverlay_opencv(TailOverlay):
             skeleton: NDArray,
             skeleton_interp: NDArray,
             pix_per_mm: float,
-            T_input_to_global: SimilarityTransform2D = SimilarityTransform2D.identity()
+            transformation: SimilarityTransform2D = SimilarityTransform2D.identity()
         ) -> NDArray:
                 
         overlay = im2rgb(im2uint8(image))
         original = overlay.copy()        
 
-        ball_radius_px = max(1,int(self.overlay_param.ball_radius_mm * pix_per_mm))
+        pix_per_mm_input =  pix_per_mm * transformation.inv().scale_factor
+        ball_radius_px = max(1,int(self.overlay_param.ball_radius_mm * pix_per_mm_input))
             
-        transformed_coord_interp = T_input_to_global.transform_points(skeleton_interp)
+        transformed_coord_interp = transformation.transform_points(skeleton_interp)
         tail_segments = zip(transformed_coord_interp[:-1,], transformed_coord_interp[1:,])
         for pt1, pt2 in tail_segments:
             overlay = cv2.line(
@@ -75,7 +76,7 @@ class TailOverlay_opencv(TailOverlay):
                 self.overlay_param.thickness
             )
 
-        transformed_coord = T_input_to_global.transform_points(skeleton)
+        transformed_coord = transformation.transform_points(skeleton)
         for pt in transformed_coord:
             overlay = cv2.circle(
                 overlay, 

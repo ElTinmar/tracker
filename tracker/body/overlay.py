@@ -47,7 +47,7 @@ class BodyOverlay_opencv(BodyOverlay):
             body_axes = tracking['body_axes_global'],
             image = image,
             pix_per_mm = tracking['pix_per_mm_global'],
-            T_input_to_global = T_input_to_global
+            transformation = T_input_to_global
         )
     
     def overlay_cropped(self, tracking: Optional[NDArray]) -> Optional[NDArray]:
@@ -80,15 +80,16 @@ class BodyOverlay_opencv(BodyOverlay):
             centroid: NDArray,
             body_axes: NDArray, 
             pix_per_mm: float,
-            T_input_to_global: SimilarityTransform2D = SimilarityTransform2D.identity()
+            transformation: SimilarityTransform2D = SimilarityTransform2D.identity()
         ) -> Optional[NDArray]:
 
 
         overlay = im2rgb(im2uint8(image))
         original = overlay.copy()        
 
-        heading_len_px = max(1,int(self.overlay_param.heading_len_mm * pix_per_mm))
-        arrow_radius_px = max(1,int(self.overlay_param.arrow_radius_mm * pix_per_mm))
+        pix_per_mm_input =  pix_per_mm * transformation.inv().scale_factor
+        heading_len_px = max(1,int(self.overlay_param.heading_len_mm * pix_per_mm_input))
+        arrow_radius_px = max(1,int(self.overlay_param.arrow_radius_mm * pix_per_mm_input))
 
         front = heading_len_px * body_axes[:,0]
         right = heading_len_px/2 * body_axes[:,1]
@@ -97,7 +98,7 @@ class BodyOverlay_opencv(BodyOverlay):
 
         # compute transformation
         pts = np.vstack((centroid, xx, yy))
-        pts_ = T_input_to_global.transform_points(pts)
+        pts_ = transformation.transform_points(pts)
 
         overlay = draw_arrow(
             overlay, 
