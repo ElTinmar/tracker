@@ -38,16 +38,15 @@ class MultiFishTracker_CPU(MultiFishTracker):
                 R = SimilarityTransform2D.rotation(body['angle_rad'])
                 T = SimilarityTransform2D.translation(body['centroid_global'][0], body['centroid_global'][1])
                 T0 = SimilarityTransform2D.translation(-centroid_rot[0], -centroid_rot[1])
+                T_image_rot_to_global =  T @ R @ T0
             
                 # track eyes
                 if self.tracking_param.eyes is not None:
-                    T_eyes = T @ R @ T0
-                    eyes.append(self.tracking_param.eyes.track(image_rot, centroid_rot, T_eyes))
+                    eyes.append(self.tracking_param.eyes.track(image_rot, centroid_rot, T_image_rot_to_global))
 
                 # track tail
                 if self.tracking_param.tail is not None:
-                    T_tail = T @ R @ T0
-                    tails.append(self.tracking_param.tail.track(image_rot, centroid_rot, T_tail))
+                    tails.append(self.tracking_param.tail.track(image_rot, centroid_rot, T_image_rot_to_global))
 
         # compute additional features based on tracking
         if self.tracking_param.accumulator is not None:
