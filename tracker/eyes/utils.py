@@ -8,6 +8,7 @@ from .core import DTYPE_EYE
 from geometry import SimilarityTransform2D
 from image_tools import RegionPropsLike
 from tracker.prepare_image import Preprocessing
+import cv2
 
 def get_eye_properties(
         prop: RegionPropsLike,

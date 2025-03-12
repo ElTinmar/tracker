@@ -13,7 +13,7 @@ def get_best_centroid_index(
         return 0
 
     else:
-        distances = np.linalg.norm(centroids - centroid, axis=1)
+        distances = np.linalg.norm(centroids - centroid)
         closest_idx = np.argmin(distances)
     
     return closest_idx
