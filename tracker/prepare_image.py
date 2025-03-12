@@ -4,7 +4,7 @@ from numpy.typing import NDArray
 import cv2
 from tracker.core import ParamTracking
 from image_tools import enhance
-from geometry import Affine2DTransform
+from geometry import SimilarityTransform2D
 
 def crop(
         image: NDArray,
@@ -26,7 +26,7 @@ def crop(
     """
 
     if image.shape[:2] == crop_dimension_px[::-1]:
-        return image, Affine2DTransform.identity()
+        return image, SimilarityTransform2D.identity()
 
     if centroid is None:
         centroid = np.array(image.shape[:2]) // 2
@@ -56,7 +56,7 @@ def crop(
     ]
 
     # cropped space to input space
-    T_cropped_to_input = Affine2DTransform.translation(left, bottom)
+    T_cropped_to_input = SimilarityTransform2D.translation(left, bottom)
 
     return image_cropped, T_cropped_to_input
 
@@ -76,7 +76,7 @@ def resize(
     """
 
     if image.shape[:2] == target_dimension_px[::-1]:
-        return image, Affine2DTransform.identity()
+        return image, SimilarityTransform2D.identity()
 
     image_resized = cv2.resize(
         image, 
@@ -85,9 +85,13 @@ def resize(
     )
 
     # resized space to input space
-    sx = image.shape[1] / target_dimension_px[0]
+    s = image.shape[1] / target_dimension_px[0]
     sy = image.shape[0] / target_dimension_px[1]
-    T_resized_to_crop =  Affine2DTransform.scaling(sx, sy)
+    
+    # TODO remove that
+    print(s, sy)
+    
+    T_resized_to_crop =  SimilarityTransform2D.scaling(s)
 
     return image_resized, T_resized_to_crop
 

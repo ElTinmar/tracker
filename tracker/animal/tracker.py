@@ -5,7 +5,7 @@ import cv2
 from typing import Optional
 from .core import AnimalTracker
 from tracker.prepare_image import preprocess_image
-from geometry import transform_point_2d, Affine2DTransform
+from geometry import SimilarityTransform2D
 
 class AnimalTracker_CPU(AnimalTracker):
     
@@ -13,7 +13,7 @@ class AnimalTracker_CPU(AnimalTracker):
         self,
         image: Optional[NDArray], # image in input space
         centroid: Optional[NDArray] = None, # centroid in global space
-        T_input_to_global: Optional[NDArray] = Affine2DTransform.identity() # input to global space transform
+        T_input_to_global: Optional[NDArray] = SimilarityTransform2D.identity() # input to global space transform
     ) -> NDArray:
         
         failed = np.zeros((), dtype=self.tracking_param.dtype)
@@ -64,11 +64,16 @@ class AnimalTracker_CPU(AnimalTracker):
             cv2.INTER_NEAREST
         )
 
+        # This works if isotropy is preserved (same x,y scale)
+        # T_input_to_global could break that
         pix_per_mm_global = self.tracking_param.pix_per_mm
-        pix_per_mm_input = pix_per_mm_global * np.linalg.norm()
-        pix_per_mm_cropped = 0 
-        pix_per_mm_resized = 0
-        pix_per_mm_downsampled = 0
+        pix_per_mm_input = pix_per_mm_global * np.linalg.norm(T_global_to_input[:,0])
+        pix_per_mm_cropped = pix_per_mm_input * np.linalg.norm(T_input_to_cropped[:,0]) 
+        pix_per_mm_resized = pix_per_mm_cropped * np.linalg.norm(T_cropped_to_resized[:,0]) 
+        pix_per_mm_downsampled = pix_per_mm_input * self.tracking_param.downsample_factor
+
+        if not np.isclose(pix_per_mm_resized, self.tracking_param.target_pix_per_mm):
+            print(f'scaling problem, {pix_per_mm_resized} vs {self.tracking_param.target_pix_per_mm}')
 
         res = np.array(
             (
@@ -77,7 +82,7 @@ class AnimalTracker_CPU(AnimalTracker):
                 centroids_cropped,
                 centroids_input,
                 centroids_global, 
-                self.tracking_param.downsample_fullres,
+                self.tracking_param.downsample_factor,
                 mask, 
                 preproc.image_processed,
                 image_downsampled,

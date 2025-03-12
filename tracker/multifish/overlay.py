@@ -2,7 +2,7 @@ from typing import Optional
 import numpy as np
 from numpy.typing import NDArray
 from image_tools import im2uint8, im2rgb
-from geometry import Affine2DTransform
+from geometry import SimilarityTransform2D
 from .core import MultiFishOverlay
 
 class MultiFishOverlay_opencv(MultiFishOverlay):
@@ -17,7 +17,7 @@ class MultiFishOverlay_opencv(MultiFishOverlay):
             self, 
             image: NDArray, 
             tracking: Optional[NDArray], 
-            T_input_to_global: NDArray = Affine2DTransform.identity()
+            T_input_to_global: NDArray = SimilarityTransform2D.identity()
         ) -> NDArray:
 
         if (tracking is not None):

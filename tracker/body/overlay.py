@@ -1,5 +1,5 @@
 from image_tools import im2rgb, im2uint8
-from geometry import transform_point_2d, Affine2DTransform
+from geometry import transform_point_2d, SimilarityTransform2D
 
 import numpy as np
 from numpy.typing import NDArray
@@ -36,7 +36,7 @@ class BodyOverlay_opencv(BodyOverlay):
             self,
             image: NDArray, 
             tracking: Optional[NDArray],
-            T_input_to_global: NDArray = Affine2DTransform.identity()
+            T_input_to_global: NDArray = SimilarityTransform2D.identity()
         ) -> Optional[NDArray]:
 
         if tracking is None:
@@ -76,7 +76,7 @@ class BodyOverlay_opencv(BodyOverlay):
             image: NDArray, 
             centroid: NDArray,
             body_axes: NDArray, 
-            T_input_to_global: NDArray = Affine2DTransform.identity()
+            T_input_to_global: NDArray = SimilarityTransform2D.identity()
         ) -> Optional[NDArray]:
 
 

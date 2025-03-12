@@ -4,7 +4,7 @@ from typing import Optional
 from .core import TailTracker
 from .utils import tail_skeleton_ball
 from tracker.prepare_image import preprocess_image
-from geometry import transform_point_2d, Affine2DTransform
+from geometry import transform_point_2d, SimilarityTransform2D
 
 class TailTracker_CPU(TailTracker):
 
@@ -12,7 +12,7 @@ class TailTracker_CPU(TailTracker):
             self,
             image: NDArray, 
             centroid: Optional[NDArray], 
-            T_input_to_global: Optional[NDArray] = Affine2DTransform.identity()
+            T_input_to_global: Optional[NDArray] = SimilarityTransform2D.identity()
         ) -> NDArray:
         """
         output coordinates: 

@@ -11,7 +11,7 @@ from tracker import (
 from tqdm import tqdm
 import numpy as np
 import cv2
-from geometry import Affine2DTransform
+from geometry import SimilarityTransform2D
 
 DISPLAY=True
 
@@ -73,7 +73,7 @@ animal_tracker = AnimalTracker_CPU(
         max_width_mm=0,
         blur_sz_mm=0.6,
         median_filter_sz_mm=0,
-        downsample_fullres=0.25,
+        downsample_factor=0.25,
         num_animals=num_animals,
         crop_dimension_mm=(width/PIX_PER_MM,height/PIX_PER_MM), 
         crop_offset_y_mm=0
@@ -173,10 +173,7 @@ try:
 
         # display tracking
         if DISPLAY:
-            T_scale = Affine2DTransform.scaling(
-                tracking['animals']['downsample_ratio'],
-                tracking['animals']['downsample_ratio']
-            ) 
+            T_scale = SimilarityTransform2D.scaling(tracking['animals']['downsample_ratio']) 
 
             oly = overlay.overlay_global(tracking['animals']['image_downsampled'], tracking, T_scale)
             r = cv2.resize(oly,(512, 512))

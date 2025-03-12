@@ -4,7 +4,7 @@ from .tracker import BodyTracker_CPU
 from .overlay import BodyOverlay_opencv
 from qt_widgets import NDarray_to_QPixmap, LabeledDoubleSpinBox, LabeledSpinBox
 import cv2
-from geometry import Affine2DTransform
+from geometry import SimilarityTransform2D
 from image_tools import im2uint8
 from numpy.typing import NDArray
 
@@ -212,8 +212,7 @@ class BodyTrackerWidget(QWidget):
         
         if tracking is not None:
             
-            s = self.tracker.tracking_param.resize
-            T = Affine2DTransform.scaling(s, s)
+            T = SimilarityTransform2D.scaling(self.tracker.tracking_param.resize)
            
             zoom = self.zoom.value()/100.0
             image = cv2.resize(im2uint8(tracking['image']),None,None,zoom,zoom,cv2.INTER_NEAREST)

@@ -64,7 +64,7 @@ class Tracker(ABC):
         '''
         image: image to track, preferably background subtracted
         centroid: centroid of object to track if known 
-        T_input_to_global: 3x3 coordinate transformation matrix from local to image coordinates
+        T_input_to_global: 3x3 coordinate transformation matrix from image coordinates to global coordinates
         return numpy structured array
         '''
         

@@ -4,7 +4,7 @@ from .tracker import TailTracker_CPU
 from .overlay import TailOverlay_opencv
 from qt_widgets import NDarray_to_QPixmap, LabeledDoubleSpinBox, LabeledSpinBox
 import cv2
-from geometry import Affine2DTransform
+from geometry import SimilarityTransform2D
 from image_tools import im2uint8
 from numpy.typing import NDArray
 
@@ -235,8 +235,8 @@ class TailTrackerWidget(QWidget):
             
             s = self.tracker.tracking_param.resize
             tx, ty = -tracking.offset
-            S = Affine2DTransform.scaling(s,s)
-            T = Affine2DTransform.translation(tx, ty)
+            S = SimilarityTransform2D.scaling(s)
+            T = SimilarityTransform2D.translation(tx, ty)
             overlay = self.overlay.overlay(tracking['image'], tracking, T @ S)
 
             zoom = self.zoom.value()/100.0

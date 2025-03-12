@@ -5,7 +5,7 @@ from typing import Optional
 from .core import BodyTracker
 from .utils import get_orientation, get_best_centroid_index
 from tracker.prepare_image import preprocess_image
-from geometry import transform_point_2d, transform_vector_2d, Affine2DTransform
+from geometry import transform_point_2d, transform_vector_2d, SimilarityTransform2D
 import cv2
 
 class BodyTracker_CPU(BodyTracker):
@@ -14,7 +14,7 @@ class BodyTracker_CPU(BodyTracker):
             self,
             image: Optional[NDArray], 
             centroid: Optional[NDArray] = None, # centroids in global space
-            T_input_to_global: Optional[NDArray] = Affine2DTransform.identity()
+            T_input_to_global: Optional[NDArray] = SimilarityTransform2D.identity()
         ) -> NDArray:
         '''
         centroid: centroid of the fish to track if it's already known.

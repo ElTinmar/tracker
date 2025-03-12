@@ -3,7 +3,7 @@ import numpy as np
 from numpy.typing import NDArray
 from typing import Optional
 from image_tools import im2uint8, im2rgb
-from geometry import transform_point_2d, Affine2DTransform
+from geometry import transform_point_2d, SimilarityTransform2D
 from .core import TailOverlay
 
 class TailOverlay_opencv(TailOverlay):
@@ -12,7 +12,7 @@ class TailOverlay_opencv(TailOverlay):
             self,
             image: NDArray, 
             tracking: Optional[NDArray],
-            T_input_to_global: NDArray = Affine2DTransform.identity()
+            T_input_to_global: NDArray = SimilarityTransform2D.identity()
         ) -> Optional[NDArray]:
 
         if tracking is None:
@@ -52,7 +52,7 @@ class TailOverlay_opencv(TailOverlay):
             image: NDArray, 
             skeleton: NDArray,
             skeleton_interp: NDArray,
-            T_input_to_global: NDArray = Affine2DTransform.identity()
+            T_input_to_global: NDArray = SimilarityTransform2D.identity()
         ) -> NDArray:
                 
         overlay = im2rgb(im2uint8(image))

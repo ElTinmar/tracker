@@ -3,7 +3,7 @@ from typing import Optional
 from numpy.typing import NDArray
 from image_tools import imrotate
 from .core import MultiFishTracker
-from geometry import Affine2DTransform
+from geometry import SimilarityTransform2D
 
 class MultiFishTracker_CPU(MultiFishTracker):
 
@@ -25,7 +25,7 @@ class MultiFishTracker_CPU(MultiFishTracker):
             if self.tracking_param.body is not None:
 
                 # get more precise centroid and orientation of the animals
-                T_body = Affine2DTransform.identity()
+                T_body = SimilarityTransform2D.identity()
                 body = self.tracking_param.body.track(image, centroid, T_body)
                 bodies.append(body)
                     
@@ -36,9 +36,9 @@ class MultiFishTracker_CPU(MultiFishTracker):
                     np.rad2deg(body['angle_rad'])
                 )
 
-                R = Affine2DTransform.rotation(body['angle_rad'])
-                T = Affine2DTransform.translation(centroid[0], centroid[1])
-                T0 = Affine2DTransform.translation(-centroid_rot[0], -centroid_rot[1])
+                R = SimilarityTransform2D.rotation(body['angle_rad'])
+                T = SimilarityTransform2D.translation(centroid[0], centroid[1])
+                T0 = SimilarityTransform2D.translation(-centroid_rot[0], -centroid_rot[1])
             
                 # track eyes
                 if self.tracking_param.eyes is not None:

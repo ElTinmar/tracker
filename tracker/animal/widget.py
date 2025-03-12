@@ -6,7 +6,7 @@ from .assignment_widget import AssignmentWidget
 from qt_widgets import NDarray_to_QPixmap, LabeledDoubleSpinBox, LabeledSpinBox
 from image_tools import im2uint8
 import cv2
-from geometry import Affine2DTransform
+from geometry import SimilarityTransform2D
 import numpy as np
 from numpy.typing import NDArray
 
@@ -236,7 +236,7 @@ class AnimalTrackerWidget(QWidget):
         if tracking is not None:
             
             s = self.tracker.tracking_param.resize
-            T = Affine2DTransform.scaling(s, s)
+            T = SimilarityTransform2D.scaling(s)
             overlay = self.overlay.overlay(tracking['image'], tracking, T)
 
             zoom = self.zoom.value()/100.0

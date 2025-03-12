@@ -13,15 +13,15 @@ class AnimalTrackerParamTracking(ParamTracking):
     max_length_mm: float = 6.0
     min_width_mm: float = 1.0
     max_width_mm: float = 3.0
-    downsample_fullres: float = 0.25
+    downsample_factor: float = 0.25
     num_animals: int = 1
     intensity: float = 0.2
     
     @property
     def downsampled_shape(self) -> Tuple[int, int]:
         return (
-            int(2*((self.downsample_fullres * self.crop_dimension_px[1])//2)),
-            int(2*((self.downsample_fullres * self.crop_dimension_px[0])//2))
+            int(2*((self.downsample_factor * self.crop_dimension_px[1])//2)),
+            int(2*((self.downsample_factor * self.crop_dimension_px[0])//2))
         ) 
 
     @property
