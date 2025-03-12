@@ -5,7 +5,7 @@ from typing import Optional
 from .core import BodyTracker
 from .utils import get_orientation, get_best_centroid_index
 from tracker.prepare_image import preprocess_image
-from geometry import transform_point_2d, transform_vector_2d, SimilarityTransform2D
+from geometry import SimilarityTransform2D
 import cv2
 
 class BodyTracker_CPU(BodyTracker):
@@ -14,7 +14,7 @@ class BodyTracker_CPU(BodyTracker):
             self,
             image: Optional[NDArray], 
             centroid: Optional[NDArray] = None, # centroids in global space
-            T_input_to_global: Optional[NDArray] = SimilarityTransform2D.identity()
+            T_input_to_global: Optional[SimilarityTransform2D] = SimilarityTransform2D.identity()
         ) -> NDArray:
         '''
         centroid: centroid of the fish to track if it's already known.
@@ -50,9 +50,9 @@ class BodyTracker_CPU(BodyTracker):
             return failed
         
         centroids_resized = np.array([[blob.centroid[1], blob.centroid[0]] for blob in props]) #(row, col) to (x,y)
-        centroids_cropped = transform_point_2d(preproc.T_resized_to_crop, centroids_resized)
-        centroids_input = transform_point_2d(preproc.T_cropped_to_input, centroids_cropped)
-        centroids_global = transform_point_2d(T_input_to_global, centroids_input)
+        centroids_cropped = preproc.T_resized_to_crop.transform_points(centroids_resized)
+        centroids_input = preproc.T_cropped_to_input.transform_points(centroids_cropped)
+        centroids_global = T_input_to_global.transform_points(centroids_input)
 
         # get coordinates of best centroid
         index = get_best_centroid_index(centroids_global, centroid)
@@ -66,7 +66,7 @@ class BodyTracker_CPU(BodyTracker):
         if body_axes is None:
             return failed
         
-        body_axes_global = transform_vector_2d(T_input_to_global, body_axes) 
+        body_axes_global = T_input_to_global.transform_vectors(body_axes) 
         
         angle_rad = np.arctan2(body_axes[1,1], body_axes[0,1])
         angle_rad_global = np.arctan2(body_axes_global[1,1], body_axes_global[0,1])

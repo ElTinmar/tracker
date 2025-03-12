@@ -11,7 +11,7 @@ def crop(
         crop_dimension_px: Tuple[int, int],
         vertical_offset_px: int = 0,
         centroid: Optional[NDArray] = None,
-    ) -> Optional[Tuple[NDArray, NDArray]]:
+    ) -> Optional[Tuple[NDArray, SimilarityTransform2D]]:
     """
     Crops a fixed-size region from an image, optionally centered around a given centroid.
 
@@ -63,7 +63,7 @@ def crop(
 def resize(
         image: NDArray,
         target_dimension_px: Tuple[int, int], 
-    ) -> Tuple[NDArray]:
+    ) -> Tuple[NDArray, SimilarityTransform2D]:
     """
     Resize an image to the specified dimensions.
 
@@ -99,8 +99,8 @@ class Preprocessing(NamedTuple):
     image_cropped: NDArray
     image_resized: NDArray
     image_processed: NDArray
-    T_cropped_to_input: NDArray
-    T_resized_to_crop: NDArray
+    T_cropped_to_input: SimilarityTransform2D
+    T_resized_to_crop: SimilarityTransform2D
 
 def preprocess_image(
         image: NDArray, 

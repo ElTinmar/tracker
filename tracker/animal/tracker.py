@@ -13,7 +13,7 @@ class AnimalTracker_CPU(AnimalTracker):
         self,
         image: Optional[NDArray], # image in input space
         centroid: Optional[NDArray] = None, # centroid in global space
-        T_input_to_global: Optional[NDArray] = SimilarityTransform2D.identity() # input to global space transform
+        T_input_to_global: Optional[SimilarityTransform2D] = SimilarityTransform2D.identity() # input to global space transform
     ) -> NDArray:
         
         failed = np.zeros((), dtype=self.tracking_param.dtype)
@@ -41,20 +41,20 @@ class AnimalTracker_CPU(AnimalTracker):
             return failed
 
         # transform coordinates
-        centroids_cropped = transform_point_2d(preproc.T_resized_to_crop, centroids_resized)
-        centroids_input = transform_point_2d(preproc.T_cropped_to_input, centroids_cropped)
-        centroids_global = transform_point_2d(T_input_to_global, centroids_input)
+        centroids_cropped = preproc.T_resized_to_crop.transform_points(centroids_resized)
+        centroids_input = preproc.T_cropped_to_input.transform_points(centroids_cropped)
+        centroids_global = T_input_to_global.transform_points(centroids_input)
 
         # identity assignment in global space
         centroids_global = self.assignment.update(centroids_global)  
 
-        T_global_to_input = np.linalg.inv(T_input_to_global)
-        T_input_to_cropped = np.linalg.inv(preproc.T_cropped_to_input)
-        T_cropped_to_resized = np.linalg.inv(preproc.T_resized_to_crop)
+        T_global_to_input = T_input_to_global.inv()
+        T_input_to_cropped = preproc.T_cropped_to_input.inv()
+        T_cropped_to_resized = preproc.T_resized_to_crop.inv()
 
-        centroids_input = transform_point_2d(T_global_to_input, centroids_global)
-        centroids_cropped = transform_point_2d(T_input_to_cropped, centroids_input)
-        centroids_resized = transform_point_2d(T_cropped_to_resized, centroids_cropped)
+        centroids_input = T_global_to_input.transform_points(centroids_global)
+        centroids_cropped = T_input_to_cropped.transform_points(centroids_input)
+        centroids_resized = T_cropped_to_resized.transform_points(centroids_cropped)
 
         # Downsample image export (a bit easier on RAM). This is used for overlay instead of image_cropped
         # NOTE: it introduces a special case, not a big fan of this

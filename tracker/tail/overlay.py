@@ -3,7 +3,7 @@ import numpy as np
 from numpy.typing import NDArray
 from typing import Optional
 from image_tools import im2uint8, im2rgb
-from geometry import transform_point_2d, SimilarityTransform2D
+from geometry import SimilarityTransform2D
 from .core import TailOverlay
 
 class TailOverlay_opencv(TailOverlay):
@@ -58,7 +58,7 @@ class TailOverlay_opencv(TailOverlay):
         overlay = im2rgb(im2uint8(image))
         original = overlay.copy()        
             
-        transformed_coord_interp = transform_point_2d(T_input_to_global, skeleton_interp)
+        transformed_coord_interp = T_input_to_global.transform_points(skeleton_interp)
         tail_segments = zip(transformed_coord_interp[:-1,], transformed_coord_interp[1:,])
         for pt1, pt2 in tail_segments:
             overlay = cv2.line(
@@ -69,7 +69,7 @@ class TailOverlay_opencv(TailOverlay):
                 self.overlay_param.thickness
             )
 
-        transformed_coord = transform_point_2d(T_input_to_global, skeleton)
+        transformed_coord = T_input_to_global.transform_points(skeleton)
         for pt in transformed_coord:
             overlay = cv2.circle(
                 overlay, 

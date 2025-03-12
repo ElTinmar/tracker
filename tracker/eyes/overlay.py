@@ -3,7 +3,7 @@ import numpy as np
 from numpy.typing import NDArray
 from typing import Optional, Dict
 from image_tools import im2uint8, im2rgb
-from geometry import transform_point_2d, SimilarityTransform2D
+from geometry import SimilarityTransform2D
 from .core import EyesOverlay
 
 def disp_eye(
@@ -26,7 +26,7 @@ def disp_eye(
 
     # compute transformation
     pts = np.vstack((pt1, pt2, pt3))
-    pts_ = transform_point_2d(T_input_to_global, pts)
+    pts_ = T_input_to_global.transform_points(pts)
 
     overlay = cv2.line(
         overlay,

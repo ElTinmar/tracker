@@ -1,5 +1,5 @@
 from image_tools import im2rgb, im2uint8
-from geometry import transform_point_2d, SimilarityTransform2D
+from geometry import SimilarityTransform2D
 
 import numpy as np
 from numpy.typing import NDArray
@@ -90,7 +90,7 @@ class BodyOverlay_opencv(BodyOverlay):
 
         # compute transformation
         pts = np.vstack((centroid, xx, yy))
-        pts_ = transform_point_2d(T_input_to_global, pts)
+        pts_ = T_input_to_global.transform_points(pts)
 
         overlay = draw_arrow(
             overlay, 

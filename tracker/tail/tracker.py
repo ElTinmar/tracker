@@ -4,7 +4,7 @@ from typing import Optional
 from .core import TailTracker
 from .utils import tail_skeleton_ball
 from tracker.prepare_image import preprocess_image
-from geometry import transform_point_2d, SimilarityTransform2D
+from geometry import SimilarityTransform2D
 
 class TailTracker_CPU(TailTracker):
 
@@ -12,7 +12,7 @@ class TailTracker_CPU(TailTracker):
             self,
             image: NDArray, 
             centroid: Optional[NDArray], 
-            T_input_to_global: Optional[NDArray] = SimilarityTransform2D.identity()
+            T_input_to_global: Optional[SimilarityTransform2D] = SimilarityTransform2D.identity()
         ) -> NDArray:
         """
         output coordinates: 
@@ -43,13 +43,13 @@ class TailTracker_CPU(TailTracker):
         )
 
         # transform coordinates
-        skeleton_cropped = transform_point_2d(preproc.T_resized_to_crop, skeleton_resized)
-        skeleton_input = transform_point_2d(preproc.T_cropped_to_input, skeleton_cropped)
-        skeleton_global = transform_point_2d(T_input_to_global, skeleton_input)
+        skeleton_cropped = preproc.T_resized_to_crop.transform_points(skeleton_resized)
+        skeleton_input = preproc.T_cropped_to_input.transform_points(skeleton_cropped)
+        skeleton_global = T_input_to_global.transform_points(skeleton_input)
 
-        skeleton_interp_cropped = transform_point_2d(preproc.T_resized_to_crop, skeleton_interp_resized)
-        skeleton_interp_input = transform_point_2d(preproc.T_cropped_to_input, skeleton_interp_cropped)
-        skeleton_interp_global = transform_point_2d(T_input_to_global, skeleton_interp_input)
+        skeleton_interp_cropped = preproc.T_resized_to_crop.transform_points(skeleton_interp_resized)
+        skeleton_interp_input = preproc.T_cropped_to_input.transform_points(skeleton_interp_cropped)
+        skeleton_interp_global = T_input_to_global.transform_points(skeleton_interp_input)
 
         # save result to numpy structured array
         res = np.array(

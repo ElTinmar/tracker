@@ -5,28 +5,27 @@ from typing import Tuple, Optional, List
 from image_tools import bwareafilter_props_cv2, bwareafilter_cv2
 from geometry import angle_between_vectors
 from .core import DTYPE_EYE
-from geometry import transform_point_2d, transform_vector_2d
-import cv2
+from geometry import SimilarityTransform2D
 from image_tools import RegionPropsLike
 from tracker.prepare_image import Preprocessing
 
 def get_eye_properties(
         prop: RegionPropsLike,
         preproc: Preprocessing,
-        T_input_to_global: NDArray,
+        T_input_to_global: SimilarityTransform2D,
         reference_vector: NDArray
     ) -> Optional[NDArray]:
 
     centroid_resized = np.asarray(prop.centroid[::-1], dtype=np.float32)
-    centroid_cropped = transform_point_2d(preproc.T_resized_to_crop, centroid_resized)        
-    centroid_input = transform_point_2d(preproc.T_cropped_to_input, centroid_cropped)
-    centroid_global = transform_point_2d(T_input_to_global, centroid_input)
+    centroid_cropped = preproc.T_resized_to_crop.transform_points(centroid_resized)        
+    centroid_input = preproc.T_cropped_to_input.transform_points(centroid_cropped)
+    centroid_global = T_input_to_global.transform_points(centroid_input)
     
     direction = prop.principal_axis 
     if direction is None:
         return None
     
-    direction_global = transform_vector_2d(T_input_to_global, direction) 
+    direction_global = T_input_to_global.transform_vectors(direction) 
     angle = angle_between_vectors(direction, reference_vector)
     angle_global = angle_between_vectors(direction_global, reference_vector)
 

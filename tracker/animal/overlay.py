@@ -1,5 +1,5 @@
 from image_tools import im2uint8, im2rgb
-from geometry import transform_point_2d, SimilarityTransform2D
+from geometry import SimilarityTransform2D
 import numpy as np
 from numpy.typing import NDArray
 import cv2
@@ -51,7 +51,7 @@ class AnimalOverlay_opencv(AnimalOverlay):
             self,
             centroids: NDArray,
             image: NDArray, 
-            T_input_to_global: NDArray = SimilarityTransform2D.identity()
+            T_input_to_global: SimilarityTransform2D = SimilarityTransform2D.identity()
         ) -> NDArray:
 
 
@@ -61,7 +61,7 @@ class AnimalOverlay_opencv(AnimalOverlay):
         for idx, centroid in enumerate(centroids):
 
             # draw centroid
-            x,y = transform_point_2d(T_input_to_global, centroid).ravel()
+            x,y = T_input_to_global.transform_points(centroid)
             
             overlay = cv2.circle(
                 overlay,
