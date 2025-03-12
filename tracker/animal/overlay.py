@@ -61,7 +61,7 @@ class AnimalOverlay_opencv(AnimalOverlay):
         for idx, centroid in enumerate(centroids):
 
             # draw centroid
-            x,y = T_input_to_global.transform_points(centroid)
+            x,y = T_input_to_global.transform_points(centroid).ravel()
             
             overlay = cv2.circle(
                 overlay,
