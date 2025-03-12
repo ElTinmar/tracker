@@ -87,7 +87,7 @@ class BodyOverlay_opencv(BodyOverlay):
         overlay = im2rgb(im2uint8(image))
         original = overlay.copy()        
 
-        pix_per_mm_input =  pix_per_mm * transformation.scale_factor
+        pix_per_mm_input = pix_per_mm * transformation.scale_factor
         heading_len_px = max(1,int(self.overlay_param.heading_len_mm * pix_per_mm_input))
         arrow_radius_px = max(1,int(self.overlay_param.arrow_radius_mm * pix_per_mm_input))
 

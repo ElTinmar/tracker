@@ -37,7 +37,7 @@ class MultiFishTracker_CPU(MultiFishTracker):
                 )
 
                 R = SimilarityTransform2D.rotation(body['angle_rad'])
-                T = SimilarityTransform2D.translation(centroid[0], centroid[1])
+                T = SimilarityTransform2D.translation(body['centroid_global'][0], body['centroid_global'][1])
                 T0 = SimilarityTransform2D.translation(-centroid_rot[0], -centroid_rot[1])
             
                 # track eyes

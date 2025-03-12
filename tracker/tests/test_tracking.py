@@ -23,7 +23,7 @@ VIDEOS = [
     ('toy_data/single_headembedded_544x380px_param_nobckg.avi', 100)
 ]
 # background subtracted video
-VIDEO_NUM = 0
+VIDEO_NUM = 1
 INPUT_VIDEO, PIX_PER_MM = VIDEOS[VIDEO_NUM]
 
 video_reader = InMemory_OpenCV_VideoReader()
@@ -73,7 +73,7 @@ animal_tracker = AnimalTracker_CPU(
         max_width_mm=0,
         blur_sz_mm=0.6,
         median_filter_sz_mm=0,
-        downsample_factor=0.25,
+        downsample_factor=0.90,
         num_animals=num_animals,
         crop_dimension_mm=(width/PIX_PER_MM,height/PIX_PER_MM), 
         crop_offset_y_mm=0
