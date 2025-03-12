@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 import numpy as np
 from tracker.core import Tracker, TrackingOverlay, ParamTracking
+from functools import cached_property
 
 DTYPE_EYE = np.dtype([
     ('direction', np.single, (2,)),
@@ -21,15 +22,15 @@ class EyesTrackerParamTracking(ParamTracking):
     thresh_lo: float = 0.0
     thresh_hi: float = 1.0
     
-    @property
+    @cached_property
     def size_lo_px(self) -> int:
         return self.target_mm2px(self.size_lo_mm)
     
-    @property
+    @cached_property
     def size_hi_px(self) -> int:
         return self.target_mm2px(self.size_hi_mm)
     
-    @property
+    @cached_property
     def dtype(self) -> np.dtype:
         dt = np.dtype([
             ('left_eye', DTYPE_EYE),
