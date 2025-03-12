@@ -66,11 +66,13 @@ class AnimalOverlay_opencv(AnimalOverlay):
 
             # draw centroid
             x,y = T_input_to_global.transform_points(centroid).ravel()
+
+            radius_px = max(1,int(self.overlay_param.radius_mm * pix_per_mm * T_input_to_global.scale_factor))
             
             overlay = cv2.circle(
                 overlay,
                 (int(x),int(y)), 
-                int(self.overlay_param.radius_mm * pix_per_mm), 
+                radius_px, 
                 self.overlay_param.centroid_color_BGR, 
                 self.overlay_param.centroid_thickness
             )
