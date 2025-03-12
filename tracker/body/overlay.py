@@ -36,7 +36,7 @@ class BodyOverlay_opencv(BodyOverlay):
             self,
             image: NDArray, 
             tracking: Optional[NDArray],
-            T_input_to_global: NDArray = SimilarityTransform2D.identity()
+            T_input_to_global: SimilarityTransform2D = SimilarityTransform2D.identity()
         ) -> Optional[NDArray]:
 
         if tracking is None:
@@ -76,7 +76,7 @@ class BodyOverlay_opencv(BodyOverlay):
             image: NDArray, 
             centroid: NDArray,
             body_axes: NDArray, 
-            T_input_to_global: NDArray = SimilarityTransform2D.identity()
+            T_input_to_global: SimilarityTransform2D = SimilarityTransform2D.identity()
         ) -> Optional[NDArray]:
 
 

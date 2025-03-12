@@ -12,7 +12,7 @@ class TailOverlay_opencv(TailOverlay):
             self,
             image: NDArray, 
             tracking: Optional[NDArray],
-            T_input_to_global: NDArray = SimilarityTransform2D.identity()
+            T_input_to_global: SimilarityTransform2D = SimilarityTransform2D.identity()
         ) -> Optional[NDArray]:
 
         if tracking is None:
@@ -52,7 +52,7 @@ class TailOverlay_opencv(TailOverlay):
             image: NDArray, 
             skeleton: NDArray,
             skeleton_interp: NDArray,
-            T_input_to_global: NDArray = SimilarityTransform2D.identity()
+            T_input_to_global: SimilarityTransform2D = SimilarityTransform2D.identity()
         ) -> NDArray:
                 
         overlay = im2rgb(im2uint8(image))

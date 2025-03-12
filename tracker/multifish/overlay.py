@@ -17,7 +17,7 @@ class MultiFishOverlay_opencv(MultiFishOverlay):
             self, 
             image: NDArray, 
             tracking: Optional[NDArray], 
-            T_input_to_global: NDArray = SimilarityTransform2D.identity()
+            T_input_to_global: SimilarityTransform2D = SimilarityTransform2D.identity()
         ) -> NDArray:
 
         if (tracking is not None):

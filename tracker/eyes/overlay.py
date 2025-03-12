@@ -10,7 +10,7 @@ def disp_eye(
         image: NDArray, 
         eye_centroid: NDArray,
         eye_direction: NDArray,
-        T_input_to_global: NDArray,
+        T_input_to_global: SimilarityTransform2D,
         color: tuple, 
         eye_len_px: float, 
         thickness: int,
@@ -63,7 +63,7 @@ class EyesOverlay_opencv(EyesOverlay):
             self,
             image: NDArray, 
             tracking: Optional[NDArray],
-            T_input_to_global: NDArray = SimilarityTransform2D.identity()
+            T_input_to_global: SimilarityTransform2D = SimilarityTransform2D.identity()
         ) -> Optional[NDArray]:
 
         if tracking is None:
@@ -133,7 +133,7 @@ class EyesOverlay_opencv(EyesOverlay):
             image: NDArray, 
             centroid: Dict[str, NDArray],
             direction: Dict[str, NDArray],
-            T_input_to_global: NDArray = SimilarityTransform2D.identity()
+            T_input_to_global: SimilarityTransform2D = SimilarityTransform2D.identity()
         ) -> NDArray:
 
         '''
