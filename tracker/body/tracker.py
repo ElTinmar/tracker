@@ -70,6 +70,14 @@ class BodyTracker_CPU(BodyTracker):
         
         angle_rad = np.arctan2(body_axes[1,1], body_axes[0,1])
         angle_rad_global = np.arctan2(body_axes_global[1,1], body_axes_global[0,1])
+
+        T_global_to_input = T_input_to_global.inv()
+        T_input_to_cropped = preproc.T_cropped_to_input.inv()
+        T_cropped_to_resized = preproc.T_resized_to_crop.inv()
+        pix_per_mm_global = self.tracking_param.pix_per_mm
+        pix_per_mm_input = pix_per_mm_global * T_global_to_input.scale_factor
+        pix_per_mm_cropped = pix_per_mm_input * T_input_to_cropped.scale_factor
+        pix_per_mm_resized = pix_per_mm_cropped * T_cropped_to_resized.scale_factor
         
         res = np.array(
             (
@@ -83,7 +91,11 @@ class BodyTracker_CPU(BodyTracker):
                 angle_rad_global,
                 mask, 
                 preproc.image_processed,
-                preproc.image_cropped
+                preproc.image_cropped,
+                pix_per_mm_global,
+                pix_per_mm_input,
+                pix_per_mm_cropped,
+                pix_per_mm_resized,
             ), 
             dtype=self.tracking_param.dtype
         )

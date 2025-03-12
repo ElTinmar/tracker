@@ -63,13 +63,25 @@ class EyesTracker_CPU(EyesTracker):
             vertical_axis
         )
 
+        T_global_to_input = T_input_to_global.inv()
+        T_input_to_cropped = preproc.T_cropped_to_input.inv()
+        T_cropped_to_resized = preproc.T_resized_to_crop.inv()
+        pix_per_mm_global = self.tracking_param.pix_per_mm
+        pix_per_mm_input = pix_per_mm_global * T_global_to_input.scale_factor
+        pix_per_mm_cropped = pix_per_mm_input * T_input_to_cropped.scale_factor
+        pix_per_mm_resized = pix_per_mm_cropped * T_cropped_to_resized.scale_factor
+
         res = np.array(
             (
                 np.zeros(1,dtype=DTYPE_EYE) if left_eye is None else left_eye, 
                 np.zeros(1,dtype=DTYPE_EYE) if right_eye is None else right_eye,                
                 mask, 
                 preproc.image_processed,
-                preproc.image_cropped 
+                preproc.image_cropped,
+                pix_per_mm_global,
+                pix_per_mm_input,
+                pix_per_mm_cropped,
+                pix_per_mm_resized,
             ), 
             dtype = self.tracking_param.dtype
         )
