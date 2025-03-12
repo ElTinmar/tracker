@@ -64,16 +64,11 @@ class AnimalTracker_CPU(AnimalTracker):
             cv2.INTER_NEAREST
         )
 
-        # This works if isotropy is preserved (same x,y scale)
-        # T_input_to_global could break that
         pix_per_mm_global = self.tracking_param.pix_per_mm
         pix_per_mm_input = pix_per_mm_global * T_global_to_input.scale_factor
         pix_per_mm_cropped = pix_per_mm_input * T_input_to_cropped.scale_factor
         pix_per_mm_resized = pix_per_mm_cropped * T_cropped_to_resized.scale_factor
         pix_per_mm_downsampled = pix_per_mm_input * self.tracking_param.downsample_factor
-
-        if not np.isclose(pix_per_mm_resized, self.tracking_param.target_pix_per_mm):
-            print(f'scaling problem, {pix_per_mm_resized} vs {self.tracking_param.target_pix_per_mm}')
 
         res = np.array(
             (

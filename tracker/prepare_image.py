@@ -55,9 +55,7 @@ def crop(
         left+pad_left:right-pad_right
     ]
 
-    # cropped space to input space
     T_cropped_to_input = SimilarityTransform2D.translation(left, bottom)
-
     return image_cropped, T_cropped_to_input
 
 def resize(
@@ -84,13 +82,7 @@ def resize(
         interpolation=cv2.INTER_NEAREST
     )
 
-    # resized space to input space
     s = image.shape[1] / target_dimension_px[0]
-    sy = image.shape[0] / target_dimension_px[1]
-    
-    # TODO remove that
-    print(s, sy)
-    
     T_resized_to_crop =  SimilarityTransform2D.scaling(s)
 
     return image_resized, T_resized_to_crop
