@@ -70,7 +70,6 @@ class AnimalTrackerParamTracking(ParamTracking):
         
 @dataclass
 class AnimalTrackerParamOverlay:
-    pix_per_mm: float = 40.0
     radius_mm: float = 0.1
     centroid_color_BGR: tuple = (128, 255, 128)
     centroid_thickness: int = -1
@@ -78,12 +77,6 @@ class AnimalTrackerParamOverlay:
     label_offset: int = 10
     alpha: float = 0.5
 
-    def mm2px(self, val_mm):
-        return int(val_mm * self.pix_per_mm) 
-
-    @property
-    def radius_px(self):
-        return self.mm2px(self.radius_mm)
     
 class Assignment(Protocol):
 

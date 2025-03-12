@@ -21,6 +21,7 @@ class AnimalOverlay_opencv(AnimalOverlay):
         return self._overlay(
             centroids = tracking['centroids_global'],
             image = image,
+            pix_per_mm = tracking['pix_per_mm_global'],
             T_input_to_global = T_input_to_global
         )
 
@@ -34,6 +35,7 @@ class AnimalOverlay_opencv(AnimalOverlay):
         return self._overlay(
             centroids = tracking['centroids_cropped'],
             image = tracking['image_downsampled'],
+            pix_per_mm = tracking['pix_per_mm_downsampled'],
             T_input_to_global = S
         )
 
@@ -44,6 +46,7 @@ class AnimalOverlay_opencv(AnimalOverlay):
         
         return self._overlay(
             centroids = tracking['centroids_resized'],
+            pix_per_mm = tracking['pix_per_mm_resized'],
             image = tracking['image_processed']
         )
 
@@ -51,7 +54,8 @@ class AnimalOverlay_opencv(AnimalOverlay):
             self,
             centroids: NDArray,
             image: NDArray, 
-            T_input_to_global: SimilarityTransform2D = SimilarityTransform2D.identity()
+            pix_per_mm: float,
+            T_input_to_global: SimilarityTransform2D = SimilarityTransform2D.identity(),
         ) -> NDArray:
 
 
@@ -66,7 +70,7 @@ class AnimalOverlay_opencv(AnimalOverlay):
             overlay = cv2.circle(
                 overlay,
                 (int(x),int(y)), 
-                self.overlay_param.radius_px, 
+                int(self.overlay_param.radius_mm * pix_per_mm), 
                 self.overlay_param.centroid_color_BGR, 
                 self.overlay_param.centroid_thickness
             )
