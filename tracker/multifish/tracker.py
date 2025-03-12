@@ -13,7 +13,7 @@ class MultiFishTracker_CPU(MultiFishTracker):
             return None
 
         # get animal centroids (only crude location is necessary)
-        animals = self.tracking_param.animal.track(image)
+        animals = self.tracking_param.animal.track(image, None, SimilarityTransform2D.identity())
         
         bodies = []
         eyes = []
@@ -25,8 +25,7 @@ class MultiFishTracker_CPU(MultiFishTracker):
             if self.tracking_param.body is not None:
 
                 # get more precise centroid and orientation of the animals
-                T_body = SimilarityTransform2D.identity()
-                body = self.tracking_param.body.track(image, centroid, T_body)
+                body = self.tracking_param.body.track(image, centroid, SimilarityTransform2D.identity())
                 bodies.append(body)
                     
                 # rotate the animal so that it's vertical head up
