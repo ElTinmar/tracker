@@ -7,13 +7,18 @@ from geometry import SimilarityTransform2D
 
 class MultiFishTracker_CPU(MultiFishTracker):
 
-    def track(self, image: NDArray, centroid: Optional[NDArray] = None) -> Optional[NDArray]:
+    def track(
+            self, 
+            image: NDArray, 
+            centroid: Optional[NDArray] = None,
+            T_input_to_global: SimilarityTransform2D = SimilarityTransform2D.identity()
+        ) -> Optional[NDArray]:
 
         if (image is None) or (image.size == 0):
             return None
 
         # get animal centroids (only crude location is necessary)
-        animals = self.tracking_param.animal.track(image, None, SimilarityTransform2D.identity())
+        animals = self.tracking_param.animal.track(image, None, T_input_to_global)
         
         bodies = []
         eyes = []
@@ -25,7 +30,7 @@ class MultiFishTracker_CPU(MultiFishTracker):
             if self.tracking_param.body is not None:
 
                 # get more precise centroid and orientation of the animals
-                body = self.tracking_param.body.track(image, centroid, SimilarityTransform2D.identity())
+                body = self.tracking_param.body.track(image, centroid, T_input_to_global)
                 bodies.append(body)
                     
                 # rotate the animal so that it's vertical head up
@@ -38,7 +43,7 @@ class MultiFishTracker_CPU(MultiFishTracker):
                 R = SimilarityTransform2D.rotation(body['angle_rad'])
                 T = SimilarityTransform2D.translation(body['centroid_global'][0], body['centroid_global'][1])
                 T0 = SimilarityTransform2D.translation(-centroid_rot[0], -centroid_rot[1])
-                T_image_rot_to_global =  T @ R @ T0
+                T_image_rot_to_global =  T_input_to_global @ T @ R @ T0
             
                 # track eyes
                 if self.tracking_param.eyes is not None:
