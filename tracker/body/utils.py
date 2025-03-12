@@ -1,8 +1,7 @@
-from sklearn.decomposition import PCA
+from geometry import pca
 from numpy.typing import NDArray
-from typing import Tuple, List, Optional
+from typing import Optional
 import numpy as np
-from skimage.measure._regionprops import RegionProperties
 
 def get_best_centroid_index(
         centroids: NDArray, 
@@ -27,12 +26,9 @@ def get_orientation(coordinates: NDArray) -> Optional[NDArray]:
     # if only one point, or points aligned in 1D, quit
     if (coordinates.shape[0] <= 1) or np.any(np.var(coordinates, axis=0) == 0):
         return None
-    
-    pca = PCA()
-    scores = pca.fit_transform(coordinates)
 
     # PCs are organized in rows, transform to columns
-    body_axes = pca.components_.T
+    body_axes, scores = pca(coordinates)
 
     # resolve 180 degrees ambiguity in first PC
     if abs(max(scores[:,0])) > abs(min(scores[:,0])):
