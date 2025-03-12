@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from numpy.typing import NDArray 
 from typing import Optional, Tuple
+from geometry import SimilarityTransform2D
 
 @dataclass
 class ParamTracking:
@@ -59,7 +60,7 @@ class Tracker(ABC):
             self, 
             image: NDArray,
             centroid: Optional[NDArray],
-            T_input_to_global: Optional[NDArray]
+            T_input_to_global: Optional[SimilarityTransform2D]
         ) -> Optional[NDArray]:
         '''
         image: image to track, preferably background subtracted
