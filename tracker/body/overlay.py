@@ -36,7 +36,7 @@ class BodyOverlay_opencv(BodyOverlay):
             self,
             image: NDArray, 
             tracking: Optional[NDArray],
-            T_input_to_global: SimilarityTransform2D = SimilarityTransform2D.identity()
+            T_global_to_input: SimilarityTransform2D = SimilarityTransform2D.identity()
         ) -> Optional[NDArray]:
 
         if tracking is None:
@@ -47,7 +47,7 @@ class BodyOverlay_opencv(BodyOverlay):
             body_axes = tracking['body_axes_global'],
             image = image,
             pix_per_mm = tracking['pix_per_mm_global'],
-            transformation = T_input_to_global
+            transformation = T_global_to_input
         )
     
     def overlay_cropped(self, tracking: Optional[NDArray]) -> Optional[NDArray]:
@@ -87,7 +87,7 @@ class BodyOverlay_opencv(BodyOverlay):
         overlay = im2rgb(im2uint8(image))
         original = overlay.copy()        
 
-        pix_per_mm_input =  pix_per_mm * transformation.inv().scale_factor
+        pix_per_mm_input =  pix_per_mm * transformation.scale_factor
         heading_len_px = max(1,int(self.overlay_param.heading_len_mm * pix_per_mm_input))
         arrow_radius_px = max(1,int(self.overlay_param.arrow_radius_mm * pix_per_mm_input))
 

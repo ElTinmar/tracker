@@ -76,7 +76,7 @@ class TrackingOverlay(ABC):
             self, 
             image: NDArray, 
             tracking: Optional[NDArray], 
-            T_input_to_global: SimilarityTransform2D 
+            T_global_to_input: SimilarityTransform2D 
         ) -> Optional[NDArray]:
         pass
     
