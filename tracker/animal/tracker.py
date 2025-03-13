@@ -68,6 +68,7 @@ class AnimalTracker_CPU(AnimalTracker):
         pix_per_mm_downsampled = pix_per_mm_input * self.tracking_param.downsample_factor
 
         # NOTE: for large image/many fish, creating that array might take time
+        # maybe pre-allocate ?
         res = np.array(
             (
                 self.tracking_param.num_animals,
