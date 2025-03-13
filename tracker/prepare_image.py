@@ -11,7 +11,7 @@ def crop(
         crop_dimension_px: Tuple[int, int],
         vertical_offset_px: int = 0,
         centroid: Optional[NDArray] = None,
-    ) -> Optional[Tuple[NDArray, SimilarityTransform2D]]:
+    ) -> Optional[Tuple[NDArray, SimilarityTransform2D, SimilarityTransform2D]]:
     """
     Crops a fixed-size region from an image, optionally centered around a given centroid.
 
@@ -26,7 +26,7 @@ def crop(
     """
 
     if image.shape[:2] == crop_dimension_px[::-1]:
-        return image, SimilarityTransform2D.identity()
+        return image, SimilarityTransform2D.identity(), SimilarityTransform2D.identity()
 
     if centroid is None:
         centroid = np.array(image.shape[:2]) // 2
@@ -56,12 +56,13 @@ def crop(
     ]
 
     T_cropped_to_input = SimilarityTransform2D.translation(left, bottom)
-    return image_cropped, T_cropped_to_input
+    T_input_to_cropped = SimilarityTransform2D.translation(-left, -bottom)
+    return image_cropped, T_cropped_to_input, T_input_to_cropped
 
 def resize(
         image: NDArray,
         target_dimension_px: Tuple[int, int], 
-    ) -> Tuple[NDArray, SimilarityTransform2D]:
+    ) -> Tuple[NDArray, SimilarityTransform2D, SimilarityTransform2D]:
     """
     Resize an image to the specified dimensions.
 
@@ -74,7 +75,7 @@ def resize(
     """
 
     if image.shape[:2] == target_dimension_px[::-1]:
-        return image, SimilarityTransform2D.identity()
+        return image, SimilarityTransform2D.identity(), SimilarityTransform2D.identity()
 
     image_resized = cv2.resize(
         image, 
@@ -83,16 +84,19 @@ def resize(
     )
 
     s = image.shape[1] / target_dimension_px[0]
-    T_resized_to_crop =  SimilarityTransform2D.scaling(s)
+    T_resized_to_cropped =  SimilarityTransform2D.scaling(s)
+    T_cropped_to_resized =  SimilarityTransform2D.scaling(1.0/s)
 
-    return image_resized, T_resized_to_crop
+    return image_resized, T_resized_to_cropped, T_cropped_to_resized
 
 class Preprocessing(NamedTuple):
     image_cropped: NDArray
     image_resized: NDArray
     image_processed: NDArray
     T_cropped_to_input: SimilarityTransform2D
-    T_resized_to_crop: SimilarityTransform2D
+    T_input_to_cropped: SimilarityTransform2D
+    T_resized_to_cropped: SimilarityTransform2D
+    T_cropped_to_resized: SimilarityTransform2D
 
 def preprocess_image(
         image: NDArray, 
@@ -111,10 +115,10 @@ def preprocess_image(
     if cropping is None:
         return None
 
-    image_cropped, T_cropped_to_input = cropping
+    image_cropped, T_cropped_to_input, T_input_to_cropped = cropping
 
     # resize ---------------------
-    image_resized, T_resized_to_crop = resize(
+    image_resized, T_resized_to_cropped, T_cropped_to_resized = resize(
         image = image_cropped,
         target_dimension_px = params.resized_dimension_px, 
     )
@@ -133,5 +137,7 @@ def preprocess_image(
         image_resized, 
         image_processed,
         T_cropped_to_input,
-        T_resized_to_crop
+        T_input_to_cropped,
+        T_resized_to_cropped,
+        T_cropped_to_resized
     )

@@ -51,6 +51,9 @@ class MultiFishTrackerParamTracking:
         dt = np.dtype(dt_list)
         return dt
 
+    @cached_property
+    def failed(self):
+        return np.zeros((), dtype=self.dtype)
 
 @dataclass
 class MultiFishTrackerParamOverlay:

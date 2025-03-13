@@ -20,15 +20,13 @@ class TailTracker_CPU(TailTracker):
             - scale of the full-resolution image, before resizing
         """
 
-        failed = np.zeros((), dtype=self.tracking_param.dtype)
-
         if (image is None) or (image.size == 0) or (centroid is None):
-            return failed
+            return self.tracking_param.failed
         
         preproc = preprocess_image(image, centroid, self.tracking_param)
         
         if preproc is None:
-            return failed
+            return self.tracking_param.failed
 
         # track
         skeleton_resized, skeleton_interp_resized = tail_skeleton_ball(
@@ -43,21 +41,19 @@ class TailTracker_CPU(TailTracker):
         )
 
         # transform coordinates
-        skeleton_cropped = preproc.T_resized_to_crop.transform_points(skeleton_resized)
+        skeleton_cropped = preproc.T_resized_to_cropped.transform_points(skeleton_resized)
         skeleton_input = preproc.T_cropped_to_input.transform_points(skeleton_cropped)
         skeleton_global = T_input_to_global.transform_points(skeleton_input)
 
-        skeleton_interp_cropped = preproc.T_resized_to_crop.transform_points(skeleton_interp_resized)
+        skeleton_interp_cropped = preproc.T_resized_to_cropped.transform_points(skeleton_interp_resized)
         skeleton_interp_input = preproc.T_cropped_to_input.transform_points(skeleton_interp_cropped)
         skeleton_interp_global = T_input_to_global.transform_points(skeleton_interp_input)
 
         T_global_to_input = T_input_to_global.inv()
-        T_input_to_cropped = preproc.T_cropped_to_input.inv()
-        T_cropped_to_resized = preproc.T_resized_to_crop.inv()
         pix_per_mm_global = self.tracking_param.pix_per_mm
         pix_per_mm_input = pix_per_mm_global * T_global_to_input.scale_factor
-        pix_per_mm_cropped = pix_per_mm_input * T_input_to_cropped.scale_factor
-        pix_per_mm_resized = pix_per_mm_cropped * T_cropped_to_resized.scale_factor
+        pix_per_mm_cropped = pix_per_mm_input * preproc.T_input_to_cropped.scale_factor
+        pix_per_mm_resized = pix_per_mm_cropped * preproc.T_cropped_to_resized.scale_factor
         
         # save result to numpy structured array
         res = np.array(

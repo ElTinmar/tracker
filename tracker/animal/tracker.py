@@ -16,15 +16,14 @@ class AnimalTracker_CPU(AnimalTracker):
         T_input_to_global: Optional[SimilarityTransform2D] = SimilarityTransform2D.identity() # input to global space transform
     ) -> NDArray:
         
-        failed = np.zeros((), dtype=self.tracking_param.dtype)
 
         if (image is None) or (image.size == 0):
-            return failed
+            return self.tracking_param.failed
         
         preproc = preprocess_image(image, centroid, self.tracking_param)
         
         if preproc is None:
-            return failed
+            return self.tracking_param.failed
         
         mask = cv2.compare(preproc.image_processed, self.tracking_param.intensity, cv2.CMP_GT)
         centroids_resized = bwareafilter_centroids_cv2(
@@ -38,10 +37,10 @@ class AnimalTracker_CPU(AnimalTracker):
         )     
         
         if centroids_resized.size == 0:
-            return failed
+            return self.tracking_param.failed
 
         # transform coordinates
-        centroids_cropped = preproc.T_resized_to_crop.transform_points(centroids_resized)
+        centroids_cropped = preproc.T_resized_to_cropped.transform_points(centroids_resized)
         centroids_input = preproc.T_cropped_to_input.transform_points(centroids_cropped)
         centroids_global = T_input_to_global.transform_points(centroids_input)
 
@@ -49,12 +48,10 @@ class AnimalTracker_CPU(AnimalTracker):
         centroids_global = self.assignment.update(centroids_global)  
 
         T_global_to_input = T_input_to_global.inv()
-        T_input_to_cropped = preproc.T_cropped_to_input.inv()
-        T_cropped_to_resized = preproc.T_resized_to_crop.inv()
 
         centroids_input = T_global_to_input.transform_points(centroids_global)
-        centroids_cropped = T_input_to_cropped.transform_points(centroids_input)
-        centroids_resized = T_cropped_to_resized.transform_points(centroids_cropped)
+        centroids_cropped = preproc.T_input_to_cropped.transform_points(centroids_input)
+        centroids_resized = preproc.T_cropped_to_resized.transform_points(centroids_cropped)
 
         # Downsample image export (a bit easier on RAM). This is used for overlay instead of image_cropped
         # NOTE: it introduces a special case, not a big fan of this
@@ -66,10 +63,11 @@ class AnimalTracker_CPU(AnimalTracker):
 
         pix_per_mm_global = self.tracking_param.pix_per_mm
         pix_per_mm_input = pix_per_mm_global * T_global_to_input.scale_factor
-        pix_per_mm_cropped = pix_per_mm_input * T_input_to_cropped.scale_factor
-        pix_per_mm_resized = pix_per_mm_cropped * T_cropped_to_resized.scale_factor
+        pix_per_mm_cropped = pix_per_mm_input * preproc.T_input_to_cropped.scale_factor
+        pix_per_mm_resized = pix_per_mm_cropped * preproc.T_cropped_to_resized.scale_factor
         pix_per_mm_downsampled = pix_per_mm_input * self.tracking_param.downsample_factor
 
+        # NOTE: for large image/many fish, creating that array might take time
         res = np.array(
             (
                 self.tracking_param.num_animals,

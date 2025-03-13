@@ -57,7 +57,11 @@ class BodyTrackerParamTracking(ParamTracking):
             ('pix_per_mm_resized', np.float32),
         ])
         return dt
-
+    
+    @cached_property
+    def failed(self):
+        return np.zeros((), dtype=self.dtype)
+    
 @dataclass
 class BodyTrackerParamOverlay:
     heading_len_mm: float = 1

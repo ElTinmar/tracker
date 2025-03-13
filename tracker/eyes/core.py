@@ -44,7 +44,11 @@ class EyesTrackerParamTracking(ParamTracking):
             ('pix_per_mm_resized', np.float32),
         ])
         return dt
-    
+
+    @cached_property
+    def failed(self):
+        return np.zeros((), dtype=self.dtype)
+        
 @dataclass
 class EyesTrackerParamOverlay:
     eye_len_mm: float = 0.25

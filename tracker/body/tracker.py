@@ -25,15 +25,13 @@ class BodyTracker_CPU(BodyTracker):
             - scale of the full-resolution image, before resizing
         '''
 
-        failed = np.zeros((), dtype=self.tracking_param.dtype)
-
         if (image is None) or (image.size == 0):
-            return failed
+            return self.tracking_param.failed
         
         preproc = preprocess_image(image, centroid, self.tracking_param)
         
         if preproc is None:
-            return failed
+            return self.tracking_param.failed
 
         mask = cv2.compare(preproc.image_processed, self.tracking_param.intensity, cv2.CMP_GT)
         props = bwareafilter_props_cv2(
@@ -47,10 +45,10 @@ class BodyTracker_CPU(BodyTracker):
         )
 
         if not props:
-            return failed
+            return self.tracking_param.failed
         
         centroids_resized = np.array([[blob.centroid[1], blob.centroid[0]] for blob in props]) #(row, col) to (x,y)
-        centroids_cropped = preproc.T_resized_to_crop.transform_points(centroids_resized)
+        centroids_cropped = preproc.T_resized_to_cropped.transform_points(centroids_resized)
         centroids_input = preproc.T_cropped_to_input.transform_points(centroids_cropped)
         centroids_global = T_input_to_global.transform_points(centroids_input)
 
@@ -64,7 +62,7 @@ class BodyTracker_CPU(BodyTracker):
         coordinates_resized = np.fliplr(props[index].coords)
         body_axes = get_orientation(coordinates_resized)
         if body_axes is None:
-            return failed
+            return self.tracking_param.failed
         
         body_axes_global = T_input_to_global.transform_vectors(body_axes) 
         
@@ -72,12 +70,10 @@ class BodyTracker_CPU(BodyTracker):
         angle_rad_global = np.arctan2(body_axes_global[1,1], body_axes_global[0,1])
 
         T_global_to_input = T_input_to_global.inv()
-        T_input_to_cropped = preproc.T_cropped_to_input.inv()
-        T_cropped_to_resized = preproc.T_resized_to_crop.inv()
         pix_per_mm_global = self.tracking_param.pix_per_mm
         pix_per_mm_input = pix_per_mm_global * T_global_to_input.scale_factor
-        pix_per_mm_cropped = pix_per_mm_input * T_input_to_cropped.scale_factor
-        pix_per_mm_resized = pix_per_mm_cropped * T_cropped_to_resized.scale_factor
+        pix_per_mm_cropped = pix_per_mm_input * preproc.T_input_to_cropped.scale_factor
+        pix_per_mm_resized = pix_per_mm_cropped * preproc.T_cropped_to_resized.scale_factor
         
         res = np.array(
             (

@@ -18,7 +18,7 @@ def get_eye_properties(
     ) -> Optional[NDArray]:
 
     centroid_resized = np.asarray(prop.centroid[::-1], dtype=np.float32)
-    centroid_cropped = preproc.T_resized_to_crop.transform_points(centroid_resized)        
+    centroid_cropped = preproc.T_resized_to_cropped.transform_points(centroid_resized)        
     centroid_input = preproc.T_cropped_to_input.transform_points(centroid_cropped)
     centroid_global = T_input_to_global.transform_points(centroid_input)
     

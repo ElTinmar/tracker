@@ -68,6 +68,11 @@ class AnimalTrackerParamTracking(ParamTracking):
             ('pix_per_mm_downsampled', np.float32)
         ])
         return dt
+    
+    @cached_property
+    def failed(self):
+        return np.zeros((), dtype=self.dtype)
+
         
 @dataclass
 class AnimalTrackerParamOverlay:

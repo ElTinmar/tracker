@@ -20,15 +20,13 @@ class EyesTracker_CPU(EyesTracker):
             - scale of the full-resolution image, before resizing
         """
 
-        failed = np.zeros((), dtype=self.tracking_param.dtype)
-
         if (image is None) or (image.size == 0) or (centroid is None):
-            return failed
+            return self.tracking_param.failed
         
         preproc = preprocess_image(image, centroid, self.tracking_param)
         
         if preproc is None:
-            return failed
+            return self.tracking_param.failed
         
         # sweep threshold to obtain 3 connected component within size range (include swim bladder)
         found_eyes_and_sb, props, mask = find_eyes_and_swimbladder(
@@ -41,7 +39,7 @@ class EyesTracker_CPU(EyesTracker):
         )
 
         if not found_eyes_and_sb:
-            return failed 
+            return self.tracking_param.failed 
         
         # identify left eye, right eye and swimbladder
         blob_centroids = np.array([blob.centroid[::-1] for blob in props])
@@ -64,12 +62,10 @@ class EyesTracker_CPU(EyesTracker):
         )
 
         T_global_to_input = T_input_to_global.inv()
-        T_input_to_cropped = preproc.T_cropped_to_input.inv()
-        T_cropped_to_resized = preproc.T_resized_to_crop.inv()
         pix_per_mm_global = self.tracking_param.pix_per_mm
         pix_per_mm_input = pix_per_mm_global * T_global_to_input.scale_factor
-        pix_per_mm_cropped = pix_per_mm_input * T_input_to_cropped.scale_factor
-        pix_per_mm_resized = pix_per_mm_cropped * T_cropped_to_resized.scale_factor
+        pix_per_mm_cropped = pix_per_mm_input * preproc.T_input_to_cropped.scale_factor
+        pix_per_mm_resized = pix_per_mm_cropped * preproc.T_cropped_to_resized.scale_factor
 
         res = np.array(
             (

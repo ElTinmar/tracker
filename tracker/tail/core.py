@@ -43,6 +43,10 @@ class TailTrackerParamTracking(ParamTracking):
         ])
         return dt
 
+    @cached_property
+    def failed(self):
+        return np.zeros((), dtype=self.dtype)
+    
 @dataclass
 class TailTrackerParamOverlay:
     color_BGR: tuple = (255, 128, 128)
