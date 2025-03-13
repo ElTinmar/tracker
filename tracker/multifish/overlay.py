@@ -23,11 +23,16 @@ class MultiFishOverlay_opencv(MultiFishOverlay):
         if (tracking is not None):
 
             overlay = im2rgb(im2uint8(image))
-            overlay = self.overlay_param.animal.overlay_global(overlay, tracking['animals'], T_global_to_input)         
+            overlay = self.overlay_param.animal.overlay_global(
+                overlay, 
+                tracking['animals'], 
+                T_global_to_input
+            )         
 
             for idx, _ in enumerate(tracking['animals']['centroids_global']):
 
                 if (self.overlay_param.body is not None) and ('body' in tracking.dtype.fields):
+                    
                     overlay = self.overlay_param.body.overlay_global(
                         overlay, 
                         tracking['body'][idx], 
