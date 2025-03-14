@@ -12,7 +12,7 @@ class BodyTracker_CPU(BodyTracker):
         
     def track(
             self,
-            image: Optional[NDArray], 
+            image: NDArray, 
             centroid: Optional[NDArray] = None, # centroids in global space
             T_input_to_global: Optional[SimilarityTransform2D] = SimilarityTransform2D.identity()
         ) -> NDArray:
@@ -25,11 +25,8 @@ class BodyTracker_CPU(BodyTracker):
             - scale of the full-resolution image, before resizing
         '''
 
-        if (image is None) or (image.size == 0):
-            return self.tracking_param.failed
-        
         self.tracking_param.input_image_shape = image.shape
-        
+                
         preproc = preprocess_image(image, centroid, self.tracking_param)
         
         if preproc is None:

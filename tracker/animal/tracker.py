@@ -16,12 +16,8 @@ class AnimalTracker_CPU(AnimalTracker):
         T_input_to_global: Optional[SimilarityTransform2D] = SimilarityTransform2D.identity() # input to global space transform
     ) -> NDArray:
         
-
-        if (image is None) or (image.size == 0):
-            return self.tracking_param.failed
-        
         self.tracking_param.input_image_shape = image.shape
-        
+                
         preproc = preprocess_image(image, centroid, self.tracking_param)
         
         if preproc is None:

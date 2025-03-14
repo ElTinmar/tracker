@@ -20,10 +20,10 @@ class EyesTracker_CPU(EyesTracker):
             - scale of the full-resolution image, before resizing
         """
 
-        if (image is None) or (image.size == 0) or (centroid is None):
-            return self.tracking_param.failed
-        
         self.tracking_param.input_image_shape = image.shape
+
+        if centroid is None:
+            return self.tracking_param.failed
         
         preproc = preprocess_image(image, centroid, self.tracking_param)
         

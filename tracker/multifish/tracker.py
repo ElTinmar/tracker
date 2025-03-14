@@ -14,9 +14,6 @@ class MultiFishTracker_CPU(MultiFishTracker):
             T_input_to_global: SimilarityTransform2D = SimilarityTransform2D.identity()
         ) -> Optional[NDArray]:
 
-        if (image is None) or (image.size == 0):
-            return None
-
         # get animal centroids (only crude location is necessary)
         animals = self.tracking_param.animal.track(image, None, T_input_to_global)
         
