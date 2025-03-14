@@ -6,7 +6,7 @@ from tracker.eyes import EyesOverlay, EyesTracker
 from tracker.tail import TailOverlay, TailTracker
 from dataclasses import dataclass
 import numpy as np
-from functools import cached_property
+
 
 class Accumulator(Protocol):
     def update(self):
@@ -20,7 +20,7 @@ class MultiFishTrackerParamTracking:
     eyes: Optional[EyesTracker] 
     tail: Optional[TailTracker]
 
-    @cached_property
+    @property
     def dtype(self) -> np.dtype:
 
         dt_list = [
@@ -51,7 +51,7 @@ class MultiFishTrackerParamTracking:
         dt = np.dtype(dt_list)
         return dt
 
-    @cached_property
+    @property
     def failed(self):
         return np.zeros((), dtype=self.dtype)
 

@@ -1,7 +1,7 @@
 import numpy as np
 from dataclasses import dataclass
 from tracker.core import Tracker, TrackingOverlay, ParamTracking
-from functools import cached_property
+
 
 @dataclass
 class BodyTrackerParamTracking(ParamTracking):
@@ -13,31 +13,31 @@ class BodyTrackerParamTracking(ParamTracking):
     max_width_mm: float = 3.0
     intensity: float = 0.2
     
-    @cached_property
+    @property
     def min_size_px(self) -> int:
         return self.target_mm2px(self.min_size_mm)
     
-    @cached_property
+    @property
     def max_size_px(self) -> int:
         return self.target_mm2px(self.max_size_mm) 
         
-    @cached_property
+    @property
     def min_length_px(self) -> int:
         return self.target_mm2px(self.min_length_mm)
     
-    @cached_property
+    @property
     def max_length_px(self) -> int:
         return self.target_mm2px(self.max_length_mm)
 
-    @cached_property
+    @property
     def min_width_px(self) -> int:
         return self.target_mm2px(self.min_width_mm)
     
-    @cached_property
+    @property
     def max_width_px(self) -> int:
         return self.target_mm2px(self.max_width_mm)
     
-    @cached_property
+    @property
     def dtype(self) -> np.dtype:
         dt = np.dtype([
             ('body_axes', np.float32, (2,2)),
@@ -58,7 +58,7 @@ class BodyTrackerParamTracking(ParamTracking):
         ])
         return dt
     
-    @cached_property
+    @property
     def failed(self):
         return np.zeros((), dtype=self.dtype)
     

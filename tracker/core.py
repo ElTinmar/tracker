@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from numpy.typing import NDArray 
 from typing import Optional, Tuple
 from geometry import SimilarityTransform2D
-from functools import cached_property
+
 
 @dataclass
 class ParamTracking:
@@ -23,23 +23,23 @@ class ParamTracking:
     def source_mm2px(self, val_mm):
         return int(val_mm * self.pix_per_mm) 
     
-    @cached_property
+    @property
     def resize(self):
         return self.target_pix_per_mm/self.pix_per_mm
 
-    @cached_property
+    @property
     def blur_sz_px(self):
         return self.target_mm2px(self.blur_sz_mm) 
 
-    @cached_property
+    @property
     def median_filter_sz_px(self):
         return self.target_mm2px(self.median_filter_sz_mm) 
 
-    @cached_property
+    @property
     def crop_offset_y_px(self):
         return self.target_mm2px(self.crop_offset_y_mm) 
 
-    @cached_property
+    @property
     def resized_dimension_px(self):
         # some video codec require height, width to be divisible by 2
         if self.crop_dimension_mm == (0, 0): 
@@ -53,7 +53,7 @@ class ParamTracking:
                 2 * (self.target_mm2px(self.crop_dimension_mm[1])//2)
             ) 
     
-    @cached_property
+    @property
     def crop_dimension_px(self):
         # some video codec require height, width to be divisible by 2
         return (

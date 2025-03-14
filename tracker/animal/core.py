@@ -4,7 +4,7 @@ from tracker.core import Tracker, TrackingOverlay
 import numpy as np
 from numpy.typing import NDArray
 from tracker.core import ParamTracking
-from functools import cached_property
+
 
 @dataclass
 class AnimalTrackerParamTracking(ParamTracking):        
@@ -18,38 +18,38 @@ class AnimalTrackerParamTracking(ParamTracking):
     num_animals: int = 1
     intensity: float = 0.2
     
-    @cached_property
+    @property
     def downsampled_shape(self) -> Tuple[int, int]:
         return (
             int(2*((self.downsample_factor * self.input_image_shape[0])//2)),
             int(2*((self.downsample_factor * self.input_image_shape[1])//2))
         ) 
 
-    @cached_property
+    @property
     def min_size_px(self) -> int:
         return self.target_mm2px(self.min_size_mm)
     
-    @cached_property
+    @property
     def max_size_px(self) -> int:
         return self.target_mm2px(self.max_size_mm) 
         
-    @cached_property
+    @property
     def min_length_px(self) -> int:
         return self.target_mm2px(self.min_length_mm)
     
-    @cached_property
+    @property
     def max_length_px(self) -> int:
         return self.target_mm2px(self.max_length_mm)
 
-    @cached_property
+    @property
     def min_width_px(self) -> int:
         return self.target_mm2px(self.min_width_mm)
     
-    @cached_property
+    @property
     def max_width_px(self) -> int:
         return self.target_mm2px(self.max_width_mm)
 
-    @cached_property
+    @property
     def dtype(self) -> np.dtype:
         dt = np.dtype([
             ('num_animals', int),
@@ -69,7 +69,7 @@ class AnimalTrackerParamTracking(ParamTracking):
         ])
         return dt
     
-    @cached_property
+    @property
     def failed(self):
         return np.zeros((), dtype=self.dtype)
 
