@@ -7,7 +7,7 @@ from functools import cached_property
 
 @dataclass
 class ParamTracking:
-    input_image_shape: Tuple[int, int] 
+    input_image_shape: Tuple[int, int] = (0, 0)
     pix_per_mm: float = 30
     target_pix_per_mm: float = 30
     crop_dimension_mm: Tuple[float, float] = (0, 0)

@@ -13,7 +13,7 @@ import numpy as np
 import cv2
 from geometry import SimilarityTransform2D
 
-DISPLAY=False
+DISPLAY=True
 
 # background subtracted video
 VIDEOS = [
@@ -60,6 +60,7 @@ assignment = GridAssignment(LUT, num_animals)
 animal_tracker = AnimalTracker_CPU(
     assignment=assignment,
     tracking_param=AnimalTrackerParamTracking(
+        input_image_shape=(height, width),
         pix_per_mm=PIX_PER_MM,
         target_pix_per_mm=5,
         intensity=0.15,
@@ -75,12 +76,13 @@ animal_tracker = AnimalTracker_CPU(
         median_filter_sz_mm=0,
         downsample_factor=0.90,
         num_animals=num_animals,
-        crop_dimension_mm=(width/PIX_PER_MM,height/PIX_PER_MM), 
+        crop_dimension_mm=(0,0), 
         crop_offset_y_mm=0
     )
 )
 body_tracker = BodyTracker_CPU(
     BodyTrackerParamTracking(
+        input_image_shape=(0,0),
         pix_per_mm=PIX_PER_MM,
         target_pix_per_mm=10,
         intensity=0.15,
@@ -100,6 +102,7 @@ body_tracker = BodyTracker_CPU(
 )
 eyes_tracker = EyesTracker_CPU(
     EyesTrackerParamTracking(
+        input_image_shape=(0,0),
         pix_per_mm=PIX_PER_MM,
         target_pix_per_mm=40,
         thresh_lo=0.2,
@@ -117,6 +120,7 @@ eyes_tracker = EyesTracker_CPU(
 )
 tail_tracker = TailTracker_CPU(
     TailTrackerParamTracking(
+        input_image_shape=(0,0),
         pix_per_mm=PIX_PER_MM,
         target_pix_per_mm=20,
         ball_radius_mm=0.1,

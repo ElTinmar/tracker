@@ -4,7 +4,7 @@ setup(
     name='tracker',
     python_requires='>=3.8',
     author='Martin Privat',
-    version='0.8.6',
+    version='0.8.7',
     packages=['tracker','tracker.animal','tracker.body','tracker.eyes','tracker.multifish','tracker.tail','tracker.tests'],
     license='Creative Commons Attribution-Noncommercial-Share Alike license',
     description='tracking zebrafish larvae',
