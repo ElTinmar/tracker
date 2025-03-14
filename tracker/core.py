@@ -7,6 +7,7 @@ from functools import cached_property
 
 @dataclass
 class ParamTracking:
+    input_image_shape: Tuple[int, int] 
     pix_per_mm: float = 30
     target_pix_per_mm: float = 30
     crop_dimension_mm: Tuple[float, float] = (0, 0)
@@ -41,10 +42,16 @@ class ParamTracking:
     @cached_property
     def resized_dimension_px(self):
         # some video codec require height, width to be divisible by 2
-        return (
-            2 * (self.target_mm2px(self.crop_dimension_mm[0])//2),
-            2 * (self.target_mm2px(self.crop_dimension_mm[1])//2)
-        ) 
+        if self.crop_dimension_mm == (0, 0):
+            return (
+                2 * (self.resize*self.input_image_shape[1]//2),
+                2 * (self.resize*self.input_image_shape[0]//2)
+            ) 
+        else:
+            return (
+                2 * (self.target_mm2px(self.crop_dimension_mm[0])//2),
+                2 * (self.target_mm2px(self.crop_dimension_mm[1])//2)
+            ) 
     
     @cached_property
     def crop_dimension_px(self):

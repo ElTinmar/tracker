@@ -25,7 +25,7 @@ def crop(
         Optional[Tuple[NDArray, NDArray]]: (origin, cropped image), or None if invalid crop.
     """
 
-    if image.shape[:2] == crop_dimension_px[::-1]:
+    if crop_dimension_px == (0,0) or image.shape[:2] == crop_dimension_px[::-1]:
         return image, SimilarityTransform2D.identity(), SimilarityTransform2D.identity()
 
     if centroid is None:
