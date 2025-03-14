@@ -23,6 +23,8 @@ class EyesTracker_CPU(EyesTracker):
         if (image is None) or (image.size == 0) or (centroid is None):
             return self.tracking_param.failed
         
+        self.tracking_param.input_image_shape = image.shape
+        
         preproc = preprocess_image(image, centroid, self.tracking_param)
         
         if preproc is None:
