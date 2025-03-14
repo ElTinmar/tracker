@@ -44,8 +44,8 @@ class ParamTracking:
         # some video codec require height, width to be divisible by 2
         if self.crop_dimension_mm == (0, 0):
             return (
-                2 * (self.resize*self.input_image_shape[1]//2),
-                2 * (self.resize*self.input_image_shape[0]//2)
+                2 * int(self.resize*self.input_image_shape[1]//2),
+                2 * int(self.resize*self.input_image_shape[0]//2)
             ) 
         else:
             return (
