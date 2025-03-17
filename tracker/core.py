@@ -17,10 +17,9 @@ class ParamTracking:
     blur_sz_mm: float = 0
     median_filter_sz_mm: float = 0
 
-
     def __post_init__(self):
         # when loading from JSON, tuples are converted to list
-        
+
         if isinstance(self.input_image_shape, list):
             self.input_image_shape = tuple(self.input_image_shape)
 
