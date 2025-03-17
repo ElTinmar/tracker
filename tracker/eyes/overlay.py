@@ -148,7 +148,7 @@ class EyesOverlay_opencv(EyesOverlay):
         original = overlay.copy()        
 
         pix_per_mm_input =  pix_per_mm * transformation.scale_factor
-        eye_len_px = max(1,int(self.overlay_param.eye_len_mm * pix_per_mm_input))
+        eye_len_px = max(1,int(self.overlay_param.eye_len_mm * pix_per_mm)) # in global space
         arrow_radius_px = max(1,int(self.overlay_param.arrow_radius_mm * pix_per_mm_input))
         
         it = zip(

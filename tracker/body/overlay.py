@@ -88,9 +88,9 @@ class BodyOverlay_opencv(BodyOverlay):
         original = overlay.copy()        
 
         pix_per_mm_input = pix_per_mm * transformation.scale_factor
-        heading_len_px = max(1,int(self.overlay_param.heading_len_mm * pix_per_mm_input))
         arrow_radius_px = max(1,int(self.overlay_param.arrow_radius_mm * pix_per_mm_input))
 
+        heading_len_px = max(1,int(self.overlay_param.heading_len_mm * pix_per_mm))  # in global space
         front = heading_len_px * body_axes[:,0]
         right = heading_len_px/2 * body_axes[:,1]
         yy = centroid + front
