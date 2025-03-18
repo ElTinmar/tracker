@@ -44,11 +44,11 @@ class MultiFishTracker_CPU(MultiFishTracker):
             
                 # track eyes
                 if self.tracking_param.eyes is not None:
-                    eyes.append(self.tracking_param.eyes.track(image_rot, centroid_rot, T_image_rot_to_global))
+                    eyes.append(self.tracking_param.eyes.track(image_rot, centroid, T_image_rot_to_global))
 
                 # track tail
                 if self.tracking_param.tail is not None:
-                    tails.append(self.tracking_param.tail.track(image_rot, centroid_rot, T_image_rot_to_global))
+                    tails.append(self.tracking_param.tail.track(image_rot, centroid, T_image_rot_to_global))
 
         # compute additional features based on tracking
         if self.tracking_param.accumulator is not None:

@@ -24,11 +24,18 @@ class BodyTracker_CPU(BodyTracker):
             - (0,0) = topleft corner of the bounding box
             - scale of the full-resolution image, before resizing
         '''
-
-        self.tracking_param.input_image_shape = image.shape
-                
-        preproc = preprocess_image(image, centroid, self.tracking_param)
         
+        self.tracking_param.input_image_shape = image.shape
+
+        T_global_to_input = T_input_to_global.inv()
+        
+        if centroid is None:
+            centroid_input = None
+        else:
+            centroid_input = T_global_to_input.transform_points(centroid).squeeze()
+
+        preproc = preprocess_image(image, centroid_input, self.tracking_param)
+            
         if preproc is None:
             return self.tracking_param.failed
 
@@ -68,7 +75,6 @@ class BodyTracker_CPU(BodyTracker):
         angle_rad = np.arctan2(body_axes[1,1], body_axes[0,1])
         angle_rad_global = np.arctan2(body_axes_global[1,1], body_axes_global[0,1])
 
-        T_global_to_input = T_input_to_global.inv()
         pix_per_mm_global = self.tracking_param.pix_per_mm
         pix_per_mm_input = pix_per_mm_global * T_global_to_input.scale_factor
         pix_per_mm_cropped = pix_per_mm_input * preproc.T_input_to_cropped.scale_factor

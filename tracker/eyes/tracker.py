@@ -25,7 +25,9 @@ class EyesTracker_CPU(EyesTracker):
         if centroid is None:
             return self.tracking_param.failed
         
-        preproc = preprocess_image(image, centroid, self.tracking_param)
+        T_global_to_input = T_input_to_global.inv()
+        centroid_input = T_global_to_input.transform_points(centroid).squeeze()
+        preproc = preprocess_image(image, centroid_input, self.tracking_param)
         
         if preproc is None:
             return self.tracking_param.failed
@@ -63,7 +65,6 @@ class EyesTracker_CPU(EyesTracker):
             vertical_axis
         )
 
-        T_global_to_input = T_input_to_global.inv()
         pix_per_mm_global = self.tracking_param.pix_per_mm
         pix_per_mm_input = pix_per_mm_global * T_global_to_input.scale_factor
         pix_per_mm_cropped = pix_per_mm_input * preproc.T_input_to_cropped.scale_factor
