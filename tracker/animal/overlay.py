@@ -69,6 +69,7 @@ class AnimalOverlay_opencv(AnimalOverlay):
 
             pix_per_mm_input =  pix_per_mm * transformation.scale_factor
             radius_px = max(1,int(self.overlay_param.radius_mm * pix_per_mm_input))
+            font_height_px = max(1, int(self.overlay_param.id_str_height_mm * pix_per_mm_input))
             
             overlay = cv2.circle(
                 overlay,
@@ -78,14 +79,20 @@ class AnimalOverlay_opencv(AnimalOverlay):
                 self.overlay_param.centroid_thickness
             )
             
+            font_size = cv2.getFontScaleFromHeight(
+                self.overlay_param.font,
+                font_height_px, 
+                self.overlay_param.font_thickness
+            )
+
             # show ID
             cv2.putText(
                 overlay, 
                 str(idx), (int(x+self.overlay_param.label_offset), int(y-self.overlay_param.label_offset)), 
-                cv2.FONT_HERSHEY_SIMPLEX, 1.5, 
+                self.overlay_param.font, font_size, 
                 self.overlay_param.id_str_color_BGR, 
-                2, 
-                cv2.LINE_AA
+                self.overlay_param.font_thickness, 
+                self.overlay_param.font_line_type
             )
         
         overlay = cv2.addWeighted(

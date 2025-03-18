@@ -4,7 +4,7 @@ from tracker.core import Tracker, TrackingOverlay
 import numpy as np
 from numpy.typing import NDArray
 from tracker.core import ParamTracking
-
+import cv2
 
 @dataclass
 class AnimalTrackerParamTracking(ParamTracking):        
@@ -80,8 +80,12 @@ class AnimalTrackerParamOverlay:
     centroid_color_BGR: tuple = (128, 255, 128)
     centroid_thickness: int = -1
     id_str_color_BGR: tuple = (255, 255, 255)
+    id_str_height_mm = 1.5
     label_offset: int = 10
     alpha: float = 0.5
+    font = cv2.FONT_HERSHEY_SIMPLEX
+    font_thickness = 2
+    font_line_type = cv2.LINE_AA
 
     
 class Assignment(Protocol):
