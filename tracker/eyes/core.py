@@ -62,7 +62,7 @@ class EyesTracker(Tracker):
 
     def __init__(
             self, 
-            tracking_param: EyesTrackerParamTracking, 
+            tracking_param: EyesTrackerParamTracking = EyesTrackerParamTracking(), 
         ) -> None:
 
         self.tracking_param = tracking_param
@@ -71,7 +71,7 @@ class EyesOverlay(TrackingOverlay):
 
     def __init__(
             self, 
-            overlay_param: EyesTrackerParamOverlay
+            overlay_param: EyesTrackerParamOverlay = EyesTrackerParamOverlay()
         ) -> None:
 
         self.overlay_param = overlay_param

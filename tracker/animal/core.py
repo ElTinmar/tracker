@@ -5,6 +5,7 @@ import numpy as np
 from numpy.typing import NDArray
 from tracker.core import ParamTracking
 import cv2
+from assignment import NoAssignment
 
 @dataclass
 class AnimalTrackerParamTracking(ParamTracking):        
@@ -97,8 +98,8 @@ class AnimalTracker(Tracker):
 
     def __init__(
             self, 
-            assignment: Assignment,
-            tracking_param: AnimalTrackerParamTracking, 
+            assignment: Assignment = NoAssignment(),
+            tracking_param: AnimalTrackerParamTracking = AnimalTrackerParamTracking(), 
         ):
 
         self.tracking_param = tracking_param
@@ -108,7 +109,7 @@ class AnimalOverlay(TrackingOverlay):
 
     def __init__(
             self, 
-            overlay_param: AnimalTrackerParamOverlay
+            overlay_param: AnimalTrackerParamOverlay = AnimalTrackerParamOverlay()
         ):
 
         self.overlay_param = overlay_param

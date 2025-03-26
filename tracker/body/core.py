@@ -75,7 +75,7 @@ class BodyTracker(Tracker):
 
     def __init__(
             self, 
-            tracking_param: BodyTrackerParamTracking, 
+            tracking_param: BodyTrackerParamTracking = BodyTrackerParamTracking(), 
         ) -> None:
 
         self.tracking_param = tracking_param
@@ -84,7 +84,7 @@ class BodyOverlay(TrackingOverlay):
 
     def __init__(
             self, 
-            overlay_param: BodyTrackerParamOverlay
+            overlay_param: BodyTrackerParamOverlay = BodyTrackerParamOverlay()
         ) -> None:
 
         self.overlay_param = overlay_param

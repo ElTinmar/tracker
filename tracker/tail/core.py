@@ -58,7 +58,7 @@ class TailTracker(Tracker):
 
     def __init__(
             self, 
-            tracking_param: TailTrackerParamTracking, 
+            tracking_param: TailTrackerParamTracking = TailTrackerParamTracking(), 
         ) -> None:
 
         self.tracking_param = tracking_param
@@ -67,7 +67,7 @@ class TailOverlay(TrackingOverlay):
 
     def __init__(
             self, 
-            overlay_param: TailTrackerParamOverlay
+            overlay_param: TailTrackerParamOverlay = TailTrackerParamOverlay()
         ) -> None:
 
         self.overlay_param = overlay_param

@@ -16,6 +16,7 @@ class MultiFishTracker_CPU(MultiFishTracker):
 
         # get animal centroids (only crude location is necessary)
         animals = self.tracking_param.animal.track(image, None, T_input_to_global)
+        arr = (animals,)
         
         bodies = []
         eyes = []
@@ -51,13 +52,7 @@ class MultiFishTracker_CPU(MultiFishTracker):
                 if self.tracking_param.tail is not None:
                     tails.append(self.tracking_param.tail.track(image_rot, centroid, T_image_rot_to_global))
 
-        # compute additional features based on tracking
-        if self.tracking_param.accumulator is not None:
-            self.tracking_param.accumulator.update(res)
-
         # save tracking results and return
-        arr = (animals,)
-
         if self.tracking_param.body is not None:
             arr += (bodies,)
 

@@ -7,14 +7,8 @@ from tracker.tail import TailOverlay, TailTracker
 from dataclasses import dataclass
 import numpy as np
 
-
-class Accumulator(Protocol):
-    def update(self):
-        ...
-
 @dataclass
 class MultiFishTrackerParamTracking:
-    accumulator: Accumulator
     animal: AnimalTracker
     body: Optional[BodyTracker]
     eyes: Optional[EyesTracker] 
@@ -66,7 +60,7 @@ class MultiFishTracker(Tracker):
 
     def __init__(
             self, 
-            tracking_param = MultiFishTrackerParamTracking
+            tracking_param: MultiFishTrackerParamTracking = MultiFishTrackerParamTracking() 
         ):
 
         self.tracking_param = tracking_param
@@ -75,7 +69,7 @@ class MultiFishOverlay(TrackingOverlay):
 
     def __init__(
             self, 
-            overlay_param: MultiFishTrackerParamOverlay
+            overlay_param: MultiFishTrackerParamOverlay = MultiFishTrackerParamOverlay() 
         ) -> None:
         super().__init__()
 

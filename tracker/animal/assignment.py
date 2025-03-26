@@ -3,6 +3,11 @@ from scipy.optimize import linear_sum_assignment
 from scipy.spatial.distance import cdist
 from numpy.typing import NDArray
 
+class NoAssignment:
+    
+    def update(self, centroids: NDArray) -> NDArray:
+        return centroids
+
 class GridAssignment:
     '''
     Use a Lookup Table and previous position to determine centroid identity. 
