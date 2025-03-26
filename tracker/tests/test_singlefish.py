@@ -1,8 +1,7 @@
 from video_tools import InMemory_OpenCV_VideoReader
 from image_tools import im2single, im2gray
 from tracker import (
-    GridAssignment,
-    MultiFishTracker_CPU, MultiFishOverlay_opencv, MultiFishTrackerParamTracking, MultiFishTrackerParamOverlay,
+    SingleFishTracker_CPU, SingleFishOverlay_opencv, SingleFishTrackerParamTracking, SingleFishTrackerParamOverlay,
     AnimalTracker_CPU, AnimalOverlay_opencv, AnimalTrackerParamTracking, AnimalTrackerParamOverlay,
     BodyTracker_CPU, BodyOverlay_opencv, BodyTrackerParamTracking, BodyTrackerParamOverlay,
     EyesTracker_CPU, EyesOverlay_opencv, EyesTrackerParamTracking, EyesTrackerParamOverlay,
@@ -17,13 +16,12 @@ DISPLAY=False
 
 # background subtracted video
 VIDEOS = [
-    ('toy_data/multi_freelyswimming_1800x1800px_nobckg.avi', 40),
     ('toy_data/single_freelyswimming_504x500px_nobckg.avi', 40),
     ('toy_data/single_headembedded_544x380px_noparam_nobckg.avi', 100),
     ('toy_data/single_headembedded_544x380px_param_nobckg.avi', 100)
 ]
 # background subtracted video
-VIDEO_NUM = 1
+VIDEO_NUM = 0
 INPUT_VIDEO, PIX_PER_MM = VIDEOS[VIDEO_NUM]
 
 video_reader = InMemory_OpenCV_VideoReader()
@@ -40,25 +38,8 @@ width = video_reader.get_width()
 fps = video_reader.get_fps()  
 num_frames = video_reader.get_number_of_frame()
 
-LUT = np.zeros((height, width))
-num_animals = 1
-if VIDEO_NUM == 0:
-    LUT[0:600,0:600] = 0
-    LUT[0:600,600:1200] = 1
-    LUT[0:600,1200:1800] = 2
-    LUT[600:1200,0:600] = 3
-    LUT[600:1200,600:1200] = 4
-    LUT[600:1200,1200:1800] = 5
-    LUT[1200:1800,0:600] = 6
-    LUT[1200:1800,600:1200] = 7
-    LUT[1200:1800,1200:1800] = 8
-    num_animals = 9
-
-assignment = GridAssignment(LUT, num_animals)
-
 # tracking 
 animal_tracker = AnimalTracker_CPU(
-    assignment=assignment,
     tracking_param=AnimalTrackerParamTracking(
         pix_per_mm=PIX_PER_MM,
         target_pix_per_mm=5,
@@ -74,7 +55,7 @@ animal_tracker = AnimalTracker_CPU(
         blur_sz_mm=0.6,
         median_filter_sz_mm=0,
         downsample_factor=0.90,
-        num_animals=num_animals,
+        num_animals=1,
         crop_dimension_mm=(0,0), 
         crop_offset_y_mm=0
     )
@@ -140,8 +121,8 @@ body_overlay = BodyOverlay_opencv(BodyTrackerParamOverlay())
 eyes_overlay = EyesOverlay_opencv(EyesTrackerParamOverlay())
 tail_overlay = TailOverlay_opencv(TailTrackerParamOverlay())
 
-tracker = MultiFishTracker_CPU(
-    MultiFishTrackerParamTracking(
+tracker = SingleFishTracker_CPU(
+    SingleFishTrackerParamTracking(
         animal=animal_tracker,
         body=body_tracker, 
         eyes=eyes_tracker, 
@@ -149,8 +130,8 @@ tracker = MultiFishTracker_CPU(
     )
 )
 
-overlay = MultiFishOverlay_opencv(
-    MultiFishTrackerParamOverlay(
+overlay = SingleFishOverlay_opencv(
+    SingleFishTrackerParamOverlay(
         animal_overlay,
         body_overlay,
         eyes_overlay,

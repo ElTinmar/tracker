@@ -4,5 +4,6 @@ from .body import *
 from .eyes import *
 from .tail import *
 from .multifish import *
+from .singlefish import *
 from .prepare_image import *
 

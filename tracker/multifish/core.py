@@ -1,4 +1,4 @@
-from typing import Protocol, Optional
+from typing import Optional
 from tracker.core import Tracker, TrackingOverlay
 from tracker.animal import AnimalOverlay, AnimalTracker
 from tracker.body import BodyOverlay, BodyTracker
@@ -9,10 +9,10 @@ import numpy as np
 
 @dataclass
 class MultiFishTrackerParamTracking:
-    animal: AnimalTracker
-    body: Optional[BodyTracker]
-    eyes: Optional[EyesTracker] 
-    tail: Optional[TailTracker]
+    animal: AnimalTracker = AnimalTracker()
+    body: Optional[BodyTracker] = BodyTracker()
+    eyes: Optional[EyesTracker] = EyesTracker()
+    tail: Optional[TailTracker] = TailTracker()
 
     @property
     def dtype(self) -> np.dtype:
@@ -51,10 +51,10 @@ class MultiFishTrackerParamTracking:
 
 @dataclass
 class MultiFishTrackerParamOverlay:
-    animal: AnimalOverlay
-    body: Optional[BodyOverlay]
-    eyes: Optional[EyesOverlay] 
-    tail: Optional[TailOverlay]
+    animal: AnimalOverlay = AnimalOverlay()
+    body: Optional[BodyOverlay] = BodyOverlay()
+    eyes: Optional[EyesOverlay] = EyesOverlay()
+    tail: Optional[TailOverlay] = TailOverlay()
         
 class MultiFishTracker(Tracker):
 

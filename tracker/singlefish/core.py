@@ -1,4 +1,4 @@
-from typing import Protocol, Optional
+from typing import Optional
 from tracker.core import Tracker, TrackingOverlay
 from tracker.animal import AnimalOverlay, AnimalTracker
 from tracker.body import BodyOverlay, BodyTracker
