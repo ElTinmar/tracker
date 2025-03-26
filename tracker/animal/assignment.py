@@ -4,9 +4,19 @@ from scipy.spatial.distance import cdist
 from numpy.typing import NDArray
 
 class NoAssignment:
+
+    def __init__(self, num_animals: int = 1) -> None:
+        self.num_animals = num_animals
     
     def update(self, centroids: NDArray) -> NDArray:
-        return centroids
+        
+        c = np.zeros((self.num_animals,2))
+        try:
+            c = centroids[:self.num_animals, :]
+        except:
+            pass
+
+        return c
 
 class GridAssignment:
     '''
