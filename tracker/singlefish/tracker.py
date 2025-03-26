@@ -17,8 +17,8 @@ class SingleFishTracker_CPU(SingleFishTracker):
         # get animal centroids (only crude location is necessary)
         animals = self.tracking_param.animal.track(image, None, T_input_to_global)
         arr = (animals,)
-
         centroid = animals['centroids_global'][0,:]
+        
         body = eyes = tail = None
         if self.tracking_param.body is not None:
 
