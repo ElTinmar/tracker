@@ -12,7 +12,7 @@ import numpy as np
 import cv2
 from geometry import SimilarityTransform2D
 
-DISPLAY=False
+DISPLAY=True
 
 # background subtracted video
 VIDEOS = [
@@ -160,23 +160,22 @@ try:
             cv2.imshow('global',r)
             cv2.waitKey(1)
             
-            fish = 0
-            cv2.imshow('body_cropped', body_overlay.overlay_cropped(tracking['body'][fish]))
+            cv2.imshow('body_cropped', body_overlay.overlay_cropped(tracking['body']))
             cv2.waitKey(1)
 
-            cv2.imshow('eyes_cropped', eyes_overlay.overlay_cropped(tracking['eyes'][fish]))
+            cv2.imshow('eyes_cropped', eyes_overlay.overlay_cropped(tracking['eyes']))
             cv2.waitKey(1)
             
-            cv2.imshow('tail_cropped', tail_overlay.overlay_cropped(tracking['tail'][fish]))
+            cv2.imshow('tail_cropped', tail_overlay.overlay_cropped(tracking['tail']))
             cv2.waitKey(1)
 
-            cv2.imshow('body_resized', body_overlay.overlay_processed(tracking['body'][fish]))
+            cv2.imshow('body_resized', body_overlay.overlay_processed(tracking['body']))
             cv2.waitKey(1)
 
-            cv2.imshow('eyes_resized', eyes_overlay.overlay_processed(tracking['eyes'][fish]))
+            cv2.imshow('eyes_resized', eyes_overlay.overlay_processed(tracking['eyes']))
             cv2.waitKey(1)
             
-            cv2.imshow('tail_resized', tail_overlay.overlay_processed(tracking['tail'][fish]))
+            cv2.imshow('tail_resized', tail_overlay.overlay_processed(tracking['tail']))
             cv2.waitKey(1)
 
 finally:
