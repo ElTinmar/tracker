@@ -5,7 +5,7 @@ import numpy as np
 from numpy.typing import NDArray
 from tracker.core import ParamTracking
 import cv2
-from assignment import NoAssignment
+from .assignment import NoAssignment
 
 @dataclass
 class AnimalTrackerParamTracking(ParamTracking):        

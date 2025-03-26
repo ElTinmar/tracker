@@ -1,18 +1,18 @@
 from typing import Optional
 from tracker.core import Tracker, TrackingOverlay
-from tracker.animal import AnimalOverlay, AnimalTracker
-from tracker.body import BodyOverlay, BodyTracker
-from tracker.eyes import EyesOverlay, EyesTracker
-from tracker.tail import TailOverlay, TailTracker
+from tracker.animal import AnimalOverlay, AnimalTracker, AnimalOverlay_opencv, AnimalTracker_CPU
+from tracker.body import BodyOverlay, BodyTracker, BodyOverlay_opencv, BodyTracker_CPU
+from tracker.eyes import EyesOverlay, EyesTracker, EyesOverlay_opencv, EyesTracker_CPU
+from tracker.tail import TailOverlay, TailTracker, TailOverlay_opencv, TailTracker_CPU
 from dataclasses import dataclass
 import numpy as np
 
 @dataclass
 class SingleFishTrackerParamTracking:
-    animal: AnimalTracker
-    body: Optional[BodyTracker]
-    eyes: Optional[EyesTracker] 
-    tail: Optional[TailTracker]
+    animal: AnimalTracker = AnimalTracker_CPU()
+    body: Optional[BodyTracker] = BodyTracker_CPU()
+    eyes: Optional[EyesTracker] = EyesTracker_CPU()
+    tail: Optional[TailTracker] = TailTracker_CPU()
 
     @property
     def dtype(self) -> np.dtype:
@@ -37,10 +37,10 @@ class SingleFishTrackerParamTracking:
 
 @dataclass
 class SingleFishTrackerParamOverlay:
-    animal: AnimalOverlay
-    body: Optional[BodyOverlay]
-    eyes: Optional[EyesOverlay] 
-    tail: Optional[TailOverlay]
+    animal: AnimalOverlay = AnimalOverlay_opencv()
+    body: Optional[BodyOverlay] = BodyOverlay_opencv()
+    eyes: Optional[EyesOverlay] = EyesOverlay_opencv()
+    tail: Optional[TailOverlay] = TailOverlay_opencv()
         
 class SingleFishTracker(Tracker):
 
