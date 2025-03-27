@@ -65,6 +65,8 @@ class ParamTracking:
     @property
     def crop_dimension_px(self):
         # some video codec require height, width to be divisible by 2
+        if self.crop_dimension_mm == (0, 0): 
+            return self.input_image_shape[::-1] #FIXME no longer necessarily divisible by 2
         return (
                 2* (self.source_mm2px(self.crop_dimension_mm[0])//2),
                 2* (self.source_mm2px(self.crop_dimension_mm[1])//2)
