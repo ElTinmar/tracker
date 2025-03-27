@@ -16,10 +16,10 @@ DTYPE_EYE = np.dtype([
 
 @dataclass
 class EyesTrackerParamTracking(ParamTracking):
-    dyntresh_res: int = 20
-    size_lo_mm: float = 1.0
+    dyntresh_res: int = 5
+    size_lo_mm: float = 0.0
     size_hi_mm: float = 10.0
-    thresh_lo: float = 0.0
+    thresh_lo: float = 0.2
     thresh_hi: float = 1.0
     
     @property

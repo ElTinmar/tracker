@@ -5,12 +5,12 @@ from tracker.core import Tracker, TrackingOverlay, ParamTracking
 
 @dataclass
 class BodyTrackerParamTracking(ParamTracking):
-    min_size_mm: float = 10.0
+    min_size_mm: float = 0.0
     max_size_mm: float = 100.0
-    min_length_mm: float = 2.0
-    max_length_mm: float = 6.0
-    min_width_mm: float = 1.0
-    max_width_mm: float = 3.0
+    min_length_mm: float = 0.0
+    max_length_mm: float = 0.0
+    min_width_mm: float = 0.0
+    max_width_mm: float = 0.0
     intensity: float = 0.2
     
     @property
