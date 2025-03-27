@@ -2,7 +2,7 @@ from image_tools import bwareafilter_centroids_cv2
 import numpy as np
 from numpy.typing import NDArray
 import cv2
-from typing import Optional
+from typing import Optional, Tuple
 from .core import AnimalTracker
 from tracker.prepare_image import preprocess_image
 from geometry import SimilarityTransform2D
@@ -14,14 +14,14 @@ class AnimalTracker_CPU(AnimalTracker):
         image: Optional[NDArray], # image in input space
         centroid: Optional[NDArray] = None, # centroid in global space
         T_input_to_global: Optional[SimilarityTransform2D] = SimilarityTransform2D.identity() # input to global space transform
-    ) -> NDArray:
+    ) -> Tuple[bool, NDArray]:
         
         self.tracking_param.input_image_shape = image.shape
                 
         preproc = preprocess_image(image, centroid, self.tracking_param)
         
         if preproc is None:
-            return self.tracking_param.failed
+            return (False, self.tracking_param.failed)
         
         mask = cv2.compare(preproc.image_processed, self.tracking_param.intensity, cv2.CMP_GT)
         centroids_resized = bwareafilter_centroids_cv2(
@@ -35,7 +35,7 @@ class AnimalTracker_CPU(AnimalTracker):
         )     
         
         if centroids_resized.size == 0:
-            return self.tracking_param.failed
+            return (False, self.tracking_param.failed)
 
         # transform coordinates
         centroids_cropped = preproc.T_resized_to_cropped.transform_points(centroids_resized)
@@ -86,4 +86,4 @@ class AnimalTracker_CPU(AnimalTracker):
             ),
             dtype=self.tracking_param.dtype
         )
-        return res
+        return (True, res)

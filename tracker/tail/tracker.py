@@ -1,6 +1,6 @@
 from numpy.typing import NDArray
 import numpy as np
-from typing import Optional
+from typing import Optional, Tuple
 from .core import TailTracker
 from .utils import tail_skeleton_ball
 from tracker.prepare_image import preprocess_image
@@ -13,7 +13,7 @@ class TailTracker_CPU(TailTracker):
             image: NDArray, 
             centroid: Optional[NDArray], 
             T_input_to_global: Optional[SimilarityTransform2D] = SimilarityTransform2D.identity()
-        ) -> NDArray:
+        ) -> Tuple[bool, NDArray]:
         """
         output coordinates: 
             - (0,0) = fish centroid
@@ -23,14 +23,14 @@ class TailTracker_CPU(TailTracker):
         self.tracking_param.input_image_shape = image.shape
 
         if centroid is None:
-            return self.tracking_param.failed
+            return (False, self.tracking_param.failed)
         
         T_global_to_input = T_input_to_global.inv()
         centroid_input = T_global_to_input.transform_points(centroid).squeeze()
         preproc = preprocess_image(image, centroid_input, self.tracking_param)
         
         if preproc is None:
-            return self.tracking_param.failed
+            return (False, self.tracking_param.failed)
 
         # track
         skeleton_resized, skeleton_interp_resized = tail_skeleton_ball(
@@ -82,4 +82,4 @@ class TailTracker_CPU(TailTracker):
             dtype= self.tracking_param.dtype
         )
 
-        return res
+        return (True, res)

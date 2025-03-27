@@ -65,13 +65,7 @@ class ParamTracking:
     @property
     def crop_dimension_px(self):
         # some video codec require height, width to be divisible by 2
-        if self.crop_dimension_mm == (0, 0): 
-            return (
-                2 * int(self.resize*self.input_image_shape[1]//2),
-                2 * int(self.resize*self.input_image_shape[0]//2)
-            )
-        else:
-            return (
+        return (
                 2* (self.source_mm2px(self.crop_dimension_mm[0])//2),
                 2* (self.source_mm2px(self.crop_dimension_mm[1])//2)
             ) 
@@ -84,7 +78,7 @@ class Tracker(ABC):
             image: NDArray,
             centroid: Optional[NDArray],
             T_input_to_global: Optional[SimilarityTransform2D]
-        ) -> Optional[NDArray]:
+        ) -> Tuple[bool, Optional[NDArray]]:
         '''
         image: image to track, preferably background subtracted
         centroid: centroid of object to track if known 

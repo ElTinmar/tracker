@@ -1,7 +1,7 @@
 from image_tools import  bwareafilter_props_cv2
 import numpy as np
 from numpy.typing import NDArray
-from typing import Optional
+from typing import Optional, Tuple
 from .core import BodyTracker
 from .utils import get_orientation, get_best_centroid_index
 from tracker.prepare_image import preprocess_image
@@ -15,7 +15,7 @@ class BodyTracker_CPU(BodyTracker):
             image: NDArray, 
             centroid: Optional[NDArray] = None, # centroids in global space
             T_input_to_global: Optional[SimilarityTransform2D] = SimilarityTransform2D.identity()
-        ) -> NDArray:
+        ) -> Tuple[bool, NDArray]:
         '''
         centroid: centroid of the fish to track if it's already known.
         Useful when tracking multiple fish to discriminate between nearby blobs
@@ -37,7 +37,7 @@ class BodyTracker_CPU(BodyTracker):
         preproc = preprocess_image(image, centroid_input, self.tracking_param)
             
         if preproc is None:
-            return self.tracking_param.failed
+            return (False, self.tracking_param.failed)
 
         mask = cv2.compare(preproc.image_processed, self.tracking_param.intensity, cv2.CMP_GT)
         props = bwareafilter_props_cv2(
@@ -51,7 +51,7 @@ class BodyTracker_CPU(BodyTracker):
         )
 
         if not props:
-            return self.tracking_param.failed
+            return (False, self.tracking_param.failed)
         
         centroids_resized = np.array([[blob.centroid[1], blob.centroid[0]] for blob in props]) #(row, col) to (x,y)
         centroids_cropped = preproc.T_resized_to_cropped.transform_points(centroids_resized)
@@ -68,7 +68,7 @@ class BodyTracker_CPU(BodyTracker):
         coordinates_resized = np.fliplr(props[index].coords)
         body_axes = get_orientation(coordinates_resized)
         if body_axes is None:
-            return self.tracking_param.failed
+            return (False, self.tracking_param.failed)
         
         body_axes_global = T_input_to_global.transform_vectors(body_axes) 
         
@@ -100,4 +100,4 @@ class BodyTracker_CPU(BodyTracker):
             ), 
             dtype=self.tracking_param.dtype
         )
-        return res
+        return (True, res)
