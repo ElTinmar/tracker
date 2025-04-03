@@ -46,7 +46,7 @@ class ParamTracking:
 
     @property
     def crop_offset_y_px(self):
-        return self.target_mm2px(self.crop_offset_y_mm) 
+        return self.source_mm2px(self.crop_offset_y_mm) 
 
     @property
     def resized_dimension_px(self):
