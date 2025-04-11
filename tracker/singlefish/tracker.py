@@ -12,22 +12,22 @@ class SingleFishTracker_CPU(SingleFishTracker):
             image: NDArray, 
             centroid: Optional[NDArray] = None,
             T_input_to_global: SimilarityTransform2D = SimilarityTransform2D.identity()
-        ) -> Tuple[bool, NDArray]:
-
-        # get animal centroids (only crude location is necessary)
-        success, animals = self.tracking_param.animal.track(image, None, T_input_to_global)
-
-        if not success:
-            return (False, self.tracking_param.failed)
+        ) -> NDArray:
         
-        arr = (animals,)
+        # get animal centroids (only crude location is necessary)
+        animals = self.tracking_param.animal.track(image, None, T_input_to_global)
+
+        if not animals['success']:
+            return self.tracking_param.failed
+        
+        arr = (True, animals)
         centroid = animals['centroids_global'][0,:]
         
         body = eyes = tail = None
         if self.tracking_param.body is not None:
 
             # get more precise centroid and orientation of the animals
-            success, body = self.tracking_param.body.track(image, centroid, T_input_to_global)
+            body = self.tracking_param.body.track(image, centroid, T_input_to_global)
             arr += (body,)
 
             # rotate the animal so that it's vertical head up
@@ -45,12 +45,12 @@ class SingleFishTracker_CPU(SingleFishTracker):
         
             # track eyes
             if self.tracking_param.eyes is not None:
-                success, eyes = self.tracking_param.eyes.track(image_rot, centroid, T_image_rot_to_global)
+                eyes = self.tracking_param.eyes.track(image_rot, centroid, T_image_rot_to_global)
                 arr += (eyes,)
 
             # track tail
             if self.tracking_param.tail is not None:
-                success, tail = self.tracking_param.tail.track(image_rot, centroid, T_image_rot_to_global)
+                tail = self.tracking_param.tail.track(image_rot, centroid, T_image_rot_to_global)
                 arr += (tail,)
 
         res = np.array(
@@ -58,5 +58,5 @@ class SingleFishTracker_CPU(SingleFishTracker):
             dtype=self.tracking_param.dtype
         )
 
-        return (True, res) 
+        return res
     

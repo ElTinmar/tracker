@@ -13,7 +13,7 @@ class EyesTracker_CPU(EyesTracker):
             image: NDArray, 
             centroid: Optional[NDArray], 
             T_input_to_global: Optional[SimilarityTransform2D] = SimilarityTransform2D.identity()
-        ) -> Tuple[bool, NDArray]:
+        ) -> NDArray:
         """
         output coordinates: 
             - (0,0) = fish centroid
@@ -23,14 +23,14 @@ class EyesTracker_CPU(EyesTracker):
         self.tracking_param.input_image_shape = image.shape
 
         if centroid is None:
-            return (False, self.tracking_param.failed)
+            return self.tracking_param.failed
         
         T_global_to_input = T_input_to_global.inv()
         centroid_input = T_global_to_input.transform_points(centroid).squeeze()
         preproc = preprocess_image(image, centroid_input, self.tracking_param)
         
         if preproc is None:
-            return (False, self.tracking_param.failed)
+            return self.tracking_param.failed
         
         # sweep threshold to obtain 3 connected component within size range (include swim bladder)
         found_eyes_and_sb, props, mask = find_eyes_and_swimbladder(
@@ -43,7 +43,7 @@ class EyesTracker_CPU(EyesTracker):
         )
 
         if not found_eyes_and_sb:
-            return (False, self.tracking_param.failed)
+            return self.tracking_param.failed
         
         # identify left eye, right eye and swimbladder
         blob_centroids = np.array([blob.centroid[::-1] for blob in props])
@@ -72,6 +72,7 @@ class EyesTracker_CPU(EyesTracker):
 
         res = np.array(
             (
+                True,
                 np.zeros(1,dtype=DTYPE_EYE) if left_eye is None else left_eye, 
                 np.zeros(1,dtype=DTYPE_EYE) if right_eye is None else right_eye,                
                 mask, 
@@ -85,5 +86,5 @@ class EyesTracker_CPU(EyesTracker):
             dtype = self.tracking_param.dtype
         )
 
-        return (True, res)
+        return res
     

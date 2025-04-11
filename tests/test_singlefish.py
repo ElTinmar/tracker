@@ -12,7 +12,7 @@ import numpy as np
 import cv2
 from geometry import SimilarityTransform2D
 
-DISPLAY=True
+DISPLAY=False
 
 # background subtracted video
 VIDEOS = [
@@ -149,7 +149,7 @@ try:
         frame_gray = im2single(im2gray(frame))
 
         # track
-        success, tracking = tracker.track(frame_gray)
+        tracking = tracker.track(frame_gray)
 
         # display tracking
         if DISPLAY:

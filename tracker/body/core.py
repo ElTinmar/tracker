@@ -1,7 +1,7 @@
 import numpy as np
 from dataclasses import dataclass
 from tracker.core import Tracker, TrackingOverlay, ParamTracking
-
+from functools import cached_property
 
 @dataclass
 class BodyTrackerParamTracking(ParamTracking):
@@ -40,6 +40,7 @@ class BodyTrackerParamTracking(ParamTracking):
     @property
     def dtype(self) -> np.dtype:
         dt = np.dtype([
+            ('success', np.bool_),
             ('body_axes', np.float32, (2,2)),
             ('body_axes_global', np.float32, (2,2)),
             ('centroid_resized', np.float32, (2,)),

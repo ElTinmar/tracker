@@ -6,6 +6,7 @@ from numpy.typing import NDArray
 from tracker.core import ParamTracking
 import cv2
 from .assignment import NoAssignment
+from functools import cached_property
 
 @dataclass
 class AnimalTrackerParamTracking(ParamTracking):        
@@ -53,6 +54,7 @@ class AnimalTrackerParamTracking(ParamTracking):
     @property
     def dtype(self) -> np.dtype:
         dt = np.dtype([
+            ('success', np.bool_),
             ('num_animals', int),
             ('centroids_resized', np.float32, (self.num_animals, 2)),
             ('centroids_cropped', np.float32, (self.num_animals, 2)),

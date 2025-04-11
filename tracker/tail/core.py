@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 import numpy as np
 from tracker.core import Tracker, TrackingOverlay, ParamTracking
-
+from functools import cached_property
 
 @dataclass
 class TailTrackerParamTracking(ParamTracking):
@@ -23,6 +23,7 @@ class TailTrackerParamTracking(ParamTracking):
     @property
     def dtype(self) -> np.dtype:
         dt = np.dtype([
+            ('success', np.bool_),
             ('num_pts', int),
             ('num_interp_pts', int),
             ('centroid', np.float32, (2,)),

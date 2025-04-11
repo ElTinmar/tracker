@@ -14,14 +14,14 @@ class AnimalTracker_CPU(AnimalTracker):
         image: Optional[NDArray], # image in input space
         centroid: Optional[NDArray] = None, # centroid in global space
         T_input_to_global: Optional[SimilarityTransform2D] = SimilarityTransform2D.identity() # input to global space transform
-    ) -> Tuple[bool, NDArray]:
+    ) -> NDArray:
         
         self.tracking_param.input_image_shape = image.shape
                 
         preproc = preprocess_image(image, centroid, self.tracking_param)
         
         if preproc is None:
-            return (False, self.tracking_param.failed)
+            return self.tracking_param.failed
         
         mask = cv2.compare(preproc.image_processed, self.tracking_param.intensity, cv2.CMP_GT)
         centroids_resized = bwareafilter_centroids_cv2(
@@ -35,7 +35,7 @@ class AnimalTracker_CPU(AnimalTracker):
         )     
         
         if centroids_resized.size == 0:
-            return (False, self.tracking_param.failed)
+            return self.tracking_param.failed
 
         # transform coordinates
         centroids_cropped = preproc.T_resized_to_cropped.transform_points(centroids_resized)
@@ -69,6 +69,7 @@ class AnimalTracker_CPU(AnimalTracker):
         # maybe pre-allocate in tracking_param?
         res = np.array(
             (
+                True,
                 self.tracking_param.num_animals,
                 centroids_resized,
                 centroids_cropped,
@@ -86,4 +87,4 @@ class AnimalTracker_CPU(AnimalTracker):
             ),
             dtype=self.tracking_param.dtype
         )
-        return (True, res)
+        return res

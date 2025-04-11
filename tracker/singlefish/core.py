@@ -6,6 +6,7 @@ from tracker.eyes import EyesOverlay, EyesTracker, EyesOverlay_opencv, EyesTrack
 from tracker.tail import TailOverlay, TailTracker, TailOverlay_opencv, TailTracker_CPU
 from dataclasses import dataclass
 import numpy as np
+from functools import cached_property
 
 @dataclass
 class SingleFishTrackerParamTracking:
@@ -17,7 +18,10 @@ class SingleFishTrackerParamTracking:
     @property
     def dtype(self) -> np.dtype:
 
-        dt_list = [('animals', self.animal.tracking_param.dtype)]
+        dt_list = [
+            ('success', np.bool_),
+            ('animals', self.animal.tracking_param.dtype)
+        ]
 
         if self.body is not None:
             dt_list += [('body', self.body.tracking_param.dtype)]

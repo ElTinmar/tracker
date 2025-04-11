@@ -15,8 +15,12 @@ class MultiFishTracker_CPU(MultiFishTracker):
         ) -> Tuple[bool, NDArray]:
 
         # get animal centroids (only crude location is necessary)
-        success, animals = self.tracking_param.animal.track(image, None, T_input_to_global)
-        arr = (animals,)
+        animals = self.tracking_param.animal.track(image, None, T_input_to_global)
+        
+        if not animals['success']:
+            return self.tracking_param.failed
+        
+        arr = (True, animals)
         
         bodies = []
         eyes = []
@@ -28,7 +32,7 @@ class MultiFishTracker_CPU(MultiFishTracker):
             if self.tracking_param.body is not None:
 
                 # get more precise centroid and orientation of the animals
-                success, body = self.tracking_param.body.track(image, centroid, T_input_to_global)
+                body = self.tracking_param.body.track(image, centroid, T_input_to_global)
                 bodies.append(body)
                     
                 # rotate the animal so that it's vertical head up
@@ -46,12 +50,12 @@ class MultiFishTracker_CPU(MultiFishTracker):
             
                 # track eyes
                 if self.tracking_param.eyes is not None:
-                    success, eye = self.tracking_param.eyes.track(image_rot, centroid, T_image_rot_to_global)
+                    eye = self.tracking_param.eyes.track(image_rot, centroid, T_image_rot_to_global)
                     eyes.append(eye)
 
                 # track tail
                 if self.tracking_param.tail is not None:
-                    succcess, tail = self.tracking_param.tail.track(image_rot, centroid, T_image_rot_to_global) 
+                    tail = self.tracking_param.tail.track(image_rot, centroid, T_image_rot_to_global) 
                     tails.append(tail)
 
         # save tracking results and return
@@ -76,5 +80,5 @@ class MultiFishTracker_CPU(MultiFishTracker):
             print(len(bodies), len(eyes), len(tails))
             raise
 
-        return (True, res) 
+        return res 
     

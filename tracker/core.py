@@ -80,7 +80,7 @@ class Tracker(ABC):
             image: NDArray,
             centroid: Optional[NDArray],
             T_input_to_global: Optional[SimilarityTransform2D]
-        ) -> Tuple[bool, Optional[NDArray]]:
+        ) -> NDArray:
         '''
         image: image to track, preferably background subtracted
         centroid: centroid of object to track if known 

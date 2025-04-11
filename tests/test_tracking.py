@@ -168,7 +168,7 @@ try:
         frame_gray = im2single(im2gray(frame))
 
         # track
-        success, tracking = tracker.track(frame_gray)
+        tracking = tracker.track(frame_gray)
 
         # display tracking
         if DISPLAY:
