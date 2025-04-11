@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 import numpy as np
 from tracker.core import Tracker, TrackingOverlay, ParamTracking
-from functools import cached_property
 
 DTYPE_EYE = np.dtype([
     ('direction', np.single, (2,)),

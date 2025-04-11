@@ -1,7 +1,6 @@
 import numpy as np
 from dataclasses import dataclass
 from tracker.core import Tracker, TrackingOverlay, ParamTracking
-from functools import cached_property
 
 @dataclass
 class BodyTrackerParamTracking(ParamTracking):

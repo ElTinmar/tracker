@@ -6,7 +6,6 @@ from numpy.typing import NDArray
 from tracker.core import ParamTracking
 import cv2
 from .assignment import NoAssignment
-from functools import cached_property
 
 @dataclass
 class AnimalTrackerParamTracking(ParamTracking):        

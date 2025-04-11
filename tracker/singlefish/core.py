@@ -6,7 +6,6 @@ from tracker.eyes import EyesOverlay, EyesTracker, EyesOverlay_opencv, EyesTrack
 from tracker.tail import TailOverlay, TailTracker, TailOverlay_opencv, TailTracker_CPU
 from dataclasses import dataclass
 import numpy as np
-from functools import cached_property
 
 @dataclass
 class SingleFishTrackerParamTracking:
