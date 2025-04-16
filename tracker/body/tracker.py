@@ -5,7 +5,7 @@ from typing import Optional
 from .core import BodyTracker
 from .utils import get_orientation, get_best_centroid_index
 from tracker.prepare_image import preprocess_image
-from tracker.kalman_utils import MotionModel
+from tracker.kalman_utils import MotionModel, create_kalman_filter
 from geometry import SimilarityTransform2D
 import cv2
 from filterpy.kalman import KalmanFilter
@@ -124,78 +124,7 @@ class BodyTrackerKalman(BodyTracker_CPU):
         super().__init__(*args, **kwargs)
         self.fps = fps
         dt = 1/fps
-        
-        if model == MotionModel.CONSTANT_VELOCITY:
-            # state = x,y,theta + first time derivatives
-            self.kalman_filter = KalmanFilter(dim_x=6, dim_z=3) 
-            self.kalman_filter.x = np.zeros((6,1)) # initial state
-            self.kalman_filter.F = np.array([
-                [1,  0,  0, dt,  0,  0],
-                [0,  1,  0,  0, dt,  0],
-                [0,  0,  1,  0,  0, dt],
-                [0,  0,  0,  1,  0,  0],
-                [0,  0,  0,  0,  1,  0],
-                [0,  0,  0,  0,  0,  1],
-            ])
-            self.kalman_filter.H = np.array([
-                [1,0,0,0,0,0],
-                [0,1,0,0,0,0],
-                [0,0,1,0,0,0]
-            ])
-            self.kalman_filter.P = 100 * np.eye(6) # state uncertainty
-            self.kalman_filter.Q = np.eye(6) # model uncertainty
-
-        elif model == MotionModel.CONSTANT_ACCELERATION:   
-            # state = x,y,theta + first and second time derivatives
-            self.kalman_filter = KalmanFilter(dim_x=9, dim_z=3) 
-            self.kalman_filter.F = np.array([
-                [1, 0, 0, dt, 0, 0, dt**2/2, 0, 0],
-                [0, 1, 0, 0, dt, 0, 0, dt**2/2, 0],
-                [0, 0, 1, 0, 0, dt, 0, 0, dt**2/2],
-                [0, 0, 0, 1, 0, 0, dt, 0, 0],
-                [0, 0, 0, 0, 1, 0, 0, dt, 0],
-                [0, 0, 0, 0, 0, 1, 0, 0, dt],
-                [0, 0, 0, 0, 0, 0, 1, 0, 0],
-                [0, 0, 0, 0, 0, 0, 0, 1, 0],
-                [0, 0, 0, 0, 0, 0, 0, 0, 1],
-            ])
-            self.kalman_filter.x = np.zeros((9,1)) # initial state
-            self.kalman_filter.H = np.array([
-                [1,0,0,0,0,0,0,0,0],
-                [0,1,0,0,0,0,0,0,0],
-                [0,0,1,0,0,0,0,0,0]
-            ])
-            self.kalman_filter.P = 100 * np.eye(9) # state uncertainty
-            self.kalman_filter.Q = np.diag([1,1,1, 1,1,1, 1,1,1]) # model uncertainty
-
-        elif model == MotionModel.CONSTANT_JERK:   
-            # state = x,y,theta + first and second time derivatives
-            self.kalman_filter = KalmanFilter(dim_x=12, dim_z=3) 
-            self.kalman_filter.F = np.array([
-                [1, 0, 0, dt, 0, 0, dt**2/2, 0, 0, dt**3/6, 0, 0],
-                [0, 1, 0, 0, dt, 0, 0, dt**2/2, 0, 0, dt**3/6, 0],
-                [0, 0, 1, 0, 0, dt, 0, 0, dt**2/2, 0, 0, dt**3/6],
-                [0, 0, 0, 1, 0, 0, dt, 0, 0, dt**2/2, 0, 0],
-                [0, 0, 0, 0, 1, 0, 0, dt, 0, 0, dt**2/2, 0],
-                [0, 0, 0, 0, 0, 1, 0, 0, dt, 0, 0, dt**2/2],
-                [0, 0, 0, 0, 0, 0, 1, 0, 0, dt, 0, 0],
-                [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, dt, 0],
-                [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, dt],
-                [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0],
-                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
-                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-            ])
-            self.kalman_filter.x = np.zeros((12,1)) # initial state
-            #self.kalman_filter.x[2] = -np.pi
-            self.kalman_filter.H = np.array([
-                [1,0,0,0,0,0,0,0,0,0,0,0],
-                [0,1,0,0,0,0,0,0,0,0,0,0],
-                [0,0,1,0,0,0,0,0,0,0,0,0]
-            ])
-            self.kalman_filter.P = 100 * np.eye(12) # state uncertainty
-            self.kalman_filter.Q = np.diag([1,1,1, 1,1,1, 1,1,1, 1,1,1]) # model uncertainty
-        
-        self.kalman_filter.R = np.diag([1,1,1]) # measurement uncertainty
+        self.kalman_filter = create_kalman_filter(dt=dt, model=model, dim_z=3)
 
     def track(
             self,
@@ -213,7 +142,6 @@ class BodyTrackerKalman(BodyTracker_CPU):
             measurement[:2,0] = tracking['centroid_resized']
             measurement[2] = tracking['angle_rad']
         
-
             angle_predicted = self.kalman_filter.x[2]
             delta = angular_difference(measurement[2], angle_predicted)
             if abs(delta) > np.pi / 2:
