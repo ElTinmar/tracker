@@ -112,6 +112,8 @@ def angular_difference(a, b):
 
 class BodyTrackerKalman(BodyTracker_CPU):
 
+    N_DIM = 3
+
     def __init__(
             self, 
             fps: int, 
@@ -124,10 +126,10 @@ class BodyTrackerKalman(BodyTracker_CPU):
         self.fps = fps
         dt = 1/fps
         self.kalman_filter = kinematic_kf(
-            dim = 3, 
+            dim = self.N_DIM, 
             order = model_order, 
             dt = dt, 
-            dim_z = 3, 
+            dim_z = self.N_DIM, 
             order_by_dim = False
         )
 
@@ -143,7 +145,7 @@ class BodyTrackerKalman(BodyTracker_CPU):
         self.kalman_filter.predict()
 
         if tracking['success']:
-            measurement = np.zeros((3,1))
+            measurement = np.zeros((self.N_DIM,1))
             measurement[:2,0] = tracking['centroid_resized']
             measurement[2] = tracking['angle_rad']
         
