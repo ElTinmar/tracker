@@ -5,10 +5,9 @@ from typing import Optional
 from .core import BodyTracker
 from .utils import get_orientation, get_best_centroid_index
 from tracker.prepare_image import preprocess_image
-from tracker.kalman_utils import MotionModel, create_kalman_filter
 from geometry import SimilarityTransform2D
 import cv2
-from filterpy.kalman import KalmanFilter
+from filterpy.common import kinematic_kf
 
 class BodyTracker_CPU(BodyTracker):
         
@@ -116,7 +115,7 @@ class BodyTrackerKalman(BodyTracker_CPU):
     def __init__(
             self, 
             fps: int, 
-            model: MotionModel = MotionModel.CONSTANT_VELOCITY, 
+            model_order: int, 
             *args, 
             **kwargs
         ) -> None:
@@ -124,7 +123,7 @@ class BodyTrackerKalman(BodyTracker_CPU):
         super().__init__(*args, **kwargs)
         self.fps = fps
         dt = 1/fps
-        self.kalman_filter = create_kalman_filter(dt=dt, model=model, dim_z=3)
+        self.kalman_filter = kinematic_kf(dim = 3, order=model_order, dt=dt, dim_z=3, order_by_dim=False)
 
     def track(
             self,

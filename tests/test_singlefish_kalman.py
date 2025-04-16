@@ -3,12 +3,11 @@ from image_tools import im2single, im2gray
 from tracker import (
     SingleFishTracker_CPU, SingleFishOverlay_opencv, SingleFishTrackerParamTracking, SingleFishTrackerParamOverlay,
     AnimalTracker_CPU, AnimalOverlay_opencv, AnimalTrackerParamTracking, AnimalTrackerParamOverlay,
-    BodyTrackerKalman, MotionModel, BodyOverlay_opencv, BodyTrackerParamTracking, BodyTrackerParamOverlay,
+    BodyTrackerKalman, BodyOverlay_opencv, BodyTrackerParamTracking, BodyTrackerParamOverlay,
     EyesTracker_CPU, EyesOverlay_opencv, EyesTrackerParamTracking, EyesTrackerParamOverlay,
     TailTracker_CPU, TailOverlay_opencv, TailTrackerParamTracking, TailTrackerParamOverlay
 )
 from tqdm import tqdm
-import numpy as np
 import cv2
 from geometry import SimilarityTransform2D
 
@@ -79,7 +78,7 @@ body_tracker = BodyTrackerKalman(
         crop_offset_y_mm=0
     ),
     fps = fps,
-    model = MotionModel.CONSTANT_VELOCITY
+    model_order = 1
 )
 eyes_tracker = EyesTracker_CPU(
     EyesTrackerParamTracking(
