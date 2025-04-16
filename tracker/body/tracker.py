@@ -235,5 +235,9 @@ class BodyTrackerKalman(BodyTracker_CPU):
         tracking['angle_rad'] = self.kalman_filter.x[2]
 
         # TODO also need to update 'body_axes'
-
+        tracking['body_axes'] = np.array([
+            [-np.sin(tracking['angle_rad']), np.cos(tracking['angle_rad'])],
+            [np.cos(tracking['angle_rad']), np.sin(tracking['angle_rad'])]
+        ])
+        
         return tracking
