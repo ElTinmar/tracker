@@ -172,8 +172,8 @@ class BodyTrackerKalman(BodyTracker_CPU):
                 [0,0,1,0,0,0,0,0,0]
             ])
             self.kalman_filter.P = 100 * np.eye(9) # state uncertainty
-            self.kalman_filter.R = np.diag([1,1,0.1]) # measurement uncertainty
-            self.kalman_filter.Q = np.diag([1,1,1, 1,1,0.1, 1,1,1e-7]) # model uncertainty
+            self.kalman_filter.R = np.diag([1,1,1]) # measurement uncertainty
+            self.kalman_filter.Q = np.diag([1,1,1, 1,1,1, 1,1,1]) # model uncertainty
 
         elif model == KalmanFilterModel.CONSTANT_JERK:   
             # state = x,y,theta + first and second time derivatives
@@ -200,8 +200,8 @@ class BodyTrackerKalman(BodyTracker_CPU):
                 [0,0,1,0,0,0,0,0,0,0,0,0]
             ])
             self.kalman_filter.P = 100 * np.eye(12) # state uncertainty
-            self.kalman_filter.R = np.diag([1,1,0.1]) # measurement uncertainty
-            self.kalman_filter.Q = np.diag([1,1,100, 1,1,1, 1,1,1, 1,1,1]) # model uncertainty
+            self.kalman_filter.R = np.diag([1,1,1]) # measurement uncertainty
+            self.kalman_filter.Q = np.diag([1,1,1, 1,1,1, 1,1,1, 1,1,1]) # model uncertainty
 
     def track(
             self,
@@ -212,20 +212,24 @@ class BodyTrackerKalman(BodyTracker_CPU):
 
         tracking = super().track(image, centroid, T_input_to_global)
 
-        measurement = np.zeros((3,1))
-        measurement[:2,0] = tracking['centroid_resized']
-        measurement[2] = tracking['angle_rad']
-    
         self.kalman_filter.predict()
 
-        angle_predicted = self.kalman_filter.x[2]
-        delta = angular_difference(measurement[2], angle_predicted)
-        if abs(delta) > np.pi / 2:
-            measurement[2] += np.pi 
-            #measurement[2] = np.arctan2(np.sin(measurement[2]), np.cos(measurement[2]))
+        if tracking['success']:
+            measurement = np.zeros((3,1))
+            measurement[:2,0] = tracking['centroid_resized']
+            measurement[2] = tracking['angle_rad']
+        
 
+            angle_predicted = self.kalman_filter.x[2]
+            delta = angular_difference(measurement[2], angle_predicted)
+            if abs(delta) > np.pi / 2:
+                measurement[2] += np.pi 
+                #measurement[2] = np.arctan2(np.sin(measurement[2]), np.cos(measurement[2]))
+        else:
+            measurement = None
+        
         self.kalman_filter.update(measurement)
-
+        
         # TODO do that for resized, cropped, input and global
         tracking['centroid_resized'] = self.kalman_filter.x[:2,0]
         tracking['angle_rad'] = self.kalman_filter.x[2]

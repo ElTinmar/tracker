@@ -79,7 +79,7 @@ body_tracker = BodyTrackerKalman(
         crop_offset_y_mm=0
     ),
     fps = fps,
-    model = KalmanFilterModel.CONSTANT_JERK
+    model = KalmanFilterModel.CONSTANT_VELOCITY
 )
 eyes_tracker = EyesTracker_CPU(
     EyesTrackerParamTracking(
