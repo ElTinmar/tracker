@@ -5,10 +5,10 @@ from typing import Optional
 from .core import BodyTracker
 from .utils import get_orientation, get_best_centroid_index
 from tracker.prepare_image import preprocess_image
+from tracker.kalman_utils import MotionModel
 from geometry import SimilarityTransform2D
 import cv2
 from filterpy.kalman import KalmanFilter
-from enum import Enum
 
 class BodyTracker_CPU(BodyTracker):
         
@@ -105,11 +105,6 @@ class BodyTracker_CPU(BodyTracker):
         )
         return res
     
-class MotionModel(Enum):
-    CONSTANT_VELOCITY = "constant_velocity"
-    CONSTANT_ACCELERATION = "constant_acceleration"
-    CONSTANT_JERK = "constant_jerk"
-
 def normalize_angle(theta: float) -> float:
     return np.arctan2(np.sin(theta), np.cos(theta))
 
