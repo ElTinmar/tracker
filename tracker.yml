@@ -15,6 +15,7 @@ dependencies:
 - pip:
   - opencv-python
   - snakeviz
+  - filterpy
   - git+https://github.com/ElTinmar/video_tools.git@main
   - git+https://github.com/ElTinmar/image_tools.git@main
   - git+https://github.com/ElTinmar/qt_widgets.git@main

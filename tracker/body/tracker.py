@@ -1,12 +1,14 @@
 from image_tools import  bwareafilter_props_cv2
 import numpy as np
 from numpy.typing import NDArray
-from typing import Optional, Tuple
+from typing import Optional
 from .core import BodyTracker
 from .utils import get_orientation, get_best_centroid_index
 from tracker.prepare_image import preprocess_image
 from geometry import SimilarityTransform2D
 import cv2
+from filterpy.kalman import KalmanFilter
+from enum import StrEnum
 
 class BodyTracker_CPU(BodyTracker):
         
@@ -102,3 +104,76 @@ class BodyTracker_CPU(BodyTracker):
             dtype=self.tracking_param.dtype
         )
         return res
+    
+class KalmanFilterModel(StrEnum):
+    CONSTANT_VELOCITY = "constant_velocity"
+    CONSTANT_ACCELERATION = "constant_acceleration"
+
+def normalize_angle(theta: float) -> float:
+    return np.arctan2(np.sin(theta), np.cos(theta))
+
+class BodyTrackerKalman(BodyTracker_CPU):
+
+    def __init__(self, fps: int, model: KalmanFilterModel, *args, **kwargs) -> None:
+
+        super().__init__(*args, **kwargs)
+        self.fps = fps
+        dt = 1/fps
+        
+        if model == KalmanFilterModel.CONSTANT_VELOCITY:
+
+            self.kalman_filter = KalmanFilter(dim_x=6, dim_z=3) 
+            self.kalman_filter.x = np.zeros((9,1)) # initial state
+            self.kalman_filter.F = np.array([
+                [1,  0,  0, dt,  0,  0],
+                [0,  1,  0,  0, dt,  0],
+                [0,  0,  1,  0,  0, dt],
+                [0,  0,  0,  1,  0,  0],
+                [0,  0,  0,  0,  1,  0],
+                [0,  0,  0,  0,  0,  1],
+            ])
+            self.kalman_filter.H = np.array([
+                [1,0,0,0,0,0],
+                [0,1,0,0,0,0],
+                [0,0,1,0,0,0]
+            ])
+            self.kalman_filter.P = 1000 * np.eye(6) # state uncertainty
+            self.kalman_filter.R = np.eye(3) # measurement uncertainty
+            self.kalman_filter.Q = np.eye(6) # model uncertainty
+
+        elif model == KalmanFilterModel.CONSTANT_ACCELERATION:   
+            
+            self.kalman_filter = KalmanFilter(dim_x=9, dim_z=3) 
+            self.kalman_filter.F = np.array([
+                [1, 0, 0, dt, 0, 0, dt**2/2, 0, 0],
+                [0, 1, 0, 0, dt, 0, 0, dt**2/2, 0],
+                [0, 0, 1, 0, 0, dt, 0, 0, dt**2/2],
+                [0, 0, 0, 1, 0, 0, dt, 0, 0],
+                [0, 0, 0, 0, 1, 0, 0, dt, 0],
+                [0, 0, 0, 0, 0, 1, 0, 0, dt],
+                [0, 0, 0, 0, 0, 0, 1, 0, 0],
+                [0, 0, 0, 0, 0, 0, 0, 1, 0],
+                [0, 0, 0, 0, 0, 0, 0, 0, 1],
+            ])
+            self.kalman_filter.x = np.zeros((9,1)) # initial state
+            self.kalman_filter.H = np.array([
+                [1,0,0,0,0,0,0,0,0],
+                [0,1,0,0,0,0,0,0,0],
+                [0,0,1,0,0,0,0,0,0]
+            ])
+            self.kalman_filter.P = 1000 * np.eye(9) # state uncertainty
+            self.kalman_filter.R = np.eye(3) # measurement uncertainty
+            self.kalman_filter.Q = np.eye(9) # model uncertainty
+
+    def track(
+            self,
+            image: NDArray, 
+            centroid: Optional[NDArray] = None, # centroids in global space
+            T_input_to_global: Optional[SimilarityTransform2D] = SimilarityTransform2D.identity()
+        ) -> NDArray:
+
+        tracking = super().track(image, centroid, T_input_to_global)
+        self.kalman_filter.predict()
+        self.kalman_filter.update(tracking)
+        filtered_tracking = self.kalman_filter.x
+        return filtered_tracking
