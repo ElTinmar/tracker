@@ -121,7 +121,7 @@ class BodyTrackerKalman(BodyTracker_CPU):
         dt = 1/fps
         
         if model == KalmanFilterModel.CONSTANT_VELOCITY:
-
+            # state = x,y,theta + first time derivatives
             self.kalman_filter = KalmanFilter(dim_x=6, dim_z=3) 
             self.kalman_filter.x = np.zeros((9,1)) # initial state
             self.kalman_filter.F = np.array([
@@ -142,7 +142,7 @@ class BodyTrackerKalman(BodyTracker_CPU):
             self.kalman_filter.Q = np.eye(6) # model uncertainty
 
         elif model == KalmanFilterModel.CONSTANT_ACCELERATION:   
-            
+            # state = x,y,theta + first and second time derivatives
             self.kalman_filter = KalmanFilter(dim_x=9, dim_z=3) 
             self.kalman_filter.F = np.array([
                 [1, 0, 0, dt, 0, 0, dt**2/2, 0, 0],
