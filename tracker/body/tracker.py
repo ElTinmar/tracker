@@ -224,14 +224,16 @@ class BodyTrackerKalman(BodyTracker_CPU):
             delta = angular_difference(measurement[2], angle_predicted)
             if abs(delta) > np.pi / 2:
                 measurement[2] += np.pi 
-                #measurement[2] = np.arctan2(np.sin(measurement[2]), np.cos(measurement[2]))
+                measurement[2] = normalize_angle(measurement[2])
         else:
             measurement = None
-        
+
         self.kalman_filter.update(measurement)
-        
+
         # TODO do that for resized, cropped, input and global
         tracking['centroid_resized'] = self.kalman_filter.x[:2,0]
         tracking['angle_rad'] = self.kalman_filter.x[2]
+
+        # TODO also need to update 'body_axes'
 
         return tracking
