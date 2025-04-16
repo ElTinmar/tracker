@@ -128,7 +128,7 @@ class BodyTrackerKalman(BodyTracker_CPU):
             order = model_order, 
             dt = dt, 
             dim_z = 3, 
-            order_by_dim =False
+            order_by_dim = False
         )
 
     def track(
