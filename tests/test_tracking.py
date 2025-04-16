@@ -130,7 +130,7 @@ tail_tracker = TailTracker_CPU(
         contrast=3.0,
         gamma=0.75,
         crop_dimension_mm=(3.5,3.5),
-        crop_offset_y_mm=3.5
+        crop_offset_y_mm=2
     )
 )
 

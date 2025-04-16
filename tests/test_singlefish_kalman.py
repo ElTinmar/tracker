@@ -3,7 +3,7 @@ from image_tools import im2single, im2gray
 from tracker import (
     SingleFishTracker_CPU, SingleFishOverlay_opencv, SingleFishTrackerParamTracking, SingleFishTrackerParamOverlay,
     AnimalTracker_CPU, AnimalOverlay_opencv, AnimalTrackerParamTracking, AnimalTrackerParamOverlay,
-    BodyTracker_CPU, BodyOverlay_opencv, BodyTrackerParamTracking, BodyTrackerParamOverlay,
+    BodyTrackerKalman, KalmanFilterModel, BodyOverlay_opencv, BodyTrackerParamTracking, BodyTrackerParamOverlay,
     EyesTracker_CPU, EyesOverlay_opencv, EyesTrackerParamTracking, EyesTrackerParamOverlay,
     TailTracker_CPU, TailOverlay_opencv, TailTrackerParamTracking, TailTrackerParamOverlay
 )
@@ -12,7 +12,7 @@ import numpy as np
 import cv2
 from geometry import SimilarityTransform2D
 
-DISPLAY=False
+DISPLAY=True
 
 # background subtracted video
 VIDEOS = [
@@ -60,11 +60,11 @@ animal_tracker = AnimalTracker_CPU(
         crop_offset_y_mm=0
     )
 )
-body_tracker = BodyTracker_CPU(
-    BodyTrackerParamTracking(
+body_tracker = BodyTrackerKalman(
+    tracking_param = BodyTrackerParamTracking(
         pix_per_mm=PIX_PER_MM,
         target_pix_per_mm=10,
-        intensity=0.15,
+        intensity=0.40,
         gamma=1.0,
         contrast=3.0,
         min_size_mm=2.0,
@@ -77,7 +77,9 @@ body_tracker = BodyTracker_CPU(
         median_filter_sz_mm=0,
         crop_dimension_mm=(5,5),
         crop_offset_y_mm=0
-    )
+    ),
+    fps = fps,
+    model = KalmanFilterModel.CONSTANT_JERK
 )
 eyes_tracker = EyesTracker_CPU(
     EyesTrackerParamTracking(
