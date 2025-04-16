@@ -133,17 +133,8 @@ class BodyTrackerKalman(BodyTracker_CPU):
             order_by_dim = False
         )
 
-    def track(
-            self,
-            image: NDArray, 
-            centroid: Optional[NDArray] = None, # centroids in global space
-            T_input_to_global: Optional[SimilarityTransform2D] = SimilarityTransform2D.identity()
-        ) -> NDArray:
-
-        tracking = super().track(image, centroid, T_input_to_global)
-
-        self.kalman_filter.predict()
-
+    def tracking_to_measurement(self, tracking: NDArray) -> NDArray:
+        
         if tracking['success']:
             measurement = np.zeros((self.N_DIM,1))
             measurement[:2,0] = tracking['centroid_resized']
@@ -158,8 +149,11 @@ class BodyTrackerKalman(BodyTracker_CPU):
         else:
             measurement = None
 
-        self.kalman_filter.update(measurement)
+        return measurement
 
+    def prediction_to_tracking(self, tracking: NDArray) -> None:
+        '''Side effect: modify tracking in-place'''
+        
         # TODO do that for resized, cropped, input and global
         tracking['centroid_resized'] = self.kalman_filter.x[:2,0]
         tracking['angle_rad'] = self.kalman_filter.x[2]
@@ -169,5 +163,18 @@ class BodyTrackerKalman(BodyTracker_CPU):
             [-np.sin(tracking['angle_rad']), np.cos(tracking['angle_rad'])],
             [np.cos(tracking['angle_rad']), np.sin(tracking['angle_rad'])]
         ])
+
+    def track(
+            self,
+            image: NDArray, 
+            centroid: Optional[NDArray] = None, # centroids in global space
+            T_input_to_global: Optional[SimilarityTransform2D] = SimilarityTransform2D.identity()
+        ) -> NDArray:
+
+        tracking = super().track(image, centroid, T_input_to_global)
+        self.kalman_filter.predict()
+        measurement = self.tracking_to_measurement(tracking)
+        self.kalman_filter.update(measurement)
+        self.prediction_to_tracking(tracking)
         
         return tracking
