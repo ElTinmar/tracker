@@ -123,7 +123,13 @@ class BodyTrackerKalman(BodyTracker_CPU):
         super().__init__(*args, **kwargs)
         self.fps = fps
         dt = 1/fps
-        self.kalman_filter = kinematic_kf(dim = 3, order=model_order, dt=dt, dim_z=3, order_by_dim=False)
+        self.kalman_filter = kinematic_kf(
+            dim = 3, 
+            order = model_order, 
+            dt = dt, 
+            dim_z = 3, 
+            order_by_dim =False
+        )
 
     def track(
             self,
