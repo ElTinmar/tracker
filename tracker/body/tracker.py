@@ -105,7 +105,7 @@ class BodyTracker_CPU(BodyTracker):
         )
         return res
     
-class KalmanFilterModel(Enum):
+class MotionModel(Enum):
     CONSTANT_VELOCITY = "constant_velocity"
     CONSTANT_ACCELERATION = "constant_acceleration"
     CONSTANT_JERK = "constant_jerk"
@@ -121,7 +121,7 @@ class BodyTrackerKalman(BodyTracker_CPU):
     def __init__(
             self, 
             fps: int, 
-            model: KalmanFilterModel = KalmanFilterModel.CONSTANT_VELOCITY, 
+            model: MotionModel = MotionModel.CONSTANT_VELOCITY, 
             *args, 
             **kwargs
         ) -> None:
@@ -130,7 +130,7 @@ class BodyTrackerKalman(BodyTracker_CPU):
         self.fps = fps
         dt = 1/fps
         
-        if model == KalmanFilterModel.CONSTANT_VELOCITY:
+        if model == MotionModel.CONSTANT_VELOCITY:
             # state = x,y,theta + first time derivatives
             self.kalman_filter = KalmanFilter(dim_x=6, dim_z=3) 
             self.kalman_filter.x = np.zeros((6,1)) # initial state
@@ -150,7 +150,7 @@ class BodyTrackerKalman(BodyTracker_CPU):
             self.kalman_filter.P = 100 * np.eye(6) # state uncertainty
             self.kalman_filter.Q = np.eye(6) # model uncertainty
 
-        elif model == KalmanFilterModel.CONSTANT_ACCELERATION:   
+        elif model == MotionModel.CONSTANT_ACCELERATION:   
             # state = x,y,theta + first and second time derivatives
             self.kalman_filter = KalmanFilter(dim_x=9, dim_z=3) 
             self.kalman_filter.F = np.array([
@@ -173,7 +173,7 @@ class BodyTrackerKalman(BodyTracker_CPU):
             self.kalman_filter.P = 100 * np.eye(9) # state uncertainty
             self.kalman_filter.Q = np.diag([1,1,1, 1,1,1, 1,1,1]) # model uncertainty
 
-        elif model == KalmanFilterModel.CONSTANT_JERK:   
+        elif model == MotionModel.CONSTANT_JERK:   
             # state = x,y,theta + first and second time derivatives
             self.kalman_filter = KalmanFilter(dim_x=12, dim_z=3) 
             self.kalman_filter.F = np.array([
@@ -201,7 +201,7 @@ class BodyTrackerKalman(BodyTracker_CPU):
             self.kalman_filter.Q = np.diag([1,1,1, 1,1,1, 1,1,1, 1,1,1]) # model uncertainty
         
         self.kalman_filter.R = np.diag([1,1,1]) # measurement uncertainty
-        
+
     def track(
             self,
             image: NDArray, 
@@ -224,6 +224,7 @@ class BodyTrackerKalman(BodyTracker_CPU):
             if abs(delta) > np.pi / 2:
                 measurement[2] += np.pi 
                 measurement[2] = normalize_angle(measurement[2])
+
         else:
             measurement = None
 

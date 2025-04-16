@@ -3,7 +3,7 @@ from image_tools import im2single, im2gray
 from tracker import (
     SingleFishTracker_CPU, SingleFishOverlay_opencv, SingleFishTrackerParamTracking, SingleFishTrackerParamOverlay,
     AnimalTracker_CPU, AnimalOverlay_opencv, AnimalTrackerParamTracking, AnimalTrackerParamOverlay,
-    BodyTrackerKalman, KalmanFilterModel, BodyOverlay_opencv, BodyTrackerParamTracking, BodyTrackerParamOverlay,
+    BodyTrackerKalman, MotionModel, BodyOverlay_opencv, BodyTrackerParamTracking, BodyTrackerParamOverlay,
     EyesTracker_CPU, EyesOverlay_opencv, EyesTrackerParamTracking, EyesTrackerParamOverlay,
     TailTracker_CPU, TailOverlay_opencv, TailTrackerParamTracking, TailTrackerParamOverlay
 )
@@ -79,7 +79,7 @@ body_tracker = BodyTrackerKalman(
         crop_offset_y_mm=0
     ),
     fps = fps,
-    model = KalmanFilterModel.CONSTANT_VELOCITY
+    model = MotionModel.CONSTANT_VELOCITY
 )
 eyes_tracker = EyesTracker_CPU(
     EyesTrackerParamTracking(
