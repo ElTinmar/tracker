@@ -132,7 +132,7 @@ class AnimalTrackerKalman(AnimalTracker_CPU):
         '''Side effect: modify tracking in-place'''
         
         # TODO do that for resized, cropped, input and global
-        tracking['centroids_resized'] = self.kalman_filter.x[0:self.N_DIM,0]
+        tracking['centroids_resized'] = self.kalman_filter.x[0:self.N_DIM,0].reshape((self.tracking_param.num_animals,2))
 
 
     def track(
