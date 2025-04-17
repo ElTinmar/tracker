@@ -2,7 +2,7 @@ from video_tools import InMemory_OpenCV_VideoReader
 from image_tools import im2single, im2gray
 from tracker import (
     SingleFishTracker_CPU, SingleFishOverlay_opencv, SingleFishTrackerParamTracking, SingleFishTrackerParamOverlay,
-    AnimalTracker_CPU, AnimalOverlay_opencv, AnimalTrackerParamTracking, AnimalTrackerParamOverlay,
+    AnimalTrackerKalman, AnimalOverlay_opencv, AnimalTrackerParamTracking, AnimalTrackerParamOverlay,
     BodyTrackerKalman, BodyOverlay_opencv, BodyTrackerParamTracking, BodyTrackerParamOverlay,
     EyesTrackerKalman, EyesOverlay_opencv, EyesTrackerParamTracking, EyesTrackerParamOverlay,
     TailTracker_CPU, TailOverlay_opencv, TailTrackerParamTracking, TailTrackerParamOverlay
@@ -38,8 +38,8 @@ fps = video_reader.get_fps()
 num_frames = video_reader.get_number_of_frame()
 
 # tracking 
-animal_tracker = AnimalTracker_CPU(
-    tracking_param=AnimalTrackerParamTracking(
+animal_tracker = AnimalTrackerKalman(
+    tracking_param = AnimalTrackerParamTracking(
         pix_per_mm=PIX_PER_MM,
         target_pix_per_mm=5,
         intensity=0.15,
@@ -57,7 +57,9 @@ animal_tracker = AnimalTracker_CPU(
         num_animals=1,
         crop_dimension_mm=(0,0), 
         crop_offset_y_mm=0
-    )
+    ),
+    fps = int(fps),
+    model_order = 1
 )
 body_tracker = BodyTrackerKalman(
     tracking_param = BodyTrackerParamTracking(

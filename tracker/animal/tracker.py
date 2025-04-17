@@ -6,6 +6,8 @@ from typing import Optional, Tuple
 from .core import AnimalTracker
 from tracker.prepare_image import preprocess_image
 from geometry import SimilarityTransform2D
+from filterpy.common import kinematic_kf
+from collections import deque
 
 class AnimalTracker_CPU(AnimalTracker):
     
@@ -88,3 +90,64 @@ class AnimalTracker_CPU(AnimalTracker):
             dtype=self.tracking_param.dtype
         )
         return res
+
+
+class AnimalTrackerKalman(AnimalTracker_CPU):
+    # TODO take into account multiple animals
+
+    N_DIM = 2
+
+    def __init__(
+            self, 
+            fps: int, 
+            model_order: int, 
+            model_uncertainty: float = 0.2,
+            measurement_uncertainty: float = 1.0,
+            *args, 
+            **kwargs
+        ) -> None:
+
+        super().__init__(*args, **kwargs)
+        self.fps = fps
+        dt = 1/fps
+        self.kalman_filter = kinematic_kf(
+            dim = self.N_DIM, 
+            order = model_order, 
+            dt = dt, 
+            dim_z = self.N_DIM, 
+            order_by_dim = False
+        )
+        self.kalman_filter.Q *= model_uncertainty
+        self.kalman_filter.R *= measurement_uncertainty
+
+    def tracking_to_measurement(self, tracking: NDArray) -> NDArray:
+        
+        if tracking['success']:
+            measurement = np.zeros((self.N_DIM,1))
+            measurement[:2,0] = tracking['centroids_resized']
+        else:
+            measurement = None
+
+        return measurement
+
+    def prediction_to_tracking(self, tracking: NDArray) -> None:
+        '''Side effect: modify tracking in-place'''
+        
+        # TODO do that for resized, cropped, input and global
+        tracking['centroids_resized'] = self.kalman_filter.x[:2,0]
+
+
+    def track(
+            self,
+            image: NDArray, 
+            centroid: Optional[NDArray] = None, # centroids in global space
+            T_input_to_global: Optional[SimilarityTransform2D] = SimilarityTransform2D.identity()
+        ) -> NDArray:
+
+        tracking = super().track(image, centroid, T_input_to_global)
+        self.kalman_filter.predict()
+        measurement = self.tracking_to_measurement(tracking)
+        self.kalman_filter.update(measurement)
+        self.prediction_to_tracking(tracking)
+        
+        return tracking

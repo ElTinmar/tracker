@@ -100,7 +100,6 @@ class EyesTrackerKalman(EyesTracker_CPU):
             model_order: int, 
             model_uncertainty: float = 0.2,
             measurement_uncertainty: float = 1.0,
-            angle_history_sec: float = 1,
             *args, 
             **kwargs
         ) -> None:
@@ -108,7 +107,6 @@ class EyesTrackerKalman(EyesTracker_CPU):
         super().__init__(*args, **kwargs)
         self.fps = fps
         dt = 1/fps
-        self.angle_history = deque(maxlen=int(angle_history_sec*fps))
         self.kalman_filter = kinematic_kf(
             dim = self.N_DIM, 
             order = model_order, 
