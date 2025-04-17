@@ -5,7 +5,7 @@ from tracker import (
     AnimalTrackerKalman, AnimalOverlay_opencv, AnimalTrackerParamTracking, AnimalTrackerParamOverlay,
     BodyTrackerKalman, BodyOverlay_opencv, BodyTrackerParamTracking, BodyTrackerParamOverlay,
     EyesTrackerKalman, EyesOverlay_opencv, EyesTrackerParamTracking, EyesTrackerParamOverlay,
-    TailTracker_CPU, TailOverlay_opencv, TailTrackerParamTracking, TailTrackerParamOverlay
+    TailTrackerKalman, TailOverlay_opencv, TailTrackerParamTracking, TailTrackerParamOverlay
 )
 from tqdm import tqdm
 import cv2
@@ -101,8 +101,8 @@ eyes_tracker = EyesTrackerKalman(
     fps = int(fps),
     model_order = 1
 )
-tail_tracker = TailTracker_CPU(
-    TailTrackerParamTracking(
+tail_tracker = TailTrackerKalman(
+    tracking_param = TailTrackerParamTracking(
         pix_per_mm=PIX_PER_MM,
         target_pix_per_mm=20,
         ball_radius_mm=0.1,
@@ -117,7 +117,9 @@ tail_tracker = TailTracker_CPU(
         gamma=0.75,
         crop_dimension_mm=(3.5,3.5),
         crop_offset_y_mm=2
-    )
+    ),
+    fps = int(fps),
+    model_order = 1
 )
 
 # overlay

@@ -5,6 +5,7 @@ from .core import TailTracker
 from .utils import tail_skeleton_ball
 from tracker.prepare_image import preprocess_image
 from geometry import SimilarityTransform2D
+from filterpy.common import kinematic_kf
 
 class TailTracker_CPU(TailTracker):
 
@@ -84,3 +85,64 @@ class TailTracker_CPU(TailTracker):
         )
 
         return res
+
+
+class TailTrackerKalman(TailTracker_CPU):
+    # TODO this does not respect segment length
+    # model the angle for each segment instead
+
+    def __init__(
+            self, 
+            fps: int, 
+            model_order: int, 
+            model_uncertainty: float = 1.0,
+            measurement_uncertainty: float = 1.0,
+            *args, 
+            **kwargs
+        ) -> None:
+
+        super().__init__(*args, **kwargs)
+        self.N_DIM = 2 * self.tracking_param.n_pts_interp
+        self.fps = fps
+        dt = 1/fps
+        self.kalman_filter = kinematic_kf(
+            dim = self.N_DIM, 
+            order = model_order, 
+            dt = dt, 
+            dim_z = self.N_DIM, 
+            order_by_dim = False
+        )
+        self.kalman_filter.Q *= model_uncertainty
+        self.kalman_filter.R *= measurement_uncertainty
+
+    def tracking_to_measurement(self, tracking: NDArray) -> NDArray:
+        
+        if tracking['success']:
+            measurement = np.zeros((self.N_DIM,1))
+            measurement[0:self.N_DIM,0] = tracking['skeleton_interp_resized'].flatten()
+        else:
+            measurement = None
+
+        return measurement
+
+    def prediction_to_tracking(self, tracking: NDArray) -> None:
+        '''Side effect: modify tracking in-place'''
+        
+        # TODO do that for resized, cropped, input and global
+        tracking['skeleton_interp_resized'] = self.kalman_filter.x[0:self.N_DIM,0].reshape((self.tracking_param.n_pts_interp,2))
+
+
+    def track(
+            self,
+            image: NDArray, 
+            centroid: Optional[NDArray] = None, # centroids in global space
+            T_input_to_global: Optional[SimilarityTransform2D] = SimilarityTransform2D.identity()
+        ) -> NDArray:
+
+        tracking = super().track(image, centroid, T_input_to_global)
+        self.kalman_filter.predict()
+        measurement = self.tracking_to_measurement(tracking)
+        self.kalman_filter.update(measurement)
+        self.prediction_to_tracking(tracking)
+        
+        return tracking
