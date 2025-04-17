@@ -140,7 +140,8 @@ class BodyTrackerKalman(BodyTracker_CPU):
             measurement = np.zeros((self.N_DIM,1))
             measurement[:2,0] = tracking['centroid_resized']
             measurement[2] = tracking['angle_rad']
-
+            
+            # Use previous frames to filter fast 180deg changes in orientation
             self.angle_history.append(tracking['angle_rad'].copy())
             angle_history = np.median(self.angle_history)
             delta = angdiff(measurement[2], angle_history)
