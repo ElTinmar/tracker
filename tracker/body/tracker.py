@@ -142,6 +142,8 @@ class BodyTrackerKalman(BodyTracker_CPU):
             measurement[2] = tracking['angle_rad']
             
             # Use previous frames to filter fast 180deg changes in orientation
+            # TODO maybe add this to regular tracking instead to separate from
+            # the Kalman filtering proper
             self.angle_history.append(tracking['angle_rad'].copy())
             angle_history = np.median(self.angle_history)
             delta = angdiff(measurement[2], angle_history)
