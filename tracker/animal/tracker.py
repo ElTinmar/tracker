@@ -94,8 +94,6 @@ class AnimalTracker_CPU(AnimalTracker):
 class AnimalTrackerKalman(AnimalTracker_CPU):
     # TODO take into account multiple animals
 
-    N_DIM = 2
-
     def __init__(
             self, 
             fps: int, 
@@ -107,6 +105,7 @@ class AnimalTrackerKalman(AnimalTracker_CPU):
         ) -> None:
 
         super().__init__(*args, **kwargs)
+        self.N_DIM = 2 * self.tracking_param.num_animals
         self.fps = fps
         dt = 1/fps
         self.kalman_filter = kinematic_kf(
@@ -123,7 +122,7 @@ class AnimalTrackerKalman(AnimalTracker_CPU):
         
         if tracking['success']:
             measurement = np.zeros((self.N_DIM,1))
-            measurement[:2,0] = tracking['centroids_resized']
+            measurement[0:self.N_DIM,0] = tracking['centroids_resized'].flatten()
         else:
             measurement = None
 
@@ -133,7 +132,7 @@ class AnimalTrackerKalman(AnimalTracker_CPU):
         '''Side effect: modify tracking in-place'''
         
         # TODO do that for resized, cropped, input and global
-        tracking['centroids_resized'] = self.kalman_filter.x[:2,0]
+        tracking['centroids_resized'] = self.kalman_filter.x[0:self.N_DIM,0]
 
 
     def track(
