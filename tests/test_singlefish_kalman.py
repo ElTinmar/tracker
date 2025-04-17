@@ -11,7 +11,7 @@ from tqdm import tqdm
 import cv2
 from geometry import SimilarityTransform2D
 
-DISPLAY=True
+DISPLAY=False
 
 # background subtracted video
 VIDEOS = [

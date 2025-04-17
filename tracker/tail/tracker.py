@@ -102,7 +102,7 @@ class TailTrackerKalman(TailTracker_CPU):
         ) -> None:
 
         super().__init__(*args, **kwargs)
-        self.N_DIM = 2 * self.tracking_param.n_pts_interp
+        self.N_DIM = 2 * self.tracking_param.n_tail_points
         self.fps = fps
         dt = 1/fps
         self.kalman_filter = kinematic_kf(
@@ -119,7 +119,7 @@ class TailTrackerKalman(TailTracker_CPU):
         
         if tracking['success']:
             measurement = np.zeros((self.N_DIM,1))
-            measurement[0:self.N_DIM,0] = tracking['skeleton_interp_resized'].flatten()
+            measurement[0:self.N_DIM,0] = tracking['skeleton_resized'].flatten()
         else:
             measurement = None
 
@@ -129,7 +129,7 @@ class TailTrackerKalman(TailTracker_CPU):
         '''Side effect: modify tracking in-place'''
         
         # TODO do that for resized, cropped, input and global
-        tracking['skeleton_interp_resized'] = self.kalman_filter.x[0:self.N_DIM,0].reshape((self.tracking_param.n_pts_interp,2))
+        tracking['skeleton_resized'] = self.kalman_filter.x[0:self.N_DIM,0].reshape((self.tracking_param.n_tail_points,2))
 
 
     def track(
