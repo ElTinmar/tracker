@@ -6,7 +6,6 @@ from .utils import get_eye_properties, find_eyes_and_swimbladder, assign_feature
 from geometry import SimilarityTransform2D
 from tracker.prepare_image import preprocess_image
 from filterpy.common import kinematic_kf
-from collections import deque
 
 class EyesTracker_CPU(EyesTracker):
 

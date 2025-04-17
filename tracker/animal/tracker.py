@@ -7,7 +7,6 @@ from .core import AnimalTracker
 from tracker.prepare_image import preprocess_image
 from geometry import SimilarityTransform2D
 from filterpy.common import kinematic_kf
-from collections import deque
 
 class AnimalTracker_CPU(AnimalTracker):
     
