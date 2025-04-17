@@ -11,7 +11,7 @@ from tqdm import tqdm
 import cv2
 from geometry import SimilarityTransform2D
 
-DISPLAY=True
+DISPLAY=False
 
 # background subtracted video
 VIDEOS = [
@@ -77,7 +77,7 @@ body_tracker = BodyTrackerKalman(
         crop_dimension_mm=(5,5),
         crop_offset_y_mm=0
     ),
-    fps = fps,
+    fps = int(fps),
     model_order = 1
 )
 eyes_tracker = EyesTracker_CPU(

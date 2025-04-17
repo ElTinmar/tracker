@@ -5,9 +5,10 @@ from typing import Optional
 from .core import BodyTracker
 from .utils import get_orientation, get_best_centroid_index
 from tracker.prepare_image import preprocess_image
-from geometry import SimilarityTransform2D
+from geometry import SimilarityTransform2D, angdiff, normalize_angle
 import cv2
 from filterpy.common import kinematic_kf
+from collections import deque
 
 class BodyTracker_CPU(BodyTracker):
         
@@ -103,12 +104,6 @@ class BodyTracker_CPU(BodyTracker):
             dtype=self.tracking_param.dtype
         )
         return res
-    
-def normalize_angle(theta: float) -> float:
-    return np.arctan2(np.sin(theta), np.cos(theta))
-
-def angular_difference(a, b):
-    return np.arctan2(np.sin(a - b), np.cos(a - b))
 
 class BodyTrackerKalman(BodyTracker_CPU):
 
@@ -125,6 +120,7 @@ class BodyTrackerKalman(BodyTracker_CPU):
         super().__init__(*args, **kwargs)
         self.fps = fps
         dt = 1/fps
+        self.angle_history = deque(maxlen=fps)
         self.kalman_filter = kinematic_kf(
             dim = self.N_DIM, 
             order = model_order, 
@@ -139,9 +135,10 @@ class BodyTrackerKalman(BodyTracker_CPU):
             measurement = np.zeros((self.N_DIM,1))
             measurement[:2,0] = tracking['centroid_resized']
             measurement[2] = tracking['angle_rad']
-        
-            angle_predicted = self.kalman_filter.x[2]
-            delta = angular_difference(measurement[2], angle_predicted)
+
+            self.angle_history.append(tracking['angle_rad'].copy())
+            angle_history = np.mean(self.angle_history)
+            delta = angdiff(measurement[2], angle_history)
             if abs(delta) > np.pi / 2:
                 measurement[2] += np.pi 
                 measurement[2] = normalize_angle(measurement[2])
@@ -157,11 +154,9 @@ class BodyTrackerKalman(BodyTracker_CPU):
         # TODO do that for resized, cropped, input and global
         tracking['centroid_resized'] = self.kalman_filter.x[:2,0]
         tracking['angle_rad'] = self.kalman_filter.x[2]
-
-        # TODO also need to update 'body_axes'
         tracking['body_axes'] = np.array([
-            [-np.sin(tracking['angle_rad']), np.cos(tracking['angle_rad'])],
-            [np.cos(tracking['angle_rad']), np.sin(tracking['angle_rad'])]
+            [np.sin(tracking['angle_rad']), np.cos(tracking['angle_rad'])],
+            [-np.cos(tracking['angle_rad']), np.sin(tracking['angle_rad'])]
         ])
 
     def track(
