@@ -5,6 +5,8 @@ from .core import EyesTracker, DTYPE_EYE
 from .utils import get_eye_properties, find_eyes_and_swimbladder, assign_features
 from geometry import SimilarityTransform2D
 from tracker.prepare_image import preprocess_image
+from filterpy.common import kinematic_kf
+from collections import deque
 
 class EyesTracker_CPU(EyesTracker):
 
@@ -87,4 +89,78 @@ class EyesTracker_CPU(EyesTracker):
         )
 
         return res
+    
+class EyesTrackerKalman(EyesTracker_CPU):
+
+    N_DIM = 6
+
+    def __init__(
+            self, 
+            fps: int, 
+            model_order: int, 
+            model_uncertainty: float = 0.2,
+            measurement_uncertainty: float = 1.0,
+            angle_history_sec: float = 1,
+            *args, 
+            **kwargs
+        ) -> None:
+
+        super().__init__(*args, **kwargs)
+        self.fps = fps
+        dt = 1/fps
+        self.angle_history = deque(maxlen=int(angle_history_sec*fps))
+        self.kalman_filter = kinematic_kf(
+            dim = self.N_DIM, 
+            order = model_order, 
+            dt = dt, 
+            dim_z = self.N_DIM, 
+            order_by_dim = False
+        )
+        self.kalman_filter.Q *= model_uncertainty
+        self.kalman_filter.R *= measurement_uncertainty
+
+    def tracking_to_measurement(self, tracking: NDArray) -> NDArray:
+        
+        if tracking['success']:
+            measurement = np.zeros((self.N_DIM,1))
+            measurement[:2,0] = tracking['left_eye']['centroid_resized']
+            measurement[2] = tracking['left_eye']['angle']
+            measurement[3:5,0] = tracking['right_eye']['centroid_resized']
+            measurement[5] = tracking['right_eye']['angle']
+        else:
+            measurement = None
+
+        return measurement
+
+    def prediction_to_tracking(self, tracking: NDArray) -> None:
+        '''Side effect: modify tracking in-place'''
+    
+        tracking['left_eye']['centroid_resized'] = self.kalman_filter.x[:2,0]
+        tracking['left_eye']['angle'] = self.kalman_filter.x[2]
+        tracking['left_eye']['direction'] = np.array([
+            np.sin(tracking['left_eye']['angle']), 
+            np.cos(tracking['left_eye']['angle'])
+        ])
+
+        tracking['right_eye']['centroid_resized'] = self.kalman_filter.x[3:5,0]
+        tracking['right_eye']['angle'] = self.kalman_filter.x[5]
+        tracking['right_eye']['direction'] = np.array([
+            np.sin(tracking['right_eye']['angle']), 
+            np.cos(tracking['right_eye']['angle'])
+        ])
+
+    def track(
+            self,
+            image: NDArray, 
+            centroid: Optional[NDArray] = None, # centroids in global space
+            T_input_to_global: Optional[SimilarityTransform2D] = SimilarityTransform2D.identity()
+        ) -> NDArray:
+
+        tracking = super().track(image, centroid, T_input_to_global)
+        self.kalman_filter.predict()
+        measurement = self.tracking_to_measurement(tracking)
+        self.kalman_filter.update(measurement)
+        self.prediction_to_tracking(tracking)
+        
+        return tracking
     

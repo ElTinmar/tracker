@@ -4,7 +4,7 @@ from tracker import (
     SingleFishTracker_CPU, SingleFishOverlay_opencv, SingleFishTrackerParamTracking, SingleFishTrackerParamOverlay,
     AnimalTracker_CPU, AnimalOverlay_opencv, AnimalTrackerParamTracking, AnimalTrackerParamOverlay,
     BodyTrackerKalman, BodyOverlay_opencv, BodyTrackerParamTracking, BodyTrackerParamOverlay,
-    EyesTracker_CPU, EyesOverlay_opencv, EyesTrackerParamTracking, EyesTrackerParamOverlay,
+    EyesTrackerKalman, EyesOverlay_opencv, EyesTrackerParamTracking, EyesTrackerParamOverlay,
     TailTracker_CPU, TailOverlay_opencv, TailTrackerParamTracking, TailTrackerParamOverlay
 )
 from tqdm import tqdm
@@ -80,8 +80,8 @@ body_tracker = BodyTrackerKalman(
     fps = int(fps),
     model_order = 1
 )
-eyes_tracker = EyesTracker_CPU(
-    EyesTrackerParamTracking(
+eyes_tracker = EyesTrackerKalman(
+    tracking_param = EyesTrackerParamTracking(
         pix_per_mm=PIX_PER_MM,
         target_pix_per_mm=40,
         thresh_lo=0.2,
@@ -95,7 +95,9 @@ eyes_tracker = EyesTracker_CPU(
         median_filter_sz_mm=0,
         crop_dimension_mm=(1,1.5),
         crop_offset_y_mm=-0.5
-    )
+    ),
+    fps = int(fps),
+    model_order = 1
 )
 tail_tracker = TailTracker_CPU(
     TailTrackerParamTracking(
