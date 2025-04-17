@@ -113,6 +113,9 @@ class BodyTrackerKalman(BodyTracker_CPU):
             self, 
             fps: int, 
             model_order: int, 
+            model_uncertainty: float = 0.2,
+            measurement_uncertainty: float = 1.0,
+            angle_history_sec: float = 1,
             *args, 
             **kwargs
         ) -> None:
@@ -120,7 +123,7 @@ class BodyTrackerKalman(BodyTracker_CPU):
         super().__init__(*args, **kwargs)
         self.fps = fps
         dt = 1/fps
-        self.angle_history = deque(maxlen=fps)
+        self.angle_history = deque(maxlen=int(angle_history_sec*fps))
         self.kalman_filter = kinematic_kf(
             dim = self.N_DIM, 
             order = model_order, 
@@ -128,8 +131,8 @@ class BodyTrackerKalman(BodyTracker_CPU):
             dim_z = self.N_DIM, 
             order_by_dim = False
         )
-        self.kalman_filter.Q *= 0.1 # motion model uncertainty
-        self.kalman_filter.R *= 1 # measurement model uncertainty
+        self.kalman_filter.Q *= model_uncertainty
+        self.kalman_filter.R *= measurement_uncertainty
 
     def tracking_to_measurement(self, tracking: NDArray) -> NDArray:
         
@@ -139,7 +142,7 @@ class BodyTrackerKalman(BodyTracker_CPU):
             measurement[2] = tracking['angle_rad']
 
             self.angle_history.append(tracking['angle_rad'].copy())
-            angle_history = np.mean(self.angle_history)
+            angle_history = np.median(self.angle_history)
             delta = angdiff(measurement[2], angle_history)
             if abs(delta) > np.pi / 2:
                 measurement[2] += np.pi 
