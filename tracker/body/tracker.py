@@ -128,6 +128,8 @@ class BodyTrackerKalman(BodyTracker_CPU):
             dim_z = self.N_DIM, 
             order_by_dim = False
         )
+        self.kalman_filter.Q *= 0.1 # motion model uncertainty
+        self.kalman_filter.R *= 1 # measurement model uncertainty
 
     def tracking_to_measurement(self, tracking: NDArray) -> NDArray:
         
