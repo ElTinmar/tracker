@@ -10,5 +10,6 @@ urlretrieve(FOLDER_URL, DESTINATION)
 print(f'Extracting {DESTINATION}...')
 with zipfile.ZipFile(DESTINATION, 'r') as zip_ref:
     zip_ref.extractall()
-print(f'remove {DESTINATION}...')
+print("Extraction complete.")
+print(f'Removing {DESTINATION}...')
 os.remove(DESTINATION)
