@@ -16,8 +16,9 @@ def extract() -> None:
     print("Extraction complete.")
 
 def cleanup() -> None:
-    print(f'Removing {DESTINATION}...')
-    os.remove(DESTINATION)
+    print('Cleaning up')
+    if os.path.isfile(DESTINATION):
+        os.remove(DESTINATION)
 
 if __name__ == '__main__':
     try:
