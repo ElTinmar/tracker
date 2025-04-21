@@ -1,0 +1,160 @@
+from video_tools import InMemory_OpenCV_VideoReader
+from image_tools import im2single, im2gray
+from tracker import (
+    SingleFishTracker_CPU, SingleFishTrackerParamTracking,
+    AnimalTrackerKalman, AnimalTrackerParamTracking,
+    BodyTrackerKalman, BodyTrackerParamTracking,
+    EyesTrackerKalman, EyesTrackerParamTracking,
+    TailTrackerKalman, TailTrackerParamTracking
+)
+import timeit
+from functools import partial
+import numpy as np
+
+NREP = 10
+NFRAMES = 100
+
+# background subtracted video
+VIDEOS = [
+    ('toy_data/single_freelyswimming_504x500px_nobckg.avi', 40),
+    ('toy_data/single_headembedded_544x380px_noparam_nobckg.avi', 100),
+]
+
+def load_video(video_num: int = 0):
+
+    video, pix_per_mm = VIDEOS[video_num]
+
+    video_reader = InMemory_OpenCV_VideoReader()
+    video_reader.open_file(
+        filename = video, 
+        memsize_bytes = 4e9, 
+        safe = False, 
+        single_precision = True, 
+        grayscale = True
+    )
+
+    height = video_reader.get_height()
+    width = video_reader.get_width()
+    fps = video_reader.get_fps()  
+    num_frames = video_reader.get_number_of_frame()
+
+    # tracking 
+    animal_tracker = AnimalTrackerKalman(
+        tracking_param = AnimalTrackerParamTracking(
+            pix_per_mm=pix_per_mm,
+            target_pix_per_mm=5,
+            intensity=0.15,
+            gamma=1.0,
+            contrast=1.0,
+            min_size_mm=0.0,
+            max_size_mm=300.0,
+            min_length_mm=0,
+            max_length_mm=0,
+            min_width_mm=0,
+            max_width_mm=0,
+            blur_sz_mm=0.6,
+            median_filter_sz_mm=0,
+            downsample_factor=0.90,
+            num_animals=1,
+            crop_dimension_mm=(0,0), 
+            crop_offset_y_mm=0
+        ),
+        fps = int(fps),
+        model_order = 1
+    )
+    body_tracker = BodyTrackerKalman(
+        tracking_param = BodyTrackerParamTracking(
+            pix_per_mm=pix_per_mm,
+            target_pix_per_mm=10,
+            intensity=0.20,
+            gamma=1.0,
+            contrast=3.0,
+            min_size_mm=2.0,
+            max_size_mm=300.0,
+            min_length_mm=0,
+            max_length_mm=0,
+            min_width_mm=0,
+            max_width_mm=0,
+            blur_sz_mm=0.6,
+            median_filter_sz_mm=0,
+            crop_dimension_mm=(5,5),
+            crop_offset_y_mm=0
+        ),
+        fps = int(fps),
+        model_order = 1
+    )
+    eyes_tracker = EyesTrackerKalman(
+        tracking_param = EyesTrackerParamTracking(
+            pix_per_mm=pix_per_mm,
+            target_pix_per_mm=40,
+            thresh_lo=0.2,
+            thresh_hi=0.8,
+            gamma=2.0,
+            dyntresh_res=5,
+            contrast=5.0,
+            size_lo_mm=0.1,
+            size_hi_mm=30.0,
+            blur_sz_mm=0.1,
+            median_filter_sz_mm=0,
+            crop_dimension_mm=(1,1.5),
+            crop_offset_y_mm=-0.5
+        ),
+        fps = int(fps),
+        model_order = 1
+    )
+    tail_tracker = TailTrackerKalman(
+        tracking_param = TailTrackerParamTracking(
+            pix_per_mm=pix_per_mm,
+            target_pix_per_mm=20,
+            ball_radius_mm=0.1,
+            arc_angle_deg=90,
+            n_tail_points=6,
+            n_pts_arc=20,
+            n_pts_interp=40,
+            tail_length_mm=3.0,
+            blur_sz_mm=0.06,
+            median_filter_sz_mm=0,
+            contrast=3.0,
+            gamma=0.75,
+            crop_dimension_mm=(3.5,3.5),
+            crop_offset_y_mm=2
+        ),
+        fps = int(fps),
+        model_order = 1
+    )
+
+    tracker = SingleFishTracker_CPU(
+        SingleFishTrackerParamTracking(
+            animal=animal_tracker,
+            body=body_tracker, 
+            eyes=eyes_tracker, 
+            tail=tail_tracker
+        )
+    )
+
+    return video_reader, tracker, height, width
+
+def track(video_reader, tracker) -> None:
+
+    for i in range(NFRAMES):
+
+        (rval, frame) = video_reader.next_frame()
+        if not rval:
+            raise RuntimeError('VideoReader was unable to read the whole video')
+        
+        # convert
+        frame_gray = im2single(im2gray(frame))
+
+        # track
+        tracking = tracker.track(frame_gray)
+
+if __name__ == '__main__':
+
+    for id, vid in enumerate(VIDEOS):
+        video_reader, tracker, height, width = load_video(id)
+        track_fun = partial(track, video_reader=video_reader, tracker=tracker)
+        timings = NFRAMES/np.array(timeit.repeat(track_fun, number=1, repeat=NREP))
+        avg = np.mean(timings)
+        std = np.std(timings)
+        print(f'FPS: {avg:.2f} \N{PLUS-MINUS SIGN} {std:.2f}, ({height},{width}), {vid}')
+        video_reader.close()
