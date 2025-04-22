@@ -183,11 +183,8 @@ class TailTrackerKalman(TailTracker_CPU):
 
     def tracking_to_measurement(self, tracking: NDArray) -> NDArray:
         
-        if tracking['success']:
-            measurement = np.zeros((self.N_DIM,1))
-            measurement[0:self.N_DIM,0] = tracking['skeleton_resized'].flatten()
-        else:
-            measurement = None
+        measurement = np.zeros((self.N_DIM,1))
+        measurement[0:self.N_DIM,0] = tracking.skeleton_resized.flatten()
 
         return measurement
 
@@ -195,7 +192,7 @@ class TailTrackerKalman(TailTracker_CPU):
         '''Side effect: modify tracking in-place'''
         
         # TODO do that for resized, cropped, input and global
-        tracking['skeleton_resized'] = self.kalman_filter.x[0:self.N_DIM,0].reshape((self.tracking_param.n_tail_points,2))
+        tracking.skeleton_resized = self.kalman_filter.x[0:self.N_DIM,0].reshape((self.tracking_param.n_tail_points,2))
 
 
     def track(
@@ -205,10 +202,56 @@ class TailTrackerKalman(TailTracker_CPU):
             T_input_to_global: Optional[SimilarityTransform2D] = SimilarityTransform2D.identity()
         ) -> NDArray:
 
-        tracking = super().track(image, centroid, T_input_to_global)
+        self.tracking_param.input_image_shape = image.shape
+
+        centroid_in_input, T_global_to_input = self.transform_input_centroid(
+            centroid,
+            T_input_to_global
+        )
+        
+        preproc = self.preprocess(image, centroid_in_input)
+        if preproc is None:
+            return self.tracking_param.failed
+
+        tracking = self.track_resized(preproc)
+
+        # kalman filter
         self.kalman_filter.predict()
         measurement = self.tracking_to_measurement(tracking)
         self.kalman_filter.update(measurement)
         self.prediction_to_tracking(tracking)
-        
-        return tracking
+
+        resolution = self.transform_coordinate_system(
+            tracking, 
+            preproc, 
+            T_input_to_global, 
+            T_global_to_input
+        )
+
+        # save result to numpy structured array
+        res = np.array(
+            (
+                True,
+                self.tracking_param.n_tail_points,
+                self.tracking_param.n_pts_interp,
+                centroid, 
+                tracking.skeleton_resized,
+                tracking.skeleton_cropped,
+                tracking.skeleton_input,
+                tracking.skeleton_global,
+                tracking.skeleton_interp_resized,
+                tracking.skeleton_interp_cropped,
+                tracking.skeleton_interp_input,
+                tracking.skeleton_interp_global,
+                preproc.image_processed,
+                preproc.image_cropped,
+                resolution.pix_per_mm_global,
+                resolution.pix_per_mm_input,
+                resolution.pix_per_mm_cropped,
+                resolution.pix_per_mm_resized,
+            ), 
+            dtype= self.tracking_param.dtype
+        )
+
+        return res
+    
