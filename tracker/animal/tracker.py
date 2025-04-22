@@ -89,14 +89,6 @@ class AnimalTracker_CPU(AnimalTracker):
         tracking.centroids_cropped = preproc.T_input_to_cropped.transform_points(tracking.centroids_input)
         tracking.centroids_resized = preproc.T_cropped_to_resized.transform_points(tracking.centroids_cropped)
 
-        # Downsample image export (a bit easier on RAM). This is used for overlay instead of image_cropped
-        # NOTE: it introduces a special case, not a big fan of this
-        image_downsampled = cv2.resize(
-            preproc.image_cropped,
-            self.tracking_param.downsampled_shape[::-1], # transform shape (row, col) to width, height
-            cv2.INTER_NEAREST
-        )
-
         resolution = AnimalResolution()
         resolution.pix_per_mm_global = self.tracking_param.pix_per_mm
         resolution.pix_per_mm_input = resolution.pix_per_mm_global * T_global_to_input.scale_factor
@@ -104,7 +96,7 @@ class AnimalTracker_CPU(AnimalTracker):
         resolution.pix_per_mm_resized = resolution.pix_per_mm_cropped * preproc.T_cropped_to_resized.scale_factor
         resolution.pix_per_mm_downsampled = resolution.pix_per_mm_input * self.tracking_param.downsample_factor
 
-        return resolution, image_downsampled
+        return resolution
     
     def track(
         self,
@@ -124,12 +116,20 @@ class AnimalTracker_CPU(AnimalTracker):
         if preproc is None:
             return self.tracking_param.failed
         
+        # Downsample image export (a bit easier on RAM). This is used for overlay instead of image_cropped
+        # NOTE: it introduces a special case, not a big fan of this
+        image_downsampled = cv2.resize(
+            preproc.image_cropped,
+            self.tracking_param.downsampled_shape[::-1], # transform shape (row, col) to width, height
+            cv2.INTER_NEAREST
+        )
+        
         tracking_resized = self.track_resized(preproc)
         if tracking_resized is None:
             return self.tracking_param.failed
 
         tracking, mask = tracking_resized
-        resolution, image_downsampled = self.transform_coordinate_system(
+        resolution = self.transform_coordinate_system(
             tracking, 
             preproc, 
             T_input_to_global, 
@@ -189,20 +189,55 @@ class AnimalTrackerKalman(AnimalTracker_CPU):
 
     def tracking_to_measurement(self, tracking: NDArray) -> NDArray:
         
-        if tracking['success']:
-            measurement = np.zeros((self.N_DIM,1))
-            measurement[0:self.N_DIM,0] = tracking['centroids_resized'].flatten()
-        else:
-            measurement = None
-
+        measurement = np.zeros((self.N_DIM,1))
+        measurement[0:self.N_DIM,0] = tracking.centroids_resized.flatten()
         return measurement
 
     def prediction_to_tracking(self, tracking: NDArray) -> None:
         '''Side effect: modify tracking in-place'''
         
-        # TODO do that for resized, cropped, input and global
-        tracking['centroids_resized'] = self.kalman_filter.x[0:self.N_DIM,0].reshape((self.tracking_param.num_animals,2))
+        tracking.centroids_resized = self.kalman_filter.x[0:self.N_DIM,0].reshape((self.tracking_param.num_animals,2))
 
+    def return_prediction_if_tracking_failed(
+            self,
+            preproc: Preprocessing,
+            T_input_to_global: SimilarityTransform2D,
+            T_global_to_input: SimilarityTransform2D,
+        ) -> NDArray:
+        
+        tracking = Tracking(num_animals=self.tracking_param.num_animals)
+        self.kalman_filter.predict()
+        self.kalman_filter.update(None)
+        self.prediction_to_tracking(tracking)
+
+        resolution = self.transform_coordinate_system(
+            tracking, 
+            preproc, 
+            T_input_to_global, 
+            T_global_to_input
+        )
+
+        res = np.array(
+            (
+                True,
+                self.tracking_param.num_animals,
+                tracking.centroids_resized,
+                tracking.centroids_cropped,
+                tracking.centroids_input,
+                tracking.centroids_global, 
+                self.tracking_param.downsample_factor,
+                np.zeros_like(preproc.image_processed), 
+                preproc.image_processed,
+                np.zeros(self.tracking_param.downsampled_shape, np.float32),
+                resolution.pix_per_mm_global,
+                resolution.pix_per_mm_input,
+                resolution.pix_per_mm_cropped,
+                resolution.pix_per_mm_resized,
+                resolution.pix_per_mm_downsampled
+            ),
+            dtype=self.tracking_param.dtype
+        )
+        return res
 
     def track(
             self,
@@ -211,10 +246,68 @@ class AnimalTrackerKalman(AnimalTracker_CPU):
             T_input_to_global: Optional[SimilarityTransform2D] = SimilarityTransform2D.identity()
         ) -> NDArray:
 
-        tracking = super().track(image, centroid, T_input_to_global)
+        self.tracking_param.input_image_shape = image.shape
+
+        centroid_in_input, T_global_to_input = self.transform_input_centroid(
+            centroid,
+            T_input_to_global
+        )
+
+        preproc = self.preprocess(image, centroid_in_input) 
+        if preproc is None:
+            return self.return_prediction_if_tracking_failed(
+                preproc,
+                T_input_to_global,
+                T_global_to_input,
+            )
+        
+        image_downsampled = cv2.resize(
+            preproc.image_cropped,
+            self.tracking_param.downsampled_shape[::-1], # transform shape (row, col) to width, height
+            cv2.INTER_NEAREST
+        )
+        
+        tracking_resized = self.track_resized(preproc)
+        if tracking_resized is None:
+            return self.return_prediction_if_tracking_failed(
+                preproc,
+                T_input_to_global,
+                T_global_to_input,
+            )
+        
+        # kalman filter
+        tracking, mask = tracking_resized
         self.kalman_filter.predict()
         measurement = self.tracking_to_measurement(tracking)
         self.kalman_filter.update(measurement)
         self.prediction_to_tracking(tracking)
+
+        resolution = self.transform_coordinate_system(
+            tracking, 
+            preproc, 
+            T_input_to_global, 
+            T_global_to_input
+        )
         
-        return tracking
+        res = np.array(
+            (
+                True,
+                self.tracking_param.num_animals,
+                tracking.centroids_resized,
+                tracking.centroids_cropped,
+                tracking.centroids_input,
+                tracking.centroids_global, 
+                self.tracking_param.downsample_factor,
+                mask, 
+                preproc.image_processed,
+                image_downsampled,
+                resolution.pix_per_mm_global,
+                resolution.pix_per_mm_input,
+                resolution.pix_per_mm_cropped,
+                resolution.pix_per_mm_resized,
+                resolution.pix_per_mm_downsampled
+            ),
+            dtype=self.tracking_param.dtype
+        )
+        return res
+    
