@@ -25,6 +25,21 @@ class Tracking:
 
 class BodyTracker_CPU(BodyTracker):
 
+    def transform_input_centroid(
+            self, 
+            centroid, # centroid in global space
+            T_input_to_global
+        ) -> Tuple[Optional[NDArray], SimilarityTransform2D]:
+        
+        T_global_to_input = T_input_to_global.inv()
+
+        if centroid is None:
+            centroid_input = None
+        else:
+            centroid_input = T_global_to_input.transform_points(centroid).squeeze()
+
+        return centroid_input, T_global_to_input        
+
     def preprocess(
         self,
         image: NDArray, 
@@ -34,7 +49,7 @@ class BodyTracker_CPU(BodyTracker):
         preproc = preprocess_image(image, centroid, self.tracking_param)
 
         if preproc is None:
-            return self.tracking_param.failed
+            return None
             
         centroid_cropped = preproc.T_input_to_cropped.transform_points(centroid).squeeze()
         centroid_resized = preproc.T_cropped_to_resized.transform_points(centroid_cropped).squeeze()
@@ -44,7 +59,7 @@ class BodyTracker_CPU(BodyTracker):
     def track_resized(
             self,
             preproc: Preprocessing, 
-            centroid_in_resized: Optional[NDArray] = None, # centroids in global space
+            centroid_in_resized: Optional[NDArray] = None, # centroids in resized space
         ) -> Optional[Tuple[Tracking, NDArray]]:
 
         mask = cv2.compare(preproc.image_processed, self.tracking_param.intensity, cv2.CMP_GT)
@@ -66,10 +81,12 @@ class BodyTracker_CPU(BodyTracker):
         centroids_resized = np.array([[blob.centroid[1], blob.centroid[0]] for blob in props]) #(row, col) to (x,y)
         index = get_best_centroid_index(centroids_resized, centroid_in_resized)
         tracking.centroid_resized = centroids_resized[index]
+        
         coordinates_resized = np.fliplr(props[index].coords)
         tracking.body_axes = get_orientation(coordinates_resized)
         if tracking.body_axes is None:
-            return self.tracking_param.failed
+            return None
+        
         tracking.angle_rad = np.arctan2(tracking.body_axes[1,1], tracking.body_axes[0,1])
 
         return tracking, mask
@@ -112,12 +129,12 @@ class BodyTracker_CPU(BodyTracker):
         '''
 
         self.tracking_param.input_image_shape = image.shape
-        T_global_to_input = T_input_to_global.inv()
-        if centroid is None:
-            centroid_in_input = None
-        else:
-            centroid_in_input = T_global_to_input.transform_points(centroid).squeeze()
-        
+
+        centroid_in_input, T_global_to_input = self.transform_input_centroid(
+            centroid,
+            T_input_to_global
+        )
+
         preprocessing = self.preprocess(image, centroid_in_input)
         if preprocessing is None:
             return self.tracking_param.failed
@@ -266,12 +283,12 @@ class BodyTrackerKalman(BodyTracker_CPU):
         ) -> NDArray:
 
         self.tracking_param.input_image_shape = image.shape
-        T_global_to_input = T_input_to_global.inv()
-        if centroid is None:
-            centroid_in_input = None
-        else:
-            centroid_in_input = T_global_to_input.transform_points(centroid).squeeze()
-        
+
+        centroid_in_input, T_global_to_input = self.transform_input_centroid(
+            centroid,
+            T_input_to_global
+        )
+
         preprocessing = self.preprocess(image, centroid_in_input)
         if preprocessing is None:
             return self.return_prediction_if_tracking_failed(
