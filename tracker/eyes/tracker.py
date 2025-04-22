@@ -11,8 +11,8 @@ from dataclasses import dataclass
 
 @dataclass
 class Tracking:
-    left_eye: NDArray = np.zeros(1, dtype=DTYPE_EYE)
-    right_eye: NDArray = np.zeros(1, dtype=DTYPE_EYE)
+    left_eye: NDArray = np.zeros((), dtype=DTYPE_EYE)
+    right_eye: NDArray = np.zeros((), dtype=DTYPE_EYE)
 
 class EyesTracker_CPU(EyesTracker):
 
@@ -201,19 +201,56 @@ class EyesTrackerKalman(EyesTracker_CPU):
         '''Side effect: modify tracking in-place'''
     
         tracking.left_eye['centroid_resized'] = self.kalman_filter.x[:2,0]
-        tracking.left_eye['angle'] = self.kalman_filter.x[2]
+        tracking.left_eye['angle'] = self.kalman_filter.x[2,0]
         tracking.left_eye['direction'] = np.array([
             np.sin(tracking.left_eye['angle']), 
             np.cos(tracking.left_eye['angle'])
         ])
 
         tracking.right_eye['centroid_resized'] = self.kalman_filter.x[3:5,0]
-        tracking.right_eye['angle'] = self.kalman_filter.x[5]
+        tracking.right_eye['angle'] = self.kalman_filter.x[5,0]
         tracking.right_eye['direction'] = np.array([
             np.sin(tracking.right_eye['angle']), 
             np.cos(tracking.right_eye['angle'])
         ])
 
+    def return_prediction_if_tracking_failed(
+            self,
+            preproc: Preprocessing,
+            T_input_to_global: SimilarityTransform2D,
+            T_global_to_input: SimilarityTransform2D,
+        ) -> NDArray:
+        
+        tracking = Tracking()
+        self.kalman_filter.predict()
+        self.kalman_filter.update(None)
+        self.prediction_to_tracking(tracking)
+
+        resolution = self.transform_coordinate_system(
+            tracking, 
+            preproc, 
+            T_input_to_global, 
+            T_global_to_input
+        )
+
+        res = np.array(
+            (
+                True,
+                np.zeros(1,dtype=DTYPE_EYE) if tracking.left_eye is None else tracking.left_eye, 
+                np.zeros(1,dtype=DTYPE_EYE) if tracking.right_eye is None else tracking.right_eye,                
+                np.zeros_like(preproc.image_processed), 
+                preproc.image_processed,
+                preproc.image_cropped,
+                resolution.pix_per_mm_global,
+                resolution.pix_per_mm_input,
+                resolution.pix_per_mm_cropped,
+                resolution.pix_per_mm_resized,
+            ), 
+            dtype = self.tracking_param.dtype
+        )
+
+        return res
+    
     def track(
             self,
             image: NDArray, 
@@ -230,11 +267,19 @@ class EyesTrackerKalman(EyesTracker_CPU):
 
         preproc = self.preprocess(image, centroid_in_input) 
         if preproc is None:
-            return self.tracking_param.failed
+            return self.return_prediction_if_tracking_failed(
+                preproc,
+                T_input_to_global,
+                T_global_to_input,
+            )
         
         tracking_resized = self.track_resized(preproc)
         if tracking_resized is None:
-            return self.tracking_param.failed
+            return self.return_prediction_if_tracking_failed(
+                preproc,
+                T_input_to_global,
+                T_global_to_input,
+            )
         
         # kalman filter
         tracking, mask = tracking_resized
