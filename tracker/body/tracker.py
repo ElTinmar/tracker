@@ -263,7 +263,6 @@ class BodyTrackerKalman(BodyTracker_CPU):
             dtype=self.tracking_param.dtype
         )
         return res
-        
 
     def track(
             self,
