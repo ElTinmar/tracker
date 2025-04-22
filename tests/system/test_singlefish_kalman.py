@@ -17,10 +17,10 @@ DISPLAY=True
 VIDEOS = [
     ('toy_data/single_freelyswimming_504x500px_nobckg.avi', 40),
     ('toy_data/single_headembedded_544x380px_noparam_nobckg.avi', 130),
-    ('toy_data/single_headembedded_544x380px_param_nobckg.avi', 130)
+    ('toy_data/single_headembedded_544x380px_param_nobckg.avi', 90)
 ]
 # background subtracted video
-VIDEO_NUM = 1
+VIDEO_NUM = 0
 INPUT_VIDEO, PIX_PER_MM = VIDEOS[VIDEO_NUM]
 
 video_reader = InMemory_OpenCV_VideoReader()
@@ -65,7 +65,7 @@ body_tracker = BodyTrackerKalman(
     tracking_param = BodyTrackerParamTracking(
         pix_per_mm=PIX_PER_MM,
         target_pix_per_mm=10,
-        intensity=0.20,
+        intensity=0.15,
         gamma=1.0,
         contrast=3.0,
         min_size_mm=2.0,
@@ -89,14 +89,14 @@ eyes_tracker = EyesTrackerKalman(
         thresh_lo=0.2,
         thresh_hi=1.0,
         gamma=2.0,
-        dyntresh_res=5,
+        dyntresh_res=10,
         contrast=5.0,
         size_lo_mm=0.1,
         size_hi_mm=30.0,
         blur_sz_mm=0.1,
         median_filter_sz_mm=0,
         crop_dimension_mm=(1,1.5),
-        crop_offset_y_mm=-0.5
+        crop_offset_y_mm=-0.25
     ),
     fps = int(fps),
     model_order = 1
