@@ -119,7 +119,7 @@ tail_tracker = TailTrackerKalman(
         crop_offset_y_mm=2
     ),
     fps = int(fps),
-    model_order = 1
+    model_order = 2
 )
 
 # overlay
