@@ -36,6 +36,7 @@ def get_skeleton_ball(
 
     arc = np.linspace(-arc_rad, arc_rad, n_pts_arc) + start_angle
     points = [[x, y]]
+    angles = [start_angle]
     for j in range(n_tail_points-1):
         # Find the x and y values of the arc centered around current x and y
         xs = x + spacing * np.cos(arc)
@@ -63,8 +64,9 @@ def get_skeleton_ball(
         
         # Add point to list
         points.append([x, y])
+        angles.append(a)
 
-    return points
+    return points, angles
 
 def tail_skeleton_ball(
         image: NDArray,
@@ -73,7 +75,6 @@ def tail_skeleton_ball(
         tail_length_px: int,
         n_tail_points: int,
         n_pts_arc: int,
-        n_pts_interp: int,
         w: float
     ) -> Tuple[NDArray,NDArray]: 
         '''
@@ -88,7 +89,7 @@ def tail_skeleton_ball(
         start_x = w//2 
         start_y = 0
 
-        skeleton = get_skeleton_ball(
+        skeleton, angles = get_skeleton_ball(
             arc_rad, 
             n_pts_arc,
             start_angle,
@@ -102,6 +103,6 @@ def tail_skeleton_ball(
         
         # interpolate
         skeleton = np.array(skeleton).astype('float')
-        skeleton_interp = interpolate_skeleton(skeleton, n_pts_interp)
-
-        return (skeleton, skeleton_interp)
+        angles = np.array(angles).astype('float')
+        
+        return (skeleton, angles)

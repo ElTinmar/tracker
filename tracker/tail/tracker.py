@@ -2,7 +2,7 @@ from numpy.typing import NDArray
 import numpy as np
 from typing import Optional, Tuple
 from .core import TailTracker
-from .utils import tail_skeleton_ball
+from .utils import tail_skeleton_ball, interpolate_skeleton
 from tracker.prepare_image import preprocess_image, Preprocessing
 from tracker.core import Resolution
 from geometry import SimilarityTransform2D
@@ -17,6 +17,7 @@ class Tracking:
         
         self.num_pts = num_pts
         self.num_pts_interp = num_pts_interp
+        self.angles = np.zeros((num_pts,2), np.float32)
         self.skeleton_resized = np.zeros((num_pts,2), np.float32)
         self.skeleton_cropped = np.zeros((num_pts,2), np.float32)
         self.skeleton_input = np.zeros((num_pts,2), np.float32)
@@ -57,15 +58,18 @@ class TailTracker_CPU(TailTracker):
         ) -> Tracking:
         
         tracking = Tracking(self.tracking_param.n_tail_points, self.tracking_param.n_pts_interp)
-        tracking.skeleton_resized, tracking.skeleton_interp_resized = tail_skeleton_ball(
+        tracking.skeleton_resized, tracking.angles = tail_skeleton_ball(
             image = preproc.image_processed,
             ball_radius_px = self.tracking_param.ball_radius_px,
             arc_angle_deg = self.tracking_param.arc_angle_deg,
             tail_length_px = self.tracking_param.tail_length_px,
             n_tail_points = self.tracking_param.n_tail_points,
             n_pts_arc = self.tracking_param.n_pts_arc,
-            n_pts_interp = self.tracking_param.n_pts_interp,
             w = self.tracking_param.resized_dimension_px[0] 
+        )
+        tracking.skeleton_interp_resized = interpolate_skeleton(
+            tracking.skeleton_resized,
+            n_pts_interp = self.tracking_param.n_pts_interp,
         )
         return tracking
 
