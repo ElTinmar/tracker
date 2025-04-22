@@ -12,7 +12,6 @@ ANIMAL_PARAM = {
     'blur_sz_mm': 0.6,
     'median_filter_sz_mm': 0,
     'downsample_factor': 0.90,
-    'num_animals': 1,
     'crop_dimension_mm': (0,0), 
     'crop_offset_y_mm': 0
 }

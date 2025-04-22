@@ -13,6 +13,7 @@ from geometry import SimilarityTransform2D
 from tests.config import ANIMAL_PARAM, BODY_PARAM, EYES_PARAM, TAIL_PARAM
 
 DISPLAY=True
+DISPLAY_HEIGHT = 1024
 
 # background subtracted video
 VIDEOS = [
@@ -37,6 +38,8 @@ height = video_reader.get_height()
 width = video_reader.get_width()
 fps = video_reader.get_fps()  
 num_frames = video_reader.get_number_of_frame()
+
+DISPLAY_WIDTH = int(width/height * DISPLAY_HEIGHT)
 
 # tracking 
 animal_tracker = AnimalTracker_CPU(
@@ -104,7 +107,9 @@ try:
         if DISPLAY:
             T_scale = SimilarityTransform2D.scaling(tracking['animals']['downsample_ratio']) 
 
-            cv2.imshow('global',overlay.overlay_global(tracking['animals']['image_downsampled'], tracking, T_scale))
+            oly = overlay.overlay_global(tracking['animals']['image_downsampled'], tracking, T_scale)
+            r = cv2.resize(oly,(DISPLAY_HEIGHT, DISPLAY_WIDTH))
+            cv2.imshow('global',r)
             cv2.waitKey(1)
             
             cv2.imshow('body_cropped', body_overlay.overlay_cropped(tracking['body']))

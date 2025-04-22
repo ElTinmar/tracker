@@ -1,13 +1,15 @@
 from video_tools import InMemory_OpenCV_VideoReader
 from image_tools import im2single, im2gray
 from tracker import (
-    SingleFishTracker_CPU, SingleFishOverlay_opencv, SingleFishTrackerParamTracking, SingleFishTrackerParamOverlay,
-    AnimalTrackerKalman, AnimalOverlay_opencv, AnimalTrackerParamTracking, AnimalTrackerParamOverlay,
-    BodyTrackerKalman, BodyOverlay_opencv, BodyTrackerParamTracking, BodyTrackerParamOverlay,
-    EyesTrackerKalman, EyesOverlay_opencv, EyesTrackerParamTracking, EyesTrackerParamOverlay,
-    TailTrackerKalman, TailOverlay_opencv, TailTrackerParamTracking, TailTrackerParamOverlay
+    GridAssignment,
+    MultiFishTracker_CPU, MultiFishOverlay_opencv, MultiFishTrackerParamTracking, MultiFishTrackerParamOverlay,
+    AnimalTracker_CPU, AnimalOverlay_opencv, AnimalTrackerParamTracking, AnimalTrackerParamOverlay,
+    BodyTracker_CPU, BodyOverlay_opencv, BodyTrackerParamTracking, BodyTrackerParamOverlay,
+    EyesTracker_CPU, EyesOverlay_opencv, EyesTrackerParamTracking, EyesTrackerParamOverlay,
+    TailTracker_CPU, TailOverlay_opencv, TailTrackerParamTracking, TailTrackerParamOverlay
 )
 from tqdm import tqdm
+import numpy as np
 import cv2
 from geometry import SimilarityTransform2D
 from tests.config import ANIMAL_PARAM, BODY_PARAM, EYES_PARAM, TAIL_PARAM
@@ -16,14 +18,8 @@ DISPLAY=True
 DISPLAY_HEIGHT = 1024
 
 # background subtracted video
-VIDEOS = [
-    ('toy_data/single_freelyswimming_504x500px_nobckg.avi', 40),
-    ('toy_data/single_headembedded_544x380px_noparam_nobckg.avi', 130),
-    ('toy_data/single_headembedded_544x380px_param_nobckg.avi', 90)
-]
-# background subtracted video
-VIDEO_NUM = 0
-INPUT_VIDEO, PIX_PER_MM = VIDEOS[VIDEO_NUM]
+INPUT_VIDEO = 'toy_data/multi_freelyswimming_1800x1800px_nobckg.avi'
+PIX_PER_MM = 40
 
 video_reader = InMemory_OpenCV_VideoReader()
 video_reader.open_file(
@@ -41,38 +37,47 @@ num_frames = video_reader.get_number_of_frame()
 
 DISPLAY_WIDTH = int(width/height * DISPLAY_HEIGHT)
 
+num_animals = 9
+LUT = np.zeros((height, width))
+LUT[0:600,0:600] = 0
+LUT[0:600,600:1200] = 1
+LUT[0:600,1200:1800] = 2
+LUT[600:1200,0:600] = 3
+LUT[600:1200,600:1200] = 4
+LUT[600:1200,1200:1800] = 5
+LUT[1200:1800,0:600] = 6
+LUT[1200:1800,600:1200] = 7
+LUT[1200:1800,1200:1800] = 8
+
+assignment = GridAssignment(LUT, num_animals)
+
 # tracking 
-animal_tracker = AnimalTrackerKalman(
+# tracking 
+animal_tracker = AnimalTracker_CPU(
+    assignment=assignment,
     tracking_param = AnimalTrackerParamTracking(
         pix_per_mm=PIX_PER_MM,
+        num_animals=num_animals,
         **ANIMAL_PARAM
-    ),
-    fps = int(fps),
-    model_order = 1
+    )
 )
-body_tracker = BodyTrackerKalman(
+body_tracker = BodyTracker_CPU(
     tracking_param = BodyTrackerParamTracking(
         pix_per_mm=PIX_PER_MM,
         **BODY_PARAM
-    ),
-    fps = int(fps),
-    model_order = 1
+    )
 )
-eyes_tracker = EyesTrackerKalman(
+eyes_tracker = EyesTracker_CPU(
     tracking_param = EyesTrackerParamTracking(
         pix_per_mm=PIX_PER_MM,
         **EYES_PARAM
-    ),
-    fps = int(fps),
-    model_order = 1
+    )
 )
-tail_tracker = TailTrackerKalman(
+tail_tracker = TailTracker_CPU(
     tracking_param = TailTrackerParamTracking(
         pix_per_mm=PIX_PER_MM,
         **TAIL_PARAM
-    ),
-    fps = int(fps),
-    model_order = 2
+    )
 )
 
 # overlay
@@ -81,8 +86,8 @@ body_overlay = BodyOverlay_opencv(BodyTrackerParamOverlay())
 eyes_overlay = EyesOverlay_opencv(EyesTrackerParamOverlay())
 tail_overlay = TailOverlay_opencv(TailTrackerParamOverlay())
 
-tracker = SingleFishTracker_CPU(
-    SingleFishTrackerParamTracking(
+tracker = MultiFishTracker_CPU(
+    MultiFishTrackerParamTracking(
         animal=animal_tracker,
         body=body_tracker, 
         eyes=eyes_tracker, 
@@ -90,8 +95,8 @@ tracker = SingleFishTracker_CPU(
     )
 )
 
-overlay = SingleFishOverlay_opencv(
-    SingleFishTrackerParamOverlay(
+overlay = MultiFishOverlay_opencv(
+    MultiFishTrackerParamOverlay(
         animal_overlay,
         body_overlay,
         eyes_overlay,
@@ -114,28 +119,29 @@ try:
         # display tracking
         if DISPLAY:
             T_scale = SimilarityTransform2D.scaling(tracking['animals']['downsample_ratio']) 
-            
+
             oly = overlay.overlay_global(tracking['animals']['image_downsampled'], tracking, T_scale)
             r = cv2.resize(oly,(DISPLAY_HEIGHT, DISPLAY_WIDTH))
             cv2.imshow('global',r)
             cv2.waitKey(1)
             
-            cv2.imshow('body_cropped', body_overlay.overlay_cropped(tracking['body']))
+            fish = 0
+            cv2.imshow('body_cropped', body_overlay.overlay_cropped(tracking['body'][fish]))
             cv2.waitKey(1)
 
-            cv2.imshow('eyes_cropped', eyes_overlay.overlay_cropped(tracking['eyes']))
+            cv2.imshow('eyes_cropped', eyes_overlay.overlay_cropped(tracking['eyes'][fish]))
             cv2.waitKey(1)
             
-            cv2.imshow('tail_cropped', tail_overlay.overlay_cropped(tracking['tail']))
+            cv2.imshow('tail_cropped', tail_overlay.overlay_cropped(tracking['tail'][fish]))
             cv2.waitKey(1)
 
-            cv2.imshow('body_resized', body_overlay.overlay_processed(tracking['body']))
+            cv2.imshow('body_resized', body_overlay.overlay_processed(tracking['body'][fish]))
             cv2.waitKey(1)
 
-            cv2.imshow('eyes_resized', eyes_overlay.overlay_processed(tracking['eyes']))
+            cv2.imshow('eyes_resized', eyes_overlay.overlay_processed(tracking['eyes'][fish]))
             cv2.waitKey(1)
             
-            cv2.imshow('tail_resized', tail_overlay.overlay_processed(tracking['tail']))
+            cv2.imshow('tail_resized', tail_overlay.overlay_processed(tracking['tail'][fish]))
             cv2.waitKey(1)
 
 finally:
