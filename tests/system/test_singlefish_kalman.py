@@ -65,7 +65,7 @@ body_tracker = BodyTrackerKalman(
     tracking_param = BodyTrackerParamTracking(
         pix_per_mm=PIX_PER_MM,
         target_pix_per_mm=10,
-        intensity=0.30,
+        intensity=0.20,
         gamma=1.0,
         contrast=3.0,
         min_size_mm=2.0,
@@ -162,9 +162,7 @@ try:
         if DISPLAY:
             T_scale = SimilarityTransform2D.scaling(tracking['animals']['downsample_ratio']) 
 
-            oly = overlay.overlay_global(tracking['animals']['image_downsampled'], tracking, T_scale)
-            r = cv2.resize(oly,(512, 512))
-            cv2.imshow('global',r)
+            cv2.imshow('global',overlay.overlay_global(tracking['animals']['image_downsampled'], tracking, T_scale))
             cv2.waitKey(1)
             
             cv2.imshow('body_cropped', body_overlay.overlay_cropped(tracking['body']))

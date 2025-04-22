@@ -17,7 +17,7 @@ NFRAMES = 100
 # background subtracted video
 VIDEOS = [
     ('toy_data/single_freelyswimming_504x500px_nobckg.avi', 40),
-    ('toy_data/single_headembedded_544x380px_noparam_nobckg.avi', 100),
+    ('toy_data/single_headembedded_544x380px_noparam_nobckg.avi', 130),
 ]
 
 def load_video(video_num: int = 0):
