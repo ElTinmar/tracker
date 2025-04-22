@@ -12,34 +12,25 @@ import cv2
 
 def get_eye_properties(
         prop: RegionPropsLike,
-        preproc: Preprocessing,
-        T_input_to_global: SimilarityTransform2D,
         reference_vector: NDArray
     ) -> Optional[NDArray]:
 
     centroid_resized = np.asarray(prop.centroid[::-1], dtype=np.float32)
-    centroid_cropped = preproc.T_resized_to_cropped.transform_points(centroid_resized)        
-    centroid_input = preproc.T_cropped_to_input.transform_points(centroid_cropped)
-    centroid_global = T_input_to_global.transform_points(centroid_input)
-    
     direction = prop.principal_axis 
     if direction is None:
         return None
-    
-    direction_global = T_input_to_global.transform_vectors(direction) 
     angle = angle_between_vectors(direction, reference_vector)
-    angle_global = angle_between_vectors(direction_global, reference_vector)
 
     eye =  np.array(
         (
             direction, 
-            direction_global,
+            np.zeros((2,), np.float32),
             angle,
-            angle_global,
+            0.0,
             centroid_resized,
-            centroid_cropped,
-            centroid_input,
-            centroid_global,
+            np.zeros((2,), np.float32),
+            np.zeros((2,), np.float32),
+            np.zeros((2,), np.float32),
         ),
         dtype = DTYPE_EYE
     )
