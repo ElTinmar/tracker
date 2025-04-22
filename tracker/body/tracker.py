@@ -221,15 +221,56 @@ class BodyTrackerKalman(BodyTracker_CPU):
             [-np.cos(tracking.angle_rad), np.sin(tracking.angle_rad)]
         ])
 
+    def return_prediction_if_tracking_failed(
+            self,
+            preproc,
+            T_input_to_global,
+            T_global_to_input,
+            mask
+        ) -> NDArray:
+        
+        tracking = Tracking()
+        self.kalman_filter.predict()
+        self.kalman_filter.update(None)
+        self.prediction_to_tracking(tracking)
+
+        resolution = self.transform_coordinate_system(
+            tracking, 
+            preproc, 
+            T_input_to_global, 
+            T_global_to_input
+        )
+        
+        res = np.array(
+            (
+                True,
+                tracking.body_axes, 
+                tracking.body_axes_global,
+                tracking.centroid_resized,
+                tracking.centroid_cropped,
+                tracking.centroid_input,
+                tracking.centroid_global,
+                tracking.angle_rad,
+                tracking.angle_rad_global,
+                mask, 
+                preproc.image_processed,
+                preproc.image_cropped,
+                resolution.pix_per_mm_global,
+                resolution.pix_per_mm_input,
+                resolution.pix_per_mm_cropped,
+                resolution.pix_per_mm_resized,
+            ), 
+            dtype=self.tracking_param.dtype
+        )
+        return res
+        
+
     def track(
             self,
             image: NDArray, 
             centroid: Optional[NDArray] = None, # centroids in global space
             T_input_to_global: Optional[SimilarityTransform2D] = SimilarityTransform2D.identity()
         ) -> NDArray:
-
-        # TODO if measurement is None, still update (maybe add a field in structured array to say
-        # it's prediction only?)
 
         self.tracking_param.input_image_shape = image.shape
         T_global_to_input = T_input_to_global.inv()
@@ -240,12 +281,22 @@ class BodyTrackerKalman(BodyTracker_CPU):
         
         preprocessing = self.preprocess(image, centroid_in_input)
         if preprocessing is None:
-            return self.tracking_param.failed
+            return self.return_prediction_if_tracking_failed(
+                preproc,
+                T_input_to_global,
+                T_global_to_input,
+                mask
+            )
         
         preproc, centroid_in_resized = preprocessing 
         tracking_resized = self.track_resized(preproc, centroid_in_resized)
         if tracking_resized is None:
-            return self.tracking_param.failed
+            return self.return_prediction_if_tracking_failed(
+                preproc,
+                T_input_to_global,
+                T_global_to_input,
+                mask
+            )
         
         # kalman filter
         tracking, mask = tracking_resized
