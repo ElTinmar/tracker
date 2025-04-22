@@ -5,6 +5,7 @@ from typing import Optional, Tuple
 from .core import BodyTracker
 from .utils import get_orientation, get_best_centroid_index
 from tracker.prepare_image import preprocess_image, Preprocessing
+from tracker.core import Resolution
 from geometry import SimilarityTransform2D, angdiff, normalize_angle
 import cv2
 from filterpy.common import kinematic_kf
@@ -21,13 +22,6 @@ class Tracking:
     body_axes_global: NDArray = np.zeros((2,2), np.float32)
     angle_rad: float = 0.0
     angle_rad_global: float = 0.0
-
-@dataclass
-class Resolution:
-    pix_per_mm_global: float = 0.0
-    pix_per_mm_input: float = 0.0
-    pix_per_mm_cropped: float = 0.0
-    pix_per_mm_resized: float = 0.0
 
 class BodyTracker_CPU(BodyTracker):
 

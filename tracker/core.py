@@ -4,7 +4,13 @@ from numpy.typing import NDArray
 from typing import Optional, Tuple
 from geometry import SimilarityTransform2D
 
-
+@dataclass
+class Resolution:
+    pix_per_mm_global: float = 0.0
+    pix_per_mm_input: float = 0.0
+    pix_per_mm_cropped: float = 0.0
+    pix_per_mm_resized: float = 0.0
+    
 @dataclass
 class ParamTracking:
     input_image_shape: Tuple[int, int] = (0, 0)
