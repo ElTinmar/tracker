@@ -17,7 +17,7 @@ class Tracking:
         
         self.num_pts = num_pts
         self.num_pts_interp = num_pts_interp
-        self.angles = np.zeros((num_pts,2), np.float32)
+        self.angles = np.zeros((num_pts,), np.float32)
         self.skeleton_resized = np.zeros((num_pts,2), np.float32)
         self.skeleton_cropped = np.zeros((num_pts,2), np.float32)
         self.skeleton_input = np.zeros((num_pts,2), np.float32)
@@ -185,18 +185,23 @@ class TailTrackerKalman(TailTracker_CPU):
         self.kalman_filter.Q *= model_uncertainty
         self.kalman_filter.R *= measurement_uncertainty
 
-    def tracking_to_measurement(self, tracking: NDArray) -> NDArray:
+    def tracking_to_measurement(self, tracking: Tracking) -> NDArray:
+        # TODO: kalman filter skeleton angles instead and compute skeleton_resized from angles
         
         measurement = np.zeros((self.N_DIM,1))
         measurement[0:self.N_DIM,0] = tracking.skeleton_resized.flatten()
 
         return measurement
 
-    def prediction_to_tracking(self, tracking: NDArray) -> None:
+    def prediction_to_tracking(self, tracking: Tracking) -> None:
         '''Side effect: modify tracking in-place'''
         
         # TODO do that for resized, cropped, input and global
         tracking.skeleton_resized = self.kalman_filter.x[0:self.N_DIM,0].reshape((self.tracking_param.n_tail_points,2))
+        tracking.skeleton_interp_resized = interpolate_skeleton(
+            tracking.skeleton_resized,
+            n_pts_interp = self.tracking_param.n_pts_interp,
+        )
 
     def return_prediction_if_tracking_failed(
             self,
