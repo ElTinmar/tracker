@@ -193,39 +193,34 @@ class BodyTrackerKalman(BodyTracker_CPU):
         self.kalman_filter.Q *= model_uncertainty
         self.kalman_filter.R *= measurement_uncertainty
 
-    def tracking_to_measurement(self, tracking: NDArray) -> NDArray:
+    def tracking_to_measurement(self, tracking: Tracking) -> NDArray:
         
-        if tracking['success']:
-            measurement = np.zeros((self.N_DIM,1))
-            measurement[:2,0] = tracking['centroid_resized']
-            measurement[2] = tracking['angle_rad']
-            
-            # Use previous frames to filter fast 180deg changes in orientation
-            # TODO maybe add this to regular tracking instead to separate from
-            # the Kalman filtering proper
-            self.angle_history.append(tracking['angle_rad'].copy())
-            angle_history = np.median(self.angle_history)
-            delta = angdiff(measurement[2], angle_history)
-            if abs(delta) > np.pi / 2:
-                measurement[2] += np.pi 
-                measurement[2] = normalize_angle(measurement[2])
-
-        else:
-            measurement = None
+        measurement = np.zeros((self.N_DIM,1))
+        measurement[:2,0] = tracking.centroid_resized
+        measurement[2] = tracking.angle_rad
+        
+        # Use previous frames to filter fast 180deg changes in orientation
+        # TODO maybe add this to regular tracking instead to separate from
+        # the Kalman filtering proper
+        self.angle_history.append(tracking.angle_rad.copy())
+        angle_history = np.median(self.angle_history)
+        delta = angdiff(measurement[2], angle_history)
+        if abs(delta) > np.pi / 2:
+            measurement[2] += np.pi 
+            measurement[2] = normalize_angle(measurement[2])
 
         return measurement
 
-    def prediction_to_tracking(self, tracking: NDArray) -> None:
+    def prediction_to_tracking(self, tracking: Tracking) -> None:
         '''Side effect: modify tracking in-place'''
         
-        # TODO do that for resized, cropped, input and global
-        tracking['centroid_resized'] = self.kalman_filter.x[:2,0]
-        tracking['angle_rad'] = self.kalman_filter.x[2]
-        tracking['body_axes'] = np.array([
-            [np.sin(tracking['angle_rad']), np.cos(tracking['angle_rad'])],
-            [-np.cos(tracking['angle_rad']), np.sin(tracking['angle_rad'])]
+        tracking.centroid_resized = self.kalman_filter.x[:2,0]
+        tracking.angle_rad = self.kalman_filter.x[2,0]
+        tracking.body_axes = np.array([
+            [np.sin(tracking.angle_rad), np.cos(tracking.angle_rad)],
+            [-np.cos(tracking.angle_rad), np.sin(tracking.angle_rad)]
         ])
-
+        
     def track(
             self,
             image: NDArray, 
@@ -233,10 +228,55 @@ class BodyTrackerKalman(BodyTracker_CPU):
             T_input_to_global: Optional[SimilarityTransform2D] = SimilarityTransform2D.identity()
         ) -> NDArray:
 
-        tracking = super().track(image, centroid, T_input_to_global)
+        self.tracking_param.input_image_shape = image.shape
+        T_global_to_input = T_input_to_global.inv()
+        if centroid is None:
+            centroid_in_input = None
+        else:
+            centroid_in_input = T_global_to_input.transform_points(centroid).squeeze()
+        
+        preprocessing = self.preprocess(image, centroid_in_input)
+        if preprocessing is None:
+            return self.tracking_param.failed
+        
+        preproc, centroid_in_resized = preprocessing 
+        tracking_resized = self.track_resized(preproc, centroid_in_resized)
+        if tracking_resized is None:
+            return self.tracking_param.failed
+        
+        # kalman filter
+        tracking, mask = tracking_resized
         self.kalman_filter.predict()
         measurement = self.tracking_to_measurement(tracking)
         self.kalman_filter.update(measurement)
         self.prediction_to_tracking(tracking)
+
+        resolution = self.transform_coordinate_system(
+            tracking, 
+            preproc, 
+            T_input_to_global, 
+            T_global_to_input
+        )
         
-        return tracking
+        res = np.array(
+            (
+                True,
+                tracking.body_axes, 
+                tracking.body_axes_global,
+                tracking.centroid_resized,
+                tracking.centroid_cropped,
+                tracking.centroid_input,
+                tracking.centroid_global,
+                tracking.angle_rad,
+                tracking.angle_rad_global,
+                mask, 
+                preproc.image_processed,
+                preproc.image_cropped,
+                resolution.pix_per_mm_global,
+                resolution.pix_per_mm_input,
+                resolution.pix_per_mm_cropped,
+                resolution.pix_per_mm_resized,
+            ), 
+            dtype=self.tracking_param.dtype
+        )
+        return res
