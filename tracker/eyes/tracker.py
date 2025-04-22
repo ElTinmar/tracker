@@ -4,11 +4,90 @@ from typing import Optional, Tuple
 from .core import EyesTracker, DTYPE_EYE
 from .utils import get_eye_properties, find_eyes_and_swimbladder, assign_features
 from geometry import SimilarityTransform2D
-from tracker.prepare_image import preprocess_image
+from tracker.prepare_image import preprocess_image, Preprocessing
+from tracker.core import Resolution
 from filterpy.common import kinematic_kf
+from dataclasses import dataclass
+
+@dataclass
+class Tracking:
+    ...
 
 class EyesTracker_CPU(EyesTracker):
 
+    def transform_input_centroid(
+            self, 
+            centroid, # centroid in global space
+            T_input_to_global
+        ) -> Tuple[Optional[NDArray], SimilarityTransform2D]:
+        
+        T_global_to_input = T_input_to_global.inv()
+
+        if centroid is None:
+            centroid_input = None
+        else:
+            centroid_input = T_global_to_input.transform_points(centroid).squeeze()
+
+        return centroid_input, T_global_to_input      
+
+    def preprocess(
+        self,
+        image: NDArray, 
+        centroid: Optional[NDArray] = None, # centroids in input space
+        ) -> Optional[Preprocessing]:
+        
+        return preprocess_image(image, centroid, self.tracking_param)
+
+
+    def track_resized(
+            self,
+            preproc: Preprocessing, 
+        ) -> Optional[Tuple[Tracking, NDArray]]:
+
+        # sweep threshold to obtain 3 connected component within size range (include swim bladder)
+        found_eyes_and_sb, props, mask = find_eyes_and_swimbladder(
+            preproc.image_processed, 
+            self.tracking_param.dyntresh_res, 
+            self.tracking_param.size_lo_px, 
+            self.tracking_param.size_hi_px,
+            self.tracking_param.thresh_lo,
+            self.tracking_param.thresh_hi
+        )
+
+        if not found_eyes_and_sb:
+            return None
+        
+        # identify left eye, right eye and swimbladder
+        blob_centroids = np.array([blob.centroid[::-1] for blob in props])
+        swimbladder_idx, left_idx, right_idx = assign_features(blob_centroids)
+
+        vertical_axis = np.array([0, 1], dtype=np.single)
+        
+        # TODO track only resized here, and convert coords in
+        # transform_coordinate_system
+        left_eye = get_eye_properties(
+            props[left_idx], 
+            preproc, 
+            T_input_to_global, 
+            vertical_axis
+        )
+
+        right_eye = get_eye_properties(
+            props[right_idx], 
+            preproc, 
+            T_input_to_global, 
+            vertical_axis
+        )
+
+    def transform_coordinate_system(
+            self,
+            tracking: Tracking,        
+            preproc: Preprocessing,
+            T_input_to_global,
+            T_global_to_input
+        ) -> Resolution:
+        '''modifies tracking in-place with side-effect and returns resolution'''
+       
     def track(
             self,
             image: NDArray, 
@@ -23,13 +102,12 @@ class EyesTracker_CPU(EyesTracker):
 
         self.tracking_param.input_image_shape = image.shape
 
-        if centroid is None:
-            return self.tracking_param.failed
-        
-        T_global_to_input = T_input_to_global.inv()
-        centroid_input = T_global_to_input.transform_points(centroid).squeeze()
-        preproc = preprocess_image(image, centroid_input, self.tracking_param)
-        
+        centroid_in_input, T_global_to_input = self.transform_input_centroid(
+            centroid,
+            T_input_to_global
+        )
+
+        preproc = self.preprocess(image, centroid_in_input) 
         if preproc is None:
             return self.tracking_param.failed
         
