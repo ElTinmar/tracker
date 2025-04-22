@@ -237,7 +237,6 @@ class BodyTrackerKalman(BodyTracker_CPU):
             preproc,
             T_input_to_global,
             T_global_to_input,
-            mask
         ) -> NDArray:
         
         tracking = Tracking()
@@ -263,7 +262,7 @@ class BodyTrackerKalman(BodyTracker_CPU):
                 tracking.centroid_global,
                 tracking.angle_rad,
                 tracking.angle_rad_global,
-                mask, 
+                np.zeros_like(preproc.image_processed), 
                 preproc.image_processed,
                 preproc.image_cropped,
                 resolution.pix_per_mm_global,
@@ -295,7 +294,6 @@ class BodyTrackerKalman(BodyTracker_CPU):
                 preproc,
                 T_input_to_global,
                 T_global_to_input,
-                mask
             )
         
         preproc, centroid_in_resized = preprocessing 
@@ -305,7 +303,6 @@ class BodyTrackerKalman(BodyTracker_CPU):
                 preproc,
                 T_input_to_global,
                 T_global_to_input,
-                mask
             )
         
         # kalman filter
