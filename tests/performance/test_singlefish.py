@@ -2,10 +2,10 @@ from video_tools import InMemory_OpenCV_VideoReader
 from image_tools import im2single, im2gray
 from tracker import (
     SingleFishTracker_CPU, SingleFishTrackerParamTracking,
-    AnimalTrackerKalman, AnimalTrackerParamTracking,
-    BodyTrackerKalman, BodyTrackerParamTracking,
-    EyesTrackerKalman, EyesTrackerParamTracking,
-    TailTrackerKalman, TailTrackerParamTracking
+    AnimalTracker_CPU , AnimalTrackerParamTracking,
+    BodyTracker_CPU,  BodyTrackerParamTracking,
+    EyesTracker_CPU,  EyesTrackerParamTracking,
+    TailTracker_CPU,  TailTrackerParamTracking
 )
 import timeit
 from functools import partial
@@ -41,37 +41,29 @@ def load_video(video_num: int = 0):
     num_frames = video_reader.get_number_of_frame()
 
     # tracking 
-    animal_tracker = AnimalTrackerKalman(
+    animal_tracker = AnimalTracker_CPU(
         tracking_param = AnimalTrackerParamTracking(
             pix_per_mm=pix_per_mm,
             **ANIMAL_PARAM
-        ),
-        fps = int(fps),
-        model_order = 1
+        )
     )
-    body_tracker = BodyTrackerKalman(
+    body_tracker = BodyTracker_CPU(
         tracking_param = BodyTrackerParamTracking(
             pix_per_mm=pix_per_mm,
             **BODY_PARAM
-        ),
-        fps = int(fps),
-        model_order = 1
+        )
     )
-    eyes_tracker = EyesTrackerKalman(
+    eyes_tracker = EyesTracker_CPU(
         tracking_param = EyesTrackerParamTracking(
             pix_per_mm=pix_per_mm,
             **EYES_PARAM
-        ),
-        fps = int(fps),
-        model_order = 1
+        )
     )
-    tail_tracker = TailTrackerKalman(
+    tail_tracker = TailTracker_CPU(
         tracking_param = TailTrackerParamTracking(
             pix_per_mm=pix_per_mm,
             **TAIL_PARAM
-        ),
-        fps = int(fps),
-        model_order = 2
+        )
     )
 
     tracker = SingleFishTracker_CPU(

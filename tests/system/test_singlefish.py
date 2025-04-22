@@ -8,17 +8,17 @@ from tracker import (
     TailTracker_CPU, TailOverlay_opencv, TailTrackerParamTracking, TailTrackerParamOverlay
 )
 from tqdm import tqdm
-import numpy as np
 import cv2
 from geometry import SimilarityTransform2D
+from tests.config import ANIMAL_PARAM, BODY_PARAM, EYES_PARAM, TAIL_PARAM
 
-DISPLAY=False
+DISPLAY=True
 
 # background subtracted video
 VIDEOS = [
     ('toy_data/single_freelyswimming_504x500px_nobckg.avi', 40),
     ('toy_data/single_headembedded_544x380px_noparam_nobckg.avi', 130),
-    ('toy_data/single_headembedded_544x380px_param_nobckg.avi', 130)
+    ('toy_data/single_headembedded_544x380px_param_nobckg.avi', 90)
 ]
 # background subtracted video
 VIDEO_NUM = 0
@@ -40,78 +40,27 @@ num_frames = video_reader.get_number_of_frame()
 
 # tracking 
 animal_tracker = AnimalTracker_CPU(
-    tracking_param=AnimalTrackerParamTracking(
+    tracking_param = AnimalTrackerParamTracking(
         pix_per_mm=PIX_PER_MM,
-        target_pix_per_mm=5,
-        intensity=0.15,
-        gamma=1.0,
-        contrast=1.0,
-        min_size_mm=0.0,
-        max_size_mm=300.0,
-        min_length_mm=0,
-        max_length_mm=0,
-        min_width_mm=0,
-        max_width_mm=0,
-        blur_sz_mm=0.6,
-        median_filter_sz_mm=0,
-        downsample_factor=0.90,
-        num_animals=1,
-        crop_dimension_mm=(0,0), 
-        crop_offset_y_mm=0
+        **ANIMAL_PARAM
     )
 )
 body_tracker = BodyTracker_CPU(
-    BodyTrackerParamTracking(
+    tracking_param = BodyTrackerParamTracking(
         pix_per_mm=PIX_PER_MM,
-        target_pix_per_mm=10,
-        intensity=0.15,
-        gamma=1.0,
-        contrast=3.0,
-        min_size_mm=2.0,
-        max_size_mm=300.0,
-        min_length_mm=0,
-        max_length_mm=0,
-        min_width_mm=0,
-        max_width_mm=0,
-        blur_sz_mm=0.6,
-        median_filter_sz_mm=0,
-        crop_dimension_mm=(5,5),
-        crop_offset_y_mm=0
+        **BODY_PARAM
     )
 )
 eyes_tracker = EyesTracker_CPU(
-    EyesTrackerParamTracking(
+    tracking_param = EyesTrackerParamTracking(
         pix_per_mm=PIX_PER_MM,
-        target_pix_per_mm=40,
-        thresh_lo=0.2,
-        thresh_hi=0.8,
-        gamma=2.0,
-        dyntresh_res=5,
-        contrast=5.0,
-        size_lo_mm=0.1,
-        size_hi_mm=30.0,
-        blur_sz_mm=0.1,
-        median_filter_sz_mm=0,
-        crop_dimension_mm=(1,1.5),
-        crop_offset_y_mm=-0.5
+        **EYES_PARAM
     )
 )
 tail_tracker = TailTracker_CPU(
-    TailTrackerParamTracking(
+    tracking_param = TailTrackerParamTracking(
         pix_per_mm=PIX_PER_MM,
-        target_pix_per_mm=20,
-        ball_radius_mm=0.1,
-        arc_angle_deg=90,
-        n_tail_points=6,
-        n_pts_arc=20,
-        n_pts_interp=40,
-        tail_length_mm=3.0,
-        blur_sz_mm=0.06,
-        median_filter_sz_mm=0,
-        contrast=3.0,
-        gamma=0.75,
-        crop_dimension_mm=(3.5,3.5),
-        crop_offset_y_mm=2
+        **TAIL_PARAM
     )
 )
 
@@ -155,9 +104,7 @@ try:
         if DISPLAY:
             T_scale = SimilarityTransform2D.scaling(tracking['animals']['downsample_ratio']) 
 
-            oly = overlay.overlay_global(tracking['animals']['image_downsampled'], tracking, T_scale)
-            r = cv2.resize(oly,(512, 512))
-            cv2.imshow('global',r)
+            cv2.imshow('global',overlay.overlay_global(tracking['animals']['image_downsampled'], tracking, T_scale))
             cv2.waitKey(1)
             
             cv2.imshow('body_cropped', body_overlay.overlay_cropped(tracking['body']))
