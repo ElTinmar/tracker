@@ -52,7 +52,6 @@ LUT[1200:1800,1200:1800] = 8
 assignment = GridAssignment(LUT, num_animals)
 
 # tracking 
-# tracking 
 animal_tracker = AnimalTrackerKalman(
     assignment=assignment,
     tracking_param = AnimalTrackerParamTracking(
