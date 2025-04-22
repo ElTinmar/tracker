@@ -234,9 +234,9 @@ class BodyTrackerKalman(BodyTracker_CPU):
 
     def return_prediction_if_tracking_failed(
             self,
-            preproc,
-            T_input_to_global,
-            T_global_to_input,
+            preproc: Preprocessing,
+            T_input_to_global: SimilarityTransform2D,
+            T_global_to_input: SimilarityTransform2D,
         ) -> NDArray:
         
         tracking = Tracking()
