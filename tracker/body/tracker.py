@@ -220,13 +220,16 @@ class BodyTrackerKalman(BodyTracker_CPU):
             [np.sin(tracking.angle_rad), np.cos(tracking.angle_rad)],
             [-np.cos(tracking.angle_rad), np.sin(tracking.angle_rad)]
         ])
-        
+
     def track(
             self,
             image: NDArray, 
             centroid: Optional[NDArray] = None, # centroids in global space
             T_input_to_global: Optional[SimilarityTransform2D] = SimilarityTransform2D.identity()
         ) -> NDArray:
+
+        # TODO if measurement is None, still update (maybe add a field in structured array to say
+        # it's prediction only?)
 
         self.tracking_param.input_image_shape = image.shape
         T_global_to_input = T_input_to_global.inv()
