@@ -131,7 +131,7 @@ class TailTracker_CPU(TailTracker):
                 True,
                 self.tracking_param.n_tail_points,
                 self.tracking_param.n_pts_interp,
-                centroid, 
+                centroid_in_input, 
                 tracking.skeleton_resized,
                 tracking.skeleton_cropped,
                 tracking.skeleton_input,
@@ -194,6 +194,51 @@ class TailTrackerKalman(TailTracker_CPU):
         # TODO do that for resized, cropped, input and global
         tracking.skeleton_resized = self.kalman_filter.x[0:self.N_DIM,0].reshape((self.tracking_param.n_tail_points,2))
 
+    def return_prediction_if_tracking_failed(
+            self,
+            centroid,
+            preproc: Preprocessing,
+            T_input_to_global: SimilarityTransform2D,
+            T_global_to_input: SimilarityTransform2D,
+        ) -> NDArray:
+        
+        tracking = Tracking()
+        self.kalman_filter.predict()
+        self.kalman_filter.update(None)
+        self.prediction_to_tracking(tracking)
+
+        resolution = self.transform_coordinate_system(
+            tracking, 
+            preproc, 
+            T_input_to_global, 
+            T_global_to_input
+        )
+
+        res = np.array(
+            (
+                True,
+                self.tracking_param.n_tail_points,
+                self.tracking_param.n_pts_interp,
+                centroid, 
+                tracking.skeleton_resized,
+                tracking.skeleton_cropped,
+                tracking.skeleton_input,
+                tracking.skeleton_global,
+                tracking.skeleton_interp_resized,
+                tracking.skeleton_interp_cropped,
+                tracking.skeleton_interp_input,
+                tracking.skeleton_interp_global,
+                preproc.image_processed,
+                preproc.image_cropped,
+                resolution.pix_per_mm_global,
+                resolution.pix_per_mm_input,
+                resolution.pix_per_mm_cropped,
+                resolution.pix_per_mm_resized,
+            ), 
+            dtype= self.tracking_param.dtype
+        )
+
+        return res
 
     def track(
             self,
@@ -211,7 +256,12 @@ class TailTrackerKalman(TailTracker_CPU):
         
         preproc = self.preprocess(image, centroid_in_input)
         if preproc is None:
-            return self.tracking_param.failed
+            return self.return_prediction_if_tracking_failed(
+                preproc,
+                centroid_in_input,
+                T_input_to_global,
+                T_global_to_input,
+            )
 
         tracking = self.track_resized(preproc)
 
@@ -228,13 +278,12 @@ class TailTrackerKalman(TailTracker_CPU):
             T_global_to_input
         )
 
-        # save result to numpy structured array
         res = np.array(
             (
                 True,
                 self.tracking_param.n_tail_points,
                 self.tracking_param.n_pts_interp,
-                centroid, 
+                centroid_in_input, 
                 tracking.skeleton_resized,
                 tracking.skeleton_cropped,
                 tracking.skeleton_input,
