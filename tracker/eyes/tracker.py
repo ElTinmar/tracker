@@ -70,11 +70,15 @@ class EyesTracker_CPU(EyesTracker):
             props[left_idx], 
             self.vertical_axis
         )
+        if tracking.left_eye is None:
+            return None 
 
         tracking.right_eye = get_eye_properties(
             props[right_idx], 
             self.vertical_axis
         )
+        if tracking.right_eye is None:
+            return None 
 
         return tracking, mask
 
