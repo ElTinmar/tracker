@@ -55,7 +55,7 @@ TAIL_PARAM = {
     'n_tail_points': 6,
     'n_pts_arc': 20,
     'n_pts_interp': 40,
-    'tail_length_mm': 3.0,
+    'tail_length_mm': 2.8,
     'blur_sz_mm': 0.06,
     'median_filter_sz_mm': 0,
     'contrast': 3.0,
