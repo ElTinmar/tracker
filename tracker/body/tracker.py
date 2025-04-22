@@ -28,18 +28,18 @@ class BodyTracker_CPU(BodyTracker):
     def preprocess(
         self,
         image: NDArray, 
-        centroid_in: Optional[NDArray] = None, # centroids in global space
+        centroid: Optional[NDArray] = None, # centroids in input space
         ) -> Optional[Tuple[Preprocessing, NDArray]]:
         
-        preproc = preprocess_image(image, centroid_in, self.tracking_param)
+        preproc = preprocess_image(image, centroid, self.tracking_param)
 
         if preproc is None:
             return self.tracking_param.failed
             
-        centroid_in_cropped = preproc.T_input_to_cropped.transform_points(centroid_in).squeeze()
-        centroid_in_resized = preproc.T_cropped_to_resized.transform_points(centroid_in_cropped).squeeze()
+        centroid_cropped = preproc.T_input_to_cropped.transform_points(centroid).squeeze()
+        centroid_resized = preproc.T_cropped_to_resized.transform_points(centroid_cropped).squeeze()
 
-        return preproc, centroid_in_resized
+        return preproc, centroid_resized
 
     def track_resized(
             self,
