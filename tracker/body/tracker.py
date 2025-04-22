@@ -185,7 +185,7 @@ class BodyTrackerKalman(BodyTracker_CPU):
             model_order: int, 
             model_uncertainty: float = 0.2,
             measurement_uncertainty: float = 1.0,
-            angle_history_sec: float = 1,
+            angle_history_sec: float = 0.2,
             *args, 
             **kwargs
         ) -> None:
@@ -215,10 +215,10 @@ class BodyTrackerKalman(BodyTracker_CPU):
         # the Kalman filtering proper
         self.angle_history.append(tracking.angle_rad.copy())
         angle_history = np.median(self.angle_history)
-        delta = angdiff(measurement[2], angle_history)
+        delta = angdiff(measurement[2,0], angle_history)
         if abs(delta) > np.pi / 2:
-            measurement[2] += np.pi 
-            measurement[2] = normalize_angle(measurement[2])
+            measurement[2,0] += np.pi 
+            measurement[2,0] = measurement[2,0] % 2*np.pi 
 
         return measurement
 
