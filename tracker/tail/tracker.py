@@ -3,11 +3,96 @@ import numpy as np
 from typing import Optional, Tuple
 from .core import TailTracker
 from .utils import tail_skeleton_ball
-from tracker.prepare_image import preprocess_image
+from tracker.prepare_image import preprocess_image, Preprocessing
+from tracker.core import Resolution
 from geometry import SimilarityTransform2D
 from filterpy.common import kinematic_kf
 
+class Tracking:
+    def __init__(
+            self, 
+            num_pts: int, 
+            num_pts_interp: int
+        ) -> None:
+        
+        self.num_pts = num_pts
+        self.num_pts_interp = num_pts_interp
+        self.skeleton_resized = np.zeros((num_pts,2), np.float32)
+        self.skeleton_cropped = np.zeros((num_pts,2), np.float32)
+        self.skeleton_input = np.zeros((num_pts,2), np.float32)
+        self.skeleton_global = np.zeros((num_pts,2), np.float32)
+        self.skeleton_interp_resized = np.zeros((num_pts_interp,2), np.float32)
+        self.skeleton_interp_cropped = np.zeros((num_pts_interp,2), np.float32)
+        self.skeleton_interp_input = np.zeros((num_pts_interp,2), np.float32)
+        self.skeleton_interp_global = np.zeros((num_pts_interp,2), np.float32)
+
 class TailTracker_CPU(TailTracker):
+
+    def transform_input_centroid(
+            self, 
+            centroid, # centroid in global space
+            T_input_to_global
+        ) -> Tuple[Optional[NDArray], SimilarityTransform2D]:
+        
+        T_global_to_input = T_input_to_global.inv()
+
+        if centroid is None:
+            centroid_input = None
+        else:
+            centroid_input = T_global_to_input.transform_points(centroid).squeeze()
+
+        return centroid_input, T_global_to_input        
+
+    def preprocess(
+        self,
+        image: NDArray, 
+        centroid: Optional[NDArray] = None, # centroids in input space
+        ) -> Optional[Preprocessing]:
+        
+        return preprocess_image(image, centroid, self.tracking_param)
+
+    def track_resized(
+            self,
+            preproc: Preprocessing, 
+        ) -> Tracking:
+        
+        tracking = Tracking(self.tracking_param.n_tail_points, self.tracking_param.n_pts_interp)
+        tracking.skeleton_resized, tracking.skeleton_interp_resized = tail_skeleton_ball(
+            image = preproc.image_processed,
+            ball_radius_px = self.tracking_param.ball_radius_px,
+            arc_angle_deg = self.tracking_param.arc_angle_deg,
+            tail_length_px = self.tracking_param.tail_length_px,
+            n_tail_points = self.tracking_param.n_tail_points,
+            n_pts_arc = self.tracking_param.n_pts_arc,
+            n_pts_interp = self.tracking_param.n_pts_interp,
+            w = self.tracking_param.resized_dimension_px[0] 
+        )
+        return tracking
+
+    def transform_coordinate_system(
+            self,
+            tracking: Tracking,        
+            preproc: Preprocessing,
+            T_input_to_global,
+            T_global_to_input
+        ) -> Resolution:
+        '''modifies tracking in-place with side-effect and returns resolution'''
+        
+        tracking.skeleton_cropped = preproc.T_resized_to_cropped.transform_points(tracking.skeleton_resized)
+        tracking.skeleton_input = preproc.T_cropped_to_input.transform_points(tracking.skeleton_cropped)
+        tracking.skeleton_global = T_input_to_global.transform_points(tracking.skeleton_input)
+
+        tracking.skeleton_interp_cropped = preproc.T_resized_to_cropped.transform_points(tracking.skeleton_interp_resized)
+        tracking.skeleton_interp_input = preproc.T_cropped_to_input.transform_points(tracking.skeleton_interp_cropped)
+        tracking.skeleton_interp_global = T_input_to_global.transform_points(tracking.skeleton_interp_input)
+
+        resolution = Resolution()
+        resolution.pix_per_mm_global = self.tracking_param.pix_per_mm
+        resolution.pix_per_mm_input = resolution.pix_per_mm_global * T_global_to_input.scale_factor
+        resolution.pix_per_mm_cropped = resolution.pix_per_mm_input * preproc.T_input_to_cropped.scale_factor
+        resolution.pix_per_mm_resized = resolution.pix_per_mm_cropped * preproc.T_cropped_to_resized.scale_factor
+        
+        return resolution
 
     def track(
             self,
@@ -23,42 +108,23 @@ class TailTracker_CPU(TailTracker):
 
         self.tracking_param.input_image_shape = image.shape
 
-        if centroid is None:
-            return self.tracking_param.failed
+        centroid_in_input, T_global_to_input = self.transform_input_centroid(
+            centroid,
+            T_input_to_global
+        )
         
-        T_global_to_input = T_input_to_global.inv()
-        centroid_input = T_global_to_input.transform_points(centroid).squeeze()
-        preproc = preprocess_image(image, centroid_input, self.tracking_param)
-        
+        preproc = self.preprocess(image, centroid_in_input)
         if preproc is None:
             return self.tracking_param.failed
 
-        # track
-        skeleton_resized, skeleton_interp_resized = tail_skeleton_ball(
-            image = preproc.image_processed,
-            ball_radius_px = self.tracking_param.ball_radius_px,
-            arc_angle_deg = self.tracking_param.arc_angle_deg,
-            tail_length_px = self.tracking_param.tail_length_px,
-            n_tail_points = self.tracking_param.n_tail_points,
-            n_pts_arc = self.tracking_param.n_pts_arc,
-            n_pts_interp = self.tracking_param.n_pts_interp,
-            w = self.tracking_param.resized_dimension_px[0] 
+        tracking = self.track_resized(preproc)
+        resolution = self.transform_coordinate_system(
+            tracking, 
+            preproc, 
+            T_input_to_global, 
+            T_global_to_input
         )
 
-        # transform coordinates
-        skeleton_cropped = preproc.T_resized_to_cropped.transform_points(skeleton_resized)
-        skeleton_input = preproc.T_cropped_to_input.transform_points(skeleton_cropped)
-        skeleton_global = T_input_to_global.transform_points(skeleton_input)
-
-        skeleton_interp_cropped = preproc.T_resized_to_cropped.transform_points(skeleton_interp_resized)
-        skeleton_interp_input = preproc.T_cropped_to_input.transform_points(skeleton_interp_cropped)
-        skeleton_interp_global = T_input_to_global.transform_points(skeleton_interp_input)
-
-        pix_per_mm_global = self.tracking_param.pix_per_mm
-        pix_per_mm_input = pix_per_mm_global * T_global_to_input.scale_factor
-        pix_per_mm_cropped = pix_per_mm_input * preproc.T_input_to_cropped.scale_factor
-        pix_per_mm_resized = pix_per_mm_cropped * preproc.T_cropped_to_resized.scale_factor
-        
         # save result to numpy structured array
         res = np.array(
             (
@@ -66,20 +132,20 @@ class TailTracker_CPU(TailTracker):
                 self.tracking_param.n_tail_points,
                 self.tracking_param.n_pts_interp,
                 centroid, 
-                skeleton_resized,
-                skeleton_cropped,
-                skeleton_input,
-                skeleton_global,
-                skeleton_interp_resized,
-                skeleton_interp_cropped,
-                skeleton_interp_input,
-                skeleton_interp_global,
+                tracking.skeleton_resized,
+                tracking.skeleton_cropped,
+                tracking.skeleton_input,
+                tracking.skeleton_global,
+                tracking.skeleton_interp_resized,
+                tracking.skeleton_interp_cropped,
+                tracking.skeleton_interp_input,
+                tracking.skeleton_interp_global,
                 preproc.image_processed,
                 preproc.image_cropped,
-                pix_per_mm_global,
-                pix_per_mm_input,
-                pix_per_mm_cropped,
-                pix_per_mm_resized,
+                resolution.pix_per_mm_global,
+                resolution.pix_per_mm_input,
+                resolution.pix_per_mm_cropped,
+                resolution.pix_per_mm_resized,
             ), 
             dtype= self.tracking_param.dtype
         )
