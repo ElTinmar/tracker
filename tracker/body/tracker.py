@@ -6,6 +6,7 @@ from .core import BodyTracker
 from .utils import get_orientation, get_best_centroid_index
 from tracker.prepare_image import preprocess_image, Preprocessing
 from tracker.core import Resolution
+from tracker.kalman_utils import kalman_update_wrap_angle
 from geometry import SimilarityTransform2D, angdiff, normalize_angle
 import cv2
 from filterpy.common import kinematic_kf
@@ -213,12 +214,15 @@ class BodyTrackerKalman(BodyTracker_CPU):
         # Use previous frames to filter fast 180deg changes in orientation
         # TODO maybe add this to regular tracking instead to separate from
         # the Kalman filtering proper
-        self.angle_history.append(tracking.angle_rad.copy())
-        angle_history = np.median(self.angle_history)
-        delta = angdiff(measurement[2,0], angle_history)
-        if abs(delta) > np.pi / 2:
+
+        median_unit_vector = np.mean(self.angle_history)
+        past_angle = np.angle(median_unit_vector)
+        delta = angdiff(measurement[2,0], past_angle)
+        if 3*np.pi/2 > abs(delta) > np.pi/2:
             measurement[2,0] += np.pi 
-            measurement[2,0] = measurement[2,0] % 2*np.pi 
+            measurement[2,0] = normalize_angle(measurement[2,0])
+
+        self.angle_history.append(np.exp(1j*measurement[2,0]))
 
         return measurement
 
@@ -309,7 +313,7 @@ class BodyTrackerKalman(BodyTracker_CPU):
         tracking, mask = tracking_resized
         self.kalman_filter.predict()
         measurement = self.tracking_to_measurement(tracking)
-        self.kalman_filter.update(measurement)
+        kalman_update_wrap_angle(self.kalman_filter, measurement, 2)
         self.prediction_to_tracking(tracking)
 
         resolution = self.transform_coordinate_system(
