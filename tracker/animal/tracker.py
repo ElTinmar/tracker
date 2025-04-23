@@ -73,8 +73,8 @@ class AnimalTracker_CPU(AnimalTracker):
             self,
             tracking: Tracking,        
             preproc: Preprocessing,
-            T_input_to_global,
-            T_global_to_input
+            T_input_to_global: SimilarityTransform2D,
+            T_global_to_input: SimilarityTransform2D
         ) -> AnimalResolution:
         '''modifies tracking in-place with side-effect and returns resolution'''
         
@@ -187,13 +187,14 @@ class AnimalTrackerKalman(AnimalTracker_CPU):
         self.kalman_filter.Q *= model_uncertainty
         self.kalman_filter.R *= measurement_uncertainty
 
-    def tracking_to_measurement(self, tracking: NDArray) -> NDArray:
+    def tracking_to_measurement(self, tracking: Tracking) -> NDArray:
         
         measurement = np.zeros((self.N_DIM,1))
+        print(measurement.shape, tracking.centroids_resized.shape, tracking.num_animals)
         measurement[0:self.N_DIM,0] = tracking.centroids_resized.flatten()
         return measurement
 
-    def prediction_to_tracking(self, tracking: NDArray) -> None:
+    def prediction_to_tracking(self, tracking: Tracking) -> None:
         '''Side effect: modify tracking in-place'''
         
         tracking.centroids_resized = self.kalman_filter.x[0:self.N_DIM,0].reshape((self.tracking_param.num_animals,2))
