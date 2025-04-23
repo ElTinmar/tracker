@@ -67,6 +67,8 @@ class AnimalTracker_CPU(AnimalTracker):
         if tracking.centroids_resized.size == 0:
             return None
         
+        # TODO: add assignment in resized space here
+        
         return tracking, mask
 
     def transform_coordinate_system(
