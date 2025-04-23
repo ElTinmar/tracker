@@ -84,7 +84,10 @@ class BodyTracker_CPU(BodyTracker):
         tracking.centroid_resized = centroids_resized[index]
         
         coordinates_resized = np.fliplr(props[index].coords)
-        tracking.body_axes = get_orientation(coordinates_resized)
+
+        # TODO maybe here use past direction and check if dot product is negative
+        # TODO maybe here pass preproc.image_processed and check intensity profile along main axis 
+        tracking.body_axes = get_orientation(coordinates_resized) 
         if tracking.body_axes is None:
             return None
         
