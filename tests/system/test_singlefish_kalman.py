@@ -56,7 +56,7 @@ body_tracker = BodyTrackerKalman(
         **BODY_PARAM
     ),
     fps = int(fps),
-    model_order = 1
+    model_order = 2
 )
 eyes_tracker = EyesTrackerKalman(
     tracking_param = EyesTrackerParamTracking(
