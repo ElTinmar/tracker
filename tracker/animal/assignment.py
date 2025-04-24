@@ -18,6 +18,7 @@ class NoAssignment:
 
         return c
 
+# TODO: fix that to work in resized space
 class GridAssignment:
     '''
     Use a Lookup Table and previous position to determine centroid identity. 
