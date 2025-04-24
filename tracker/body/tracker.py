@@ -26,6 +26,19 @@ class Tracking:
 
 class BodyTracker_CPU(BodyTracker):
 
+    def __init__(
+        self, 
+        fps: int, 
+        history_sec: float = 0.2,
+        *args, 
+        **kwargs
+        ) -> None:
+
+        super().__init__(*args, **kwargs)
+        self.fps = fps
+        self.history_sec = history_sec
+        self.heading_history = deque(maxlen=int(history_sec*fps))
+
     def transform_input_centroid(
             self, 
             centroid, # centroid in global space
@@ -85,9 +98,8 @@ class BodyTracker_CPU(BodyTracker):
         
         coordinates_resized = np.fliplr(props[index].coords)
 
-        # TODO maybe here use past direction and check if dot product is negative
         # TODO maybe here pass preproc.image_processed and check intensity profile along main axis 
-        tracking.body_axes = get_orientation(coordinates_resized) 
+        tracking.body_axes = get_orientation(coordinates_resized, self.heading_history) 
         if tracking.body_axes is None:
             return None
         
@@ -185,19 +197,15 @@ class BodyTrackerKalman(BodyTracker_CPU):
 
     def __init__(
             self, 
-            fps: int, 
             model_order: int, 
             model_uncertainty: float = 0.2,
             measurement_uncertainty: float = 1.0,
-            angle_history_sec: float = 0.2,
             *args, 
             **kwargs
         ) -> None:
 
         super().__init__(*args, **kwargs)
-        self.fps = fps
-        dt = 1/fps
-        self.angle_history = deque(maxlen=int(angle_history_sec*fps))
+        dt = 1/self.fps
         self.kalman_filter = kinematic_kf(
             dim = self.N_DIM, 
             order = model_order, 
@@ -213,19 +221,6 @@ class BodyTrackerKalman(BodyTracker_CPU):
         measurement = np.zeros((self.N_DIM,1))
         measurement[:2,0] = tracking.centroid_resized
         measurement[2] = tracking.angle_rad
-        
-        # Use previous frames to filter fast 180deg changes in orientation
-        # TODO maybe add this to regular tracking instead to separate from
-        # the Kalman filtering proper
-
-        median_unit_vector = np.mean(self.angle_history)
-        past_angle = np.angle(median_unit_vector)
-        delta = angdiff(measurement[2,0], past_angle)
-        if 3*np.pi/2 > abs(delta) > np.pi/2:
-            measurement[2,0] += np.pi 
-            measurement[2,0] = normalize_angle(measurement[2,0])
-
-        self.angle_history.append(np.exp(1j*measurement[2,0]))
 
         return measurement
 
