@@ -28,16 +28,19 @@ class BodyTracker_CPU(BodyTracker):
 
     def __init__(
         self, 
-        fps: int, 
+        fps: Optional[int] = None, 
         history_sec: float = 0.2,
         *args, 
         **kwargs
         ) -> None:
 
         super().__init__(*args, **kwargs)
-        self.fps = fps
-        self.history_sec = history_sec
-        self.heading_history = deque(maxlen=int(history_sec*fps))
+
+        self.heading_history = None
+        if fps is not None:
+            self.fps = fps
+            self.history_sec = history_sec
+            self.heading_history = deque(maxlen=int(history_sec*fps))
 
     def transform_input_centroid(
             self, 
@@ -205,6 +208,10 @@ class BodyTrackerKalman(BodyTracker_CPU):
         ) -> None:
 
         super().__init__(*args, **kwargs)
+        
+        if self.fps is None:
+            raise ValueError('provide valid fps as argument')
+        
         dt = 1/self.fps
         self.kalman_filter = kinematic_kf(
             dim = self.N_DIM, 
@@ -220,7 +227,7 @@ class BodyTrackerKalman(BodyTracker_CPU):
         
         measurement = np.zeros((self.N_DIM,1))
         measurement[:2,0] = tracking.centroid_resized
-        measurement[2] = tracking.angle_rad
+        measurement[2,0] = tracking.angle_rad
 
         return measurement
 

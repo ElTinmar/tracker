@@ -8,7 +8,12 @@ def kalman_update_wrap_angle(
         measurement: NDArray, 
         angle_dim: NDArray
     ) -> None:
-    '''update kalman filter in-place with side-effect'''
+    '''
+    Tracked angles can jump suddenly by 2*pi. This update function
+    computes angular difference for the innovation in [-pi,pi] and 
+    wraps predicted angles in [-pi,pi].
+    Update kalman filter in-place with side-effect.
+    '''
     
     innovation = measurement - kalman_filter.H @ kalman_filter.x
     innovation[angle_dim, 0] = angdiff(

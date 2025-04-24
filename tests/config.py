@@ -18,7 +18,7 @@ ANIMAL_PARAM = {
 
 BODY_PARAM = {
     'target_pix_per_mm': 10,
-    'intensity': 0.15,
+    'intensity': 0.40,
     'gamma': 1.0,
     'contrast': 3.0,
     'min_size_mm': 2.0,

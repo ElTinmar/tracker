@@ -84,7 +84,8 @@ body_tracker = BodyTracker_CPU(
         max_body_width_mm=0,
         blur_sz_mm=1/7.5,
         median_filter_sz_mm=0,
-    )
+    ),
+    fps = fps
 )
 eyes_tracker = EyesTracker_CPU(
     EyesTrackerParamTracking(

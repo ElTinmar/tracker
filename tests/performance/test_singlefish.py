@@ -50,8 +50,9 @@ def load_video(video_num: int = 0):
     body_tracker = BodyTracker_CPU(
         tracking_param = BodyTrackerParamTracking(
             pix_per_mm=pix_per_mm,
-            **BODY_PARAM
-        )
+            **BODY_PARAM,
+        ),
+        fps = fps
     )
     eyes_tracker = EyesTracker_CPU(
         tracking_param = EyesTrackerParamTracking(

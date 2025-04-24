@@ -19,7 +19,7 @@ def get_best_centroid_index(
     return closest_idx
 
 # TODO output type incorrect (see how crop is handled) 
-def get_orientation(coordinates: NDArray, heading_history: deque) -> Optional[NDArray]: 
+def get_orientation(coordinates: NDArray, heading_history: Optional[deque]) -> Optional[NDArray]: 
     '''
     get blob main axis using PCA
     '''
@@ -36,12 +36,18 @@ def get_orientation(coordinates: NDArray, heading_history: deque) -> Optional[ND
         body_axes[:,0] = - body_axes[:,0]
 
     # prevent spurious flips using history
-    if heading_history:
-        past_heading = np.mean(heading_history)
-        if np.dot(past_heading, body_axes[:,0]) < 0:
-            body_axes[:,0] = - body_axes[:,0]
+    if heading_history is not None:
+        
+        original_heading = body_axes[:,0].copy()
 
-    heading_history.append(body_axes[:,0])
+        if heading_history:
+            past_heading = np.mean(heading_history, axis=0)
+            if np.dot(past_heading, body_axes[:,0]) < 0:
+                body_axes[:,0] = - body_axes[:,0]
+        
+        # appending anadulterated heading vectors to avoid 
+        # getting stuck in the wrong orientation.
+        heading_history.append(original_heading)
 
     # make sure the second axis always points to the same side
     if np.linalg.det(body_axes) < 0:

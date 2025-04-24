@@ -192,7 +192,6 @@ class AnimalTrackerKalman(AnimalTracker_CPU):
     def tracking_to_measurement(self, tracking: Tracking) -> NDArray:
         
         measurement = np.zeros((self.N_DIM,1))
-        print(measurement.shape, tracking.centroids_resized.shape, tracking.num_animals)
         measurement[0:self.N_DIM,0] = tracking.centroids_resized.flatten()
         return measurement
 

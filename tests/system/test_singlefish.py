@@ -52,7 +52,8 @@ body_tracker = BodyTracker_CPU(
     tracking_param = BodyTrackerParamTracking(
         pix_per_mm=PIX_PER_MM,
         **BODY_PARAM
-    )
+    ),
+    fps = fps
 )
 eyes_tracker = EyesTracker_CPU(
     tracking_param = EyesTrackerParamTracking(
