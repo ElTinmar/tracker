@@ -54,7 +54,7 @@ class AnimalTracker_CPU(AnimalTracker):
         
         tracking = Tracking(num_animals=self.tracking_param.num_animals)
         mask = cv2.compare(preproc.image_processed, self.tracking_param.intensity, cv2.CMP_GT)
-        tracking.centroids_resized = bwareafilter_centroids_cv2(
+        centroids_resized = bwareafilter_centroids_cv2(
             mask, 
             min_size = self.tracking_param.min_size_px,
             max_size = self.tracking_param.max_size_px, 
@@ -64,10 +64,11 @@ class AnimalTracker_CPU(AnimalTracker):
             max_width = self.tracking_param.max_width_px
         )     
         
-        if tracking.centroids_resized.size == 0:
+        if centroids_resized.size == 0:
             return None
         
-        # TODO: add assignment in resized space here
+        # TODO: fix assignment for multifish to work in resized space
+        tracking.centroids_resized = self.assignment.update(centroids_resized)  
         
         return tracking, mask
 
@@ -83,13 +84,6 @@ class AnimalTracker_CPU(AnimalTracker):
         tracking.centroids_cropped = preproc.T_resized_to_cropped.transform_points(tracking.centroids_resized)
         tracking.centroids_input = preproc.T_cropped_to_input.transform_points(tracking.centroids_cropped)
         tracking.centroids_global = T_input_to_global.transform_points(tracking.centroids_input)
-
-        # TODO do the assignment in resized space instead !!!
-        # identity assignment in global space
-        tracking.centroids_global = self.assignment.update(tracking.centroids_global)  
-        tracking.centroids_input = T_global_to_input.transform_points(tracking.centroids_global)
-        tracking.centroids_cropped = preproc.T_input_to_cropped.transform_points(tracking.centroids_input)
-        tracking.centroids_resized = preproc.T_cropped_to_resized.transform_points(tracking.centroids_cropped)
 
         resolution = AnimalResolution()
         resolution.pix_per_mm_global = self.tracking_param.pix_per_mm
