@@ -7,7 +7,7 @@ from .utils import get_orientation, get_best_centroid_index
 from tracker.prepare_image import preprocess_image, Preprocessing
 from tracker.core import Resolution
 from tracker.kalman_utils import kalman_update_wrap_angle
-from geometry import SimilarityTransform2D, angdiff, normalize_angle
+from geometry import SimilarityTransform2D
 import cv2
 from filterpy.common import kinematic_kf
 from collections import deque
