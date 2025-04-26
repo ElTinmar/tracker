@@ -22,5 +22,6 @@ setup(
         "image_tools @ git+https://github.com/ElTinmar/image_tools.git@main",
         "qt_widgets @ git+https://github.com/ElTinmar/qt_widgets.git@main",
         "geometry @ git+https://github.com/ElTinmar/geometry.git@main"
+        "kalman @ git+https://github.com/ElTinmar/Kalman.git@main"
     ]
 )
