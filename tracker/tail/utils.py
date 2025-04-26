@@ -3,7 +3,7 @@ from scipy.interpolate import splprep, splev
 import numpy as np
 from numpy.typing import NDArray
 from typing import Tuple
-from numba import njit
+from numba import njit, float32, int64
 
 def interpolate_skeleton(skeleton: NDArray, n_pts_interp: int) -> NDArray:
     '''
@@ -21,18 +21,20 @@ def interpolate_skeleton(skeleton: NDArray, n_pts_interp: int) -> NDArray:
 
     return skeleton_interp
 
-@njit(cache=True)
+@njit(
+    (float32, int64, float32, float32, float32, int64, float32, float32[:, :], float32)
+)
 def get_skeleton_ball(
-        arc_rad, 
-        n_pts_arc,
-        start_angle,
-        x,
-        y,
-        n_tail_points,
-        spacing,
-        image,
-        ball_radius_px
-    ):
+        arc_rad: float, 
+        n_pts_arc: int,
+        start_angle: float,
+        x: float,
+        y: float,
+        n_tail_points: int,
+        spacing: float,
+        image: NDArray,
+        ball_radius_px: float
+    ) -> Tuple[NDArray, NDArray]:
 
     arc = np.linspace(-arc_rad, arc_rad, n_pts_arc) + start_angle
     points = np.zeros((n_tail_points,2), np.float32)
