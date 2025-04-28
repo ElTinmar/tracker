@@ -100,7 +100,12 @@ def track(video_reader, tracker) -> None:
         tracking = tracker.track(frame_gray)
 
 if __name__ == '__main__':
+    # warmup
+    video_reader, tracker, height, width = load_video(0)
+    track_fun = partial(track, video_reader=video_reader, tracker=tracker)
+    track_fun()
 
+    # test
     for id, vid in enumerate(VIDEOS):
         video_reader, tracker, height, width = load_video(id)
         track_fun = partial(track, video_reader=video_reader, tracker=tracker)
