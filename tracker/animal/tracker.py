@@ -7,7 +7,7 @@ from .core import AnimalTracker
 from tracker.prepare_image import preprocess_image, Preprocessing
 from tracker.core import Resolution
 from geometry import SimilarityTransform2D
-from filterpy.common import kinematic_kf
+from kalman import kinematic_kf
 from dataclasses import dataclass
 
 @dataclass
@@ -185,7 +185,7 @@ class AnimalTrackerKalman(AnimalTracker_CPU):
 
     def tracking_to_measurement(self, tracking: Tracking) -> NDArray:
         
-        measurement = np.zeros((self.N_DIM,1))
+        measurement = np.zeros((self.N_DIM,1), dtype=np.float32)
         measurement[0:self.N_DIM,0] = tracking.centroids_resized.flatten()
         return measurement
 
@@ -203,7 +203,6 @@ class AnimalTrackerKalman(AnimalTracker_CPU):
         
         tracking = Tracking(num_animals=self.tracking_param.num_animals)
         self.kalman_filter.predict()
-        self.kalman_filter.update(None)
         self.prediction_to_tracking(tracking)
 
         resolution = self.transform_coordinate_system(

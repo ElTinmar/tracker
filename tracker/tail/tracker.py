@@ -6,7 +6,7 @@ from .utils import tail_skeleton_ball, interpolate_skeleton
 from tracker.prepare_image import preprocess_image, Preprocessing
 from tracker.core import Resolution
 from geometry import SimilarityTransform2D
-from filterpy.common import kinematic_kf
+from kalman import kinematic_kf
 
 class Tracking:
     def __init__(
@@ -188,7 +188,7 @@ class TailTrackerKalman(TailTracker_CPU):
     def tracking_to_measurement(self, tracking: Tracking) -> NDArray:
         # TODO: kalman filter skeleton angles instead and compute skeleton_resized from angles
         
-        measurement = np.zeros((self.N_DIM,1))
+        measurement = np.zeros((self.N_DIM,1), dtype=np.float32)
         measurement[0:self.N_DIM,0] = tracking.skeleton_resized.flatten()
 
         return measurement
@@ -213,7 +213,6 @@ class TailTrackerKalman(TailTracker_CPU):
         
         tracking = Tracking()
         self.kalman_filter.predict()
-        self.kalman_filter.update(None)
         self.prediction_to_tracking(tracking)
 
         resolution = self.transform_coordinate_system(

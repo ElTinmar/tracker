@@ -6,10 +6,9 @@ from .core import BodyTracker
 from .utils import get_orientation, get_best_centroid_index
 from tracker.prepare_image import preprocess_image, Preprocessing
 from tracker.core import Resolution
-from tracker.kalman_utils import kalman_update_wrap_angle
 from geometry import SimilarityTransform2D
 import cv2
-from filterpy.common import kinematic_kf
+from kalman import kinematic_kf
 from collections import deque
 from dataclasses import dataclass
 
@@ -225,7 +224,7 @@ class BodyTrackerKalman(BodyTracker_CPU):
 
     def tracking_to_measurement(self, tracking: Tracking) -> NDArray:
         
-        measurement = np.zeros((self.N_DIM,1))
+        measurement = np.zeros((self.N_DIM,1), dtype=np.float32)
         measurement[:2,0] = tracking.centroid_resized
         measurement[2,0] = tracking.angle_rad
 
@@ -250,7 +249,6 @@ class BodyTrackerKalman(BodyTracker_CPU):
         
         tracking = Tracking()
         self.kalman_filter.predict()
-        self.kalman_filter.update(None)
         self.prediction_to_tracking(tracking)
 
         resolution = self.transform_coordinate_system(
@@ -318,7 +316,7 @@ class BodyTrackerKalman(BodyTracker_CPU):
         tracking, mask = tracking_resized
         self.kalman_filter.predict()
         measurement = self.tracking_to_measurement(tracking)
-        kalman_update_wrap_angle(self.kalman_filter, measurement, 2)
+        self.kalman_filter.update_wrap_angle(measurement, 2)
         self.prediction_to_tracking(tracking)
 
         resolution = self.transform_coordinate_system(

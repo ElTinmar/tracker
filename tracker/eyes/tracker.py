@@ -6,7 +6,7 @@ from .utils import get_eye_properties, find_eyes_and_swimbladder, assign_feature
 from geometry import SimilarityTransform2D, angle_between_vectors
 from tracker.prepare_image import preprocess_image, Preprocessing
 from tracker.core import Resolution
-from filterpy.common import kinematic_kf
+from kalman import kinematic_kf
 from dataclasses import dataclass
 
 @dataclass
@@ -193,7 +193,7 @@ class EyesTrackerKalman(EyesTracker_CPU):
 
     def tracking_to_measurement(self, tracking: Tracking) -> NDArray:
         
-        measurement = np.zeros((self.N_DIM,1))
+        measurement = np.zeros((self.N_DIM,1), dtype=np.float32)
         measurement[:2,0] = tracking.left_eye['centroid_resized']
         measurement[2,0] = tracking.left_eye['angle']
         measurement[3:5,0] = tracking.right_eye['centroid_resized']
@@ -227,7 +227,6 @@ class EyesTrackerKalman(EyesTracker_CPU):
         
         tracking = Tracking()
         self.kalman_filter.predict()
-        self.kalman_filter.update(None)
         self.prediction_to_tracking(tracking)
 
         resolution = self.transform_coordinate_system(

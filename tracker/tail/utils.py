@@ -2,10 +2,10 @@ import math
 from scipy.interpolate import splprep, splev
 import numpy as np
 from numpy.typing import NDArray
-from typing import Tuple
+from typing import Tuple, Optional
 from numba import njit, float32, int64
 
-def interpolate_skeleton(skeleton: NDArray, n_pts_interp: int) -> NDArray:
+def interpolate_skeleton(skeleton: NDArray, n_pts_interp: int) -> Optional[NDArray]:
     '''
     Parametric interpolation
     skeleton: (n,2) array, where n is the number of points along the tail
@@ -17,7 +17,10 @@ def interpolate_skeleton(skeleton: NDArray, n_pts_interp: int) -> NDArray:
         new_points = splev(np.linspace(0,1,n_pts_interp), tck)
         skeleton_interp = np.stack(new_points, axis=1) # make the array (n_pts_interp,2)
     except ValueError:
-        skeleton_interp = None
+        # if degenerate case fallback to linear interpolation
+        start, end = skeleton[0], skeleton[-1]
+        t = np.linspace(0, 1, n_pts_interp)[:, None]
+        skeleton_interp = (1 - t) * start + t * end
 
     return skeleton_interp
 
