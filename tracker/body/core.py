@@ -1,6 +1,7 @@
 import numpy as np
 from dataclasses import dataclass
 from tracker.core import Tracker, TrackingOverlay, ParamTracking
+from typing import Tuple
 
 @dataclass
 class BodyTrackerParamTracking(ParamTracking):
@@ -11,6 +12,7 @@ class BodyTrackerParamTracking(ParamTracking):
     min_width_mm: float = 0.0
     max_width_mm: float = 0.0
     intensity: float = 0.2
+    crop_dimension_mm: Tuple[float, float] = (9, 9) 
     
     @property
     def min_size_px(self) -> int:

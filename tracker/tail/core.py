@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 import numpy as np
 from tracker.core import Tracker, TrackingOverlay, ParamTracking
+from typing import Tuple
 
 @dataclass
 class TailTrackerParamTracking(ParamTracking):
@@ -9,7 +10,8 @@ class TailTrackerParamTracking(ParamTracking):
     n_pts_arc: int = 20
     n_pts_interp: int = 40
     tail_length_mm: float = 2.6
-    ball_radius_mm: float = 0.05 
+    ball_radius_mm: float = 0.05
+    crop_dimension_mm: Tuple[float, float] = (5, 5) 
      
     @property
     def tail_length_px(self) -> int:
