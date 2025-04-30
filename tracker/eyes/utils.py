@@ -73,7 +73,6 @@ def find_eyes_and_swimbladder(
 
         # actual tracking starts here
         mask = cv2.compare(image, t, cv2.CMP_GT)       
-        print(f'eyes, {mask.shape}') 
         props = bwareafilter_props_cv2(
             mask, 
             min_size = eye_size_lo_px, 
