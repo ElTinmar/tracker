@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 import numpy as np
 from tracker.core import Tracker, TrackingOverlay, ParamTracking
+from typing import Tuple
 
 DTYPE_EYE = np.dtype([
     ('direction', np.float32, (2,)),
@@ -20,6 +21,7 @@ class EyesTrackerParamTracking(ParamTracking):
     size_hi_mm: float = 10.0
     thresh_lo: float = 0.2
     thresh_hi: float = 1.0
+    crop_dimension_mm: Tuple[float, float] = (2, 2)
     
     @property
     def size_lo_px(self) -> int:
