@@ -38,7 +38,7 @@ def get_skeleton_ball(
 
     arc = np.linspace(-arc_rad, arc_rad, n_pts_arc) + start_angle
     points = np.zeros((n_tail_points,2), np.float32)
-    points[0,:] = [x, y]
+    points[0,:] = np.array([x, y], np.float32)
     angles = np.zeros((n_tail_points,), np.float32)
     angles[0] = start_angle
     for n in range(n_tail_points-1):
@@ -67,10 +67,23 @@ def get_skeleton_ball(
         arc = np.linspace(a - arc_rad, a + arc_rad, n_pts_arc)
         
         # Add point to list
-        points[n+1, :] = [x, y]
+        points[n+1, :] = np.array([x, y], np.float32)
         angles[n+1] = a
 
     return points, angles
+
+# run once  with dummy inputs to trigger compilation on import
+get_skeleton_ball( 
+    0.0, 
+    1, 
+    0.0, 
+    0.0, 
+    0.0, 
+    1, 
+    0.0, 
+    np.zeros((1,1), dtype=np.float32),
+    0.0
+)
 
 def tail_skeleton_ball(
         image: NDArray,
