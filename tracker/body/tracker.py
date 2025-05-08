@@ -300,7 +300,7 @@ class BodyTrackerKalman(BodyTracker_CPU):
         preprocessing = self.preprocess(image, centroid_in_input)
         if preprocessing is None:
             return self.return_prediction_if_tracking_failed(
-                preproc,
+                preproc, #FIXME this is not decalred here (ZebVR Issue #48)
                 T_input_to_global,
                 T_global_to_input,
             )

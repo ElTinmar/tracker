@@ -266,7 +266,7 @@ class TailTrackerKalman(TailTracker_CPU):
         preproc = self.preprocess(image, centroid_in_input)
         if preproc is None:
             return self.return_prediction_if_tracking_failed(
-                preproc,
+                preproc, # This is None, make sure its ok
                 centroid_in_input,
                 T_input_to_global,
                 T_global_to_input,

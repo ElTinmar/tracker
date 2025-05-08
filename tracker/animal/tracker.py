@@ -252,7 +252,7 @@ class AnimalTrackerKalman(AnimalTracker_CPU):
         preproc = self.preprocess(image, centroid_in_input) 
         if preproc is None:
             return self.return_prediction_if_tracking_failed(
-                preproc,
+                preproc, # TODO this is None make sure it's ok
                 T_input_to_global,
                 T_global_to_input,
             )
