@@ -6,6 +6,7 @@ from tracker.core import ParamTracking
 from image_tools import enhance
 from geometry import SimilarityTransform2D
 
+# TODO return bounding box?
 def crop(
         image: NDArray,
         crop_dimension_px: Tuple[int, int],
@@ -122,6 +123,8 @@ def preprocess_image(
         image = image_cropped,
         target_dimension_px = params.resized_dimension_px, 
     )
+
+    # TODO: add background subtraction with resized / cropped background ?
 
     # enhance --------------------
     image_processed = enhance(
