@@ -18,7 +18,6 @@ DISPLAY_HEIGHT = 1024
 # background subtracted video
 VIDEOS = [
     ('toy_data/single_freelyswimming_504x500px_nobckg.avi', 40),
-    ('toy_data/single_headembedded_544x380px_noparam_nobckg.avi', 130),
     ('toy_data/single_headembedded_544x380px_param_nobckg.avi', 90)
 ]
 # background subtracted video
