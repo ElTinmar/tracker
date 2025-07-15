@@ -153,7 +153,7 @@ class Preprocessing(NamedTuple):
 def preprocess_image(
         image: NDArray, 
         background_image: Optional[NDArray],
-        centroid: NDArray, 
+        centroid: Optional[NDArray], 
         params: ParamTracking
     ) -> Optional[Preprocessing]:
         
