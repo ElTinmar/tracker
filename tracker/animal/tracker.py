@@ -101,8 +101,6 @@ class AnimalTracker_CPU(AnimalTracker):
         T_input_to_global: Optional[SimilarityTransform2D] = SimilarityTransform2D.identity() # input to global space transform
     ) -> NDArray:
         
-        self.tracking_param.input_image_shape = image.shape
-
         centroid_in_input, T_global_to_input = self.transform_input_centroid(
             centroid,
             T_input_to_global
@@ -241,8 +239,6 @@ class AnimalTrackerKalman(AnimalTracker_CPU):
             centroid: Optional[NDArray] = None, # centroids in global space
             T_input_to_global: Optional[SimilarityTransform2D] = SimilarityTransform2D.identity()
         ) -> NDArray:
-
-        self.tracking_param.input_image_shape = image.shape
 
         centroid_in_input, T_global_to_input = self.transform_input_centroid(
             centroid,
