@@ -1,4 +1,4 @@
-from video_tools import InMemory_OpenCV_VideoReader, StaticBackground
+from video_tools import InMemory_OpenCV_VideoReader
 from image_tools import im2single, im2gray
 from tracker import (
     SingleFishTracker_CPU, SingleFishOverlay_opencv, SingleFishTrackerParamTracking, SingleFishTrackerParamOverlay,
@@ -11,19 +11,21 @@ from tqdm import tqdm
 import cv2
 from geometry import SimilarityTransform2D
 from tests.config import ANIMAL_PARAM, BODY_PARAM, EYES_PARAM, TAIL_PARAM
+import numpy as np
 
 DISPLAY=True
-DISPLAY_HEIGHT = 1024
+DISPLAY_HEIGHT = 512
 
 # background subtracted video
 VIDEOS = [
-    ('toy_data/single_freelyswimming_504x500px_nobckg.avi', 40),
-    ('toy_data/single_headembedded_544x380px_param_nobckg.avi', 90),
-    ('toy_data/freely_swimming_param.mp4', 40)
+    ('toy_data/single_freelyswimming_504x500px_nobckg.avi', 40, None),
+    ('toy_data/single_headembedded_544x380px_param_nobckg.avi', 90, None),
+    ('toy_data/freely_swimming_param.mp4', 40, None)
 ]
+
 # background subtracted video
-VIDEO_NUM = 2
-INPUT_VIDEO, PIX_PER_MM = VIDEOS[VIDEO_NUM]
+VIDEO_NUM = 0
+INPUT_VIDEO, PIX_PER_MM, BCKG_FILE = VIDEOS[VIDEO_NUM]
 
 video_reader = InMemory_OpenCV_VideoReader()
 video_reader.open_file(
@@ -38,6 +40,12 @@ height = video_reader.get_height()
 width = video_reader.get_width()
 fps = video_reader.get_fps()  
 num_frames = video_reader.get_number_of_frame()
+
+if BCKG_FILE is not None:
+    img = cv2.imread(BCKG_FILE)
+    background_image = im2single(im2gray(img))
+else:
+    background_image = np.zeros((height, width), np.float32)
 
 DISPLAY_WIDTH = int(width/height * DISPLAY_HEIGHT)
 
@@ -100,35 +108,23 @@ try:
             raise RuntimeError('VideoReader was unable to read the whole video')
         
         # convert
-        frame_gray = im2single(im2gray(frame))
+        #frame_gray = im2single(im2gray(frame))
 
         # track
-        tracking = tracker.track(frame_gray)
+        tracking = tracker.track(frame, background_image)
 
         # display tracking
         if DISPLAY:
             T_scale = SimilarityTransform2D.scaling(tracking['animals']['downsample_ratio']) 
-
             oly = overlay.overlay_global(tracking['animals']['image_downsampled'], tracking, T_scale)
             r = cv2.resize(oly,(DISPLAY_HEIGHT, DISPLAY_WIDTH))
+            cv2.imshow('frame', frame)
             cv2.imshow('global',r)
-            cv2.waitKey(1)
-            
             cv2.imshow('body_cropped', body_overlay.overlay_cropped(tracking['body']))
-            cv2.waitKey(1)
-
             cv2.imshow('eyes_cropped', eyes_overlay.overlay_cropped(tracking['eyes']))
-            cv2.waitKey(1)
-            
             cv2.imshow('tail_cropped', tail_overlay.overlay_cropped(tracking['tail']))
-            cv2.waitKey(1)
-
             cv2.imshow('body_resized', body_overlay.overlay_processed(tracking['body']))
-            cv2.waitKey(1)
-
             cv2.imshow('eyes_resized', eyes_overlay.overlay_processed(tracking['eyes']))
-            cv2.waitKey(1)
-            
             cv2.imshow('tail_resized', tail_overlay.overlay_processed(tracking['tail']))
             cv2.waitKey(1)
 
