@@ -42,10 +42,11 @@ class AnimalTracker_CPU(AnimalTracker):
     def preprocess(
         self,
         image: NDArray, 
+        background_image: Optional[NDArray], 
         centroid: Optional[NDArray] = None, # centroids in input space
         ) -> Optional[Preprocessing]:
         
-        return preprocess_image(image, centroid, self.tracking_param)
+        return preprocess_image(image, background_image, centroid, self.tracking_param)
 
     def track_resized(
             self,
@@ -53,7 +54,11 @@ class AnimalTracker_CPU(AnimalTracker):
         ) -> Optional[Tuple[Tracking, NDArray]]:
         
         tracking = Tracking(num_animals=self.tracking_param.num_animals)
-        mask = cv2.compare(preproc.image_processed, self.tracking_param.intensity, cv2.CMP_GT)
+        mask = cv2.compare(
+            preproc.image_processed, 
+            self.tracking_param.intensity, 
+            cv2.CMP_GT
+        )
         centroids_resized = bwareafilter_centroids_cv2(
             mask, 
             min_size = self.tracking_param.min_size_px,
@@ -96,9 +101,10 @@ class AnimalTracker_CPU(AnimalTracker):
     
     def track(
         self,
-        image: Optional[NDArray], # image in input space
+        image: NDArray, # image in input space
+        background_image: Optional[NDArray] = None,
         centroid: Optional[NDArray] = None, # centroid in global space
-        T_input_to_global: Optional[SimilarityTransform2D] = SimilarityTransform2D.identity() # input to global space transform
+        T_input_to_global: SimilarityTransform2D = SimilarityTransform2D.identity() # input to global space transform
     ) -> NDArray:
         
         centroid_in_input, T_global_to_input = self.transform_input_centroid(
@@ -106,16 +112,16 @@ class AnimalTracker_CPU(AnimalTracker):
             T_input_to_global
         )
 
-        preproc = self.preprocess(image, centroid_in_input) 
+        preproc = self.preprocess(image, background_image, centroid_in_input) 
         if preproc is None:
             return self.tracking_param.failed
         
         # Downsample image export (a bit easier on RAM). This is used for overlay instead of image_cropped
         # NOTE: it introduces a special case, not a big fan of this
         image_downsampled = cv2.resize(
-            preproc.image_cropped,
-            self.tracking_param.downsampled_shape[::-1], # transform shape (row, col) to width, height
-            cv2.INTER_NEAREST
+            src = preproc.image_cropped,
+            dsize = self.tracking_param.downsampled_shape[::-1], # transform shape (row, col) to width, height
+            interpolation = cv2.INTER_NEAREST
         )
         
         tracking_resized = self.track_resized(preproc)
@@ -236,8 +242,9 @@ class AnimalTrackerKalman(AnimalTracker_CPU):
     def track(
             self,
             image: NDArray, 
+            background_image: Optional[NDArray] = None, 
             centroid: Optional[NDArray] = None, # centroids in global space
-            T_input_to_global: Optional[SimilarityTransform2D] = SimilarityTransform2D.identity()
+            T_input_to_global: SimilarityTransform2D = SimilarityTransform2D.identity()
         ) -> NDArray:
 
         centroid_in_input, T_global_to_input = self.transform_input_centroid(
@@ -245,7 +252,7 @@ class AnimalTrackerKalman(AnimalTracker_CPU):
             T_input_to_global
         )
 
-        preproc = self.preprocess(image, centroid_in_input) 
+        preproc = self.preprocess(image, background_image, centroid_in_input) 
         if preproc is None:
             return self.return_prediction_if_tracking_failed(
                 preproc, # TODO this is None make sure it's ok
@@ -254,9 +261,9 @@ class AnimalTrackerKalman(AnimalTracker_CPU):
             )
         
         image_downsampled = cv2.resize(
-            preproc.image_cropped,
-            self.tracking_param.downsampled_shape[::-1], # transform shape (row, col) to width, height
-            cv2.INTER_NEAREST
+            src = preproc.image_cropped,
+            dsize = self.tracking_param.downsampled_shape[::-1], # transform shape (row, col) to width, height
+            interpolation = cv2.INTER_NEAREST
         )
         
         tracking_resized = self.track_resized(preproc)
