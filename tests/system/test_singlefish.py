@@ -20,11 +20,11 @@ DISPLAY_HEIGHT = 512
 VIDEOS = [
     ('toy_data/single_freelyswimming_504x500px_nobckg.avi', 40, None),
     ('toy_data/single_headembedded_544x380px_param_nobckg.avi', 90, None),
-    ('toy_data/freely_swimming_param.mp4', 40, None)
+    ('toy_data/freely_swimming_param.mp4', 40, 'toy_data/freely_swimming_param.png')
 ]
 
 # background subtracted video
-VIDEO_NUM = 0
+VIDEO_NUM = 2
 INPUT_VIDEO, PIX_PER_MM, BCKG_FILE = VIDEOS[VIDEO_NUM]
 
 video_reader = InMemory_OpenCV_VideoReader()

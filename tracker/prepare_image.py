@@ -156,7 +156,8 @@ def preprocess_image(
         image: NDArray, 
         background_image: NDArray,
         centroid: Optional[NDArray], 
-        params: ParamTracking
+        params: ParamTracking,
+        background_polarity: float = -1, # Put that in parameters?
     ) -> Optional[Preprocessing]:
         
     # crop -----------------------
@@ -181,7 +182,7 @@ def preprocess_image(
     # background subtraction on cropped/resized image 
     image_subtracted = resized.image_resized
     if resized.background_image_resized is not None:
-        image_subtracted -= resized.background_image_resized
+        image_subtracted = np.maximum(0, background_polarity * (resized.image_resized - resized.background_image_resized))
 
     # enhance --------------------
     image_processed = enhance(
