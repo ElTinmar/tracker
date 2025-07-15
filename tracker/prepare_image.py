@@ -6,13 +6,19 @@ from tracker.core import ParamTracking
 from image_tools import enhance
 from geometry import SimilarityTransform2D
 
-# TODO return bounding box?
+class Cropped(NamedTuple):
+    image_cropped: NDArray
+    background_image_cropped: Optional[NDArray]
+    T_cropped_to_input: SimilarityTransform2D
+    T_input_to_cropped: SimilarityTransform2D
+
 def crop(
         image: NDArray,
+        background_image: Optional[NDArray],
         crop_dimension_px: Tuple[int, int],
         vertical_offset_px: int = 0,
         centroid: Optional[NDArray] = None,
-    ) -> Optional[Tuple[NDArray, SimilarityTransform2D, SimilarityTransform2D]]:
+    ) -> Optional[Cropped]:
     """
     Crops a fixed-size region from an image, optionally centered around a given centroid.
 
@@ -27,7 +33,13 @@ def crop(
     """
 
     if crop_dimension_px == (0,0) or image.shape[:2] == crop_dimension_px[::-1]:
-        return image, SimilarityTransform2D.identity(), SimilarityTransform2D.identity()
+
+        return Cropped(
+            image, 
+            background_image, 
+            SimilarityTransform2D.identity(), 
+            SimilarityTransform2D.identity()
+        )
 
     if centroid is None:
         centroid = np.array(image.shape[:2]) // 2
@@ -50,20 +62,40 @@ def crop(
         image_cropped = np.zeros((h, w), dtype=image.dtype)
     else: 
         image_cropped = np.zeros((h, w, image.shape[-1]), dtype=image.dtype)
-
+    
     image_cropped[pad_bottom:h-pad_top, pad_left:w-pad_right] = image[
         bottom+pad_bottom:top-pad_top, 
         left+pad_left:right-pad_right
     ]
+    
+    background_image_cropped = None
+    if background_image is not None:
+        background_image_cropped = np.zeros_like(image_cropped)
+        background_image_cropped[pad_bottom:h-pad_top, pad_left:w-pad_right] = background_image[
+            bottom+pad_bottom:top-pad_top, 
+            left+pad_left:right-pad_right
+        ]
 
     T_cropped_to_input = SimilarityTransform2D.translation(left, bottom)
     T_input_to_cropped = SimilarityTransform2D.translation(-left, -bottom)
-    return image_cropped, T_cropped_to_input, T_input_to_cropped
+    return Cropped(
+        image_cropped, 
+        background_image_cropped, 
+        T_cropped_to_input, 
+        T_input_to_cropped
+    )
+
+class Resized(NamedTuple):
+    image_resized: NDArray 
+    background_image_resized: Optional[NDArray] 
+    T_resized_to_cropped: SimilarityTransform2D 
+    T_cropped_to_resized: SimilarityTransform2D
 
 def resize(
         image: NDArray,
+        background_image: Optional[NDArray],
         target_dimension_px: Tuple[int, int], 
-    ) -> Tuple[NDArray, SimilarityTransform2D, SimilarityTransform2D]:
+    ) -> Resized:
     """
     Resize an image to the specified dimensions.
 
@@ -76,7 +108,12 @@ def resize(
     """
 
     if image.shape[:2] == target_dimension_px[::-1]:
-        return image, SimilarityTransform2D.identity(), SimilarityTransform2D.identity()
+        return Resized(
+            image, 
+            background_image, 
+            SimilarityTransform2D.identity(), 
+            SimilarityTransform2D.identity()
+        )
 
     image_resized = cv2.resize(
         image, 
@@ -84,15 +121,29 @@ def resize(
         interpolation=cv2.INTER_NEAREST
     )
 
+    background_image_resized = None
+    if background_image is not None:
+        background_image_resized = cv2.resize(
+            background_image, 
+            target_dimension_px, 
+            interpolation=cv2.INTER_NEAREST
+        )
+
     s = image.shape[1] / target_dimension_px[0]
     T_resized_to_cropped =  SimilarityTransform2D.scaling(s)
     T_cropped_to_resized =  SimilarityTransform2D.scaling(1.0/s)
 
-    return image_resized, T_resized_to_cropped, T_cropped_to_resized
+    return Resized(
+        image_resized, 
+        background_image_resized, 
+        T_resized_to_cropped, 
+        T_cropped_to_resized
+    )
 
 class Preprocessing(NamedTuple):
     image_cropped: NDArray
     image_resized: NDArray
+    image_subtracted: NDArray
     image_processed: NDArray
     T_cropped_to_input: SimilarityTransform2D
     T_input_to_cropped: SimilarityTransform2D
@@ -101,35 +152,38 @@ class Preprocessing(NamedTuple):
 
 def preprocess_image(
         image: NDArray, 
+        background_image: Optional[NDArray],
         centroid: NDArray, 
         params: ParamTracking
     ) -> Optional[Preprocessing]:
         
     # crop -----------------------
-    cropping = crop(
+    cropped = crop(
         image = image,
+        background_image = background_image,
         crop_dimension_px = params.crop_dimension_px,
         vertical_offset_px = params.crop_offset_y_px,
         centroid = centroid
     )
     
-    if cropping is None:
+    if cropped is None:
         return None
 
-    image_cropped, T_cropped_to_input, T_input_to_cropped = cropping
-
     # resize ---------------------
-    image_resized, T_resized_to_cropped, T_cropped_to_resized = resize(
-        image = image_cropped,
+    resized = resize(
+        image = cropped.image_cropped,
+        background_image = cropped.background_image_cropped,
         target_dimension_px = params.resized_dimension_px, 
     )
 
-    # TODO: add background subtraction with resized / cropped background ?
-    # resize background once 
+    # background subtraction on cropped/resized image 
+    image_subtracted = resized.image_resized
+    if resized.background_image_resized is not None:
+        image_subtracted -= resized.background_image_resized
 
     # enhance --------------------
     image_processed = enhance(
-        image = image_resized,
+        image = image_subtracted,
         contrast = params.contrast,
         gamma = params.gamma,
         blur_size_px = params.blur_sz_px,
@@ -137,11 +191,12 @@ def preprocess_image(
     )
 
     return Preprocessing(
-        image_cropped, 
-        image_resized, 
+        cropped.image_cropped, 
+        resized.image_resized, 
+        image_subtracted,
         image_processed,
-        T_cropped_to_input,
-        T_input_to_cropped,
-        T_resized_to_cropped,
-        T_cropped_to_resized
+        cropped.T_cropped_to_input,
+        cropped.T_input_to_cropped,
+        resized.T_resized_to_cropped,
+        resized.T_cropped_to_resized
     )
