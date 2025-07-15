@@ -15,7 +15,7 @@ class Resolution:
 class ParamTracking:
     pix_per_mm: float = 30
     target_pix_per_mm: float = 30
-    crop_dimension_mm: Tuple[float, float] = (0, 0)
+    crop_dimension_mm: Tuple[float, float] = (0, 0) # (width, height)
     crop_offset_y_mm: float = 0
     gamma: float = 1
     contrast: float = 1

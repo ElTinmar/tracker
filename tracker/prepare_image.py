@@ -32,7 +32,7 @@ def crop(
         Optional[Tuple[NDArray, NDArray]]: (origin, cropped image), or None if invalid crop.
     """
 
-    if crop_dimension_px == (0,0) or image.shape[:2] == crop_dimension_px[::-1]:
+    if image.shape[:2] == crop_dimension_px[::-1]:
         
         return Cropped(
             image, 

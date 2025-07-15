@@ -107,6 +107,9 @@ class AnimalTracker_CPU(AnimalTracker):
         T_input_to_global: SimilarityTransform2D = SimilarityTransform2D.identity() # input to global space transform
     ) -> NDArray:
         
+        # TODO this is bit of a hack
+        self.tracking_param.crop_dimension_mm = (image.shape[1]/self.tracking_param.pix_per_mm, image.shape[0]/self.tracking_param.pix_per_mm) 
+
         if background_image is None:
             background_image = np.zeros_like(image)
         
