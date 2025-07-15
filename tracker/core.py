@@ -21,6 +21,7 @@ class ParamTracking:
     contrast: float = 1
     blur_sz_mm: float = 0
     median_filter_sz_mm: float = 0
+    background_polarity: float = -1
 
     def __post_init__(self):
         # when loading from JSON, tuples are converted to list
