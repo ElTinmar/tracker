@@ -22,8 +22,8 @@ class AnimalTrackerParamTracking(ParamTracking):
     @property
     def downsampled_shape(self) -> Tuple[int, int]:
         return (
-            int(2*((self.downsample_factor * self.crop_dimension_px[0])//2)),
-            int(2*((self.downsample_factor * self.crop_dimension_px[1])//2))
+            int(2*((self.downsample_factor * self.crop_dimension_px[1])//2)), # height
+            int(2*((self.downsample_factor * self.crop_dimension_px[0])//2))  # width
         ) 
 
     @property
