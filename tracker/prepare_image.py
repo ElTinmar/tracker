@@ -68,13 +68,11 @@ def crop(
         left+pad_left:right-pad_right
     ]
     
-    background_image_cropped = None
-    if background_image is not None:
-        background_image_cropped = np.zeros_like(image_cropped)
-        background_image_cropped[pad_bottom:h-pad_top, pad_left:w-pad_right] = background_image[
-            bottom+pad_bottom:top-pad_top, 
-            left+pad_left:right-pad_right
-        ]
+    background_image_cropped = np.zeros_like(image_cropped)
+    background_image_cropped[pad_bottom:h-pad_top, pad_left:w-pad_right] = background_image[
+        bottom+pad_bottom:top-pad_top, 
+        left+pad_left:right-pad_right
+    ]
 
     T_cropped_to_input = SimilarityTransform2D.translation(left, bottom)
     T_input_to_cropped = SimilarityTransform2D.translation(-left, -bottom)
