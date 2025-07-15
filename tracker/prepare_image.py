@@ -119,13 +119,11 @@ def resize(
         interpolation=cv2.INTER_NEAREST
     )
 
-    background_image_resized = None
-    if background_image is not None:
-        background_image_resized = cv2.resize(
-            background_image, 
-            target_dimension_px, 
-            interpolation=cv2.INTER_NEAREST
-        )
+    background_image_resized = cv2.resize(
+        background_image, 
+        target_dimension_px, 
+        interpolation=cv2.INTER_NEAREST
+    )
 
     s = image.shape[1] / target_dimension_px[0]
     T_resized_to_cropped =  SimilarityTransform2D.scaling(s)
