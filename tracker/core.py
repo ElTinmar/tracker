@@ -13,7 +13,6 @@ class Resolution:
     
 @dataclass
 class ParamTracking:
-    input_image_shape: Tuple[int, int] = (0, 0)
     pix_per_mm: float = 30
     target_pix_per_mm: float = 30
     crop_dimension_mm: Tuple[float, float] = (0, 0)
@@ -25,9 +24,6 @@ class ParamTracking:
 
     def __post_init__(self):
         # when loading from JSON, tuples are converted to list
-
-        if isinstance(self.input_image_shape, list):
-            self.input_image_shape = tuple(self.input_image_shape)
 
         if isinstance(self.crop_dimension_mm, list):
             self.crop_dimension_mm = tuple(self.crop_dimension_mm) 
@@ -56,28 +52,26 @@ class ParamTracking:
 
     @property
     def resized_dimension_px(self):
-        # some video codec require height, width to be divisible by 2
         if self.crop_dimension_mm == (0, 0): 
-            return (
-                2 * int(self.resize*self.input_image_shape[1]//2),
-                2 * int(self.resize*self.input_image_shape[0]//2)
-            ) 
-        else:
-            return (
-                2 * (self.target_mm2px(self.crop_dimension_mm[0])//2),
-                2 * (self.target_mm2px(self.crop_dimension_mm[1])//2)
-            ) 
+            raise ValueError('Please provide crop dimension')
+
+        # some video codec require height, width to be divisible by 2
+        return (
+            2 * (self.target_mm2px(self.crop_dimension_mm[0])//2),
+            2 * (self.target_mm2px(self.crop_dimension_mm[1])//2)
+        ) 
     
     @property
     def crop_dimension_px(self):
         # some video codec require height, width to be divisible by 2
         if self.crop_dimension_mm == (0, 0): 
-            return self.input_image_shape[::-1] #FIXME no longer necessarily divisible by 2
-        return (
-                2* (self.source_mm2px(self.crop_dimension_mm[0])//2),
-                2* (self.source_mm2px(self.crop_dimension_mm[1])//2)
-            ) 
+            raise ValueError('Please provide crop dimension')
         
+        return (
+            2* (self.source_mm2px(self.crop_dimension_mm[0])//2),
+            2* (self.source_mm2px(self.crop_dimension_mm[1])//2)
+        ) 
+    
 class Tracker(ABC):
     
     @abstractmethod

@@ -125,8 +125,7 @@ def preprocess_image(
     )
 
     # TODO: add background subtraction with resized / cropped background ?
-    # resize background once (depends on input_image_shape, which depends on
-    # first run?)
+    # resize background once 
 
     # enhance --------------------
     image_processed = enhance(
