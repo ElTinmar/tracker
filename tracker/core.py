@@ -58,8 +58,8 @@ class ParamTracking:
 
         # some video codec require height, width to be divisible by 2
         return (
-            2 * (self.target_mm2px(self.crop_dimension_mm[0])//2),
-            2 * (self.target_mm2px(self.crop_dimension_mm[1])//2)
+            2 * (self.target_mm2px(self.crop_dimension_mm[0])//2), # width
+            2 * (self.target_mm2px(self.crop_dimension_mm[1])//2)  # height
         ) 
     
     @property
@@ -69,8 +69,8 @@ class ParamTracking:
             raise ValueError('Please provide valid crop dimension (mm)')
         
         return (
-            2* (self.source_mm2px(self.crop_dimension_mm[0])//2),
-            2* (self.source_mm2px(self.crop_dimension_mm[1])//2)
+            2* (self.source_mm2px(self.crop_dimension_mm[0])//2), # width
+            2* (self.source_mm2px(self.crop_dimension_mm[1])//2)  # height
         ) 
     
 class Tracker(ABC):
