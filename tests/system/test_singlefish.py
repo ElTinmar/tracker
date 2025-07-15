@@ -1,4 +1,4 @@
-from video_tools import InMemory_OpenCV_VideoReader
+from video_tools import InMemory_OpenCV_VideoReader, StaticBackground
 from image_tools import im2single, im2gray
 from tracker import (
     SingleFishTracker_CPU, SingleFishOverlay_opencv, SingleFishTrackerParamTracking, SingleFishTrackerParamOverlay,
@@ -18,10 +18,11 @@ DISPLAY_HEIGHT = 1024
 # background subtracted video
 VIDEOS = [
     ('toy_data/single_freelyswimming_504x500px_nobckg.avi', 40),
-    ('toy_data/single_headembedded_544x380px_param_nobckg.avi', 90)
+    ('toy_data/single_headembedded_544x380px_param_nobckg.avi', 90),
+    ('toy_data/freely_swimming_param.mp4', 40)
 ]
 # background subtracted video
-VIDEO_NUM = 0
+VIDEO_NUM = 2
 INPUT_VIDEO, PIX_PER_MM = VIDEOS[VIDEO_NUM]
 
 video_reader = InMemory_OpenCV_VideoReader()
