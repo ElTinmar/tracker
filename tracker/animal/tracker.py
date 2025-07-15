@@ -95,7 +95,7 @@ class AnimalTracker_CPU(AnimalTracker):
         resolution.pix_per_mm_input = resolution.pix_per_mm_global * T_global_to_input.scale_factor
         resolution.pix_per_mm_cropped = resolution.pix_per_mm_input * preproc.T_input_to_cropped.scale_factor
         resolution.pix_per_mm_resized = resolution.pix_per_mm_cropped * preproc.T_cropped_to_resized.scale_factor
-        resolution.pix_per_mm_downsampled = resolution.pix_per_mm_input * self.tracking_param.downsample_factor
+        resolution.pix_per_mm_downsampled = resolution.pix_per_mm_cropped * self.tracking_param.downsample_factor
 
         return resolution
     

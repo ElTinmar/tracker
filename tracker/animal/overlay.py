@@ -35,7 +35,7 @@ class AnimalOverlay_opencv(AnimalOverlay):
         return self._overlay(
             centroids = tracking['centroids_cropped'],
             image = tracking['image_downsampled'],
-            pix_per_mm = tracking['pix_per_mm_cropped'],
+            pix_per_mm = tracking['pix_per_mm_downsampled'],
             transformation = S
         )
 
