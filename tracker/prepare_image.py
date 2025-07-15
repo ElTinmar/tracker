@@ -180,9 +180,7 @@ def preprocess_image(
     )
 
     # background subtraction on cropped/resized image 
-    image_subtracted = resized.image_resized
-    if resized.background_image_resized is not None:
-        image_subtracted = np.maximum(0, background_polarity * (resized.image_resized - resized.background_image_resized))
+    image_subtracted = np.maximum(0, background_polarity * (resized.image_resized - resized.background_image_resized))
 
     # enhance --------------------
     image_processed = enhance(
