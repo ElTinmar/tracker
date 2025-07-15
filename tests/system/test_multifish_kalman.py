@@ -56,6 +56,7 @@ animal_tracker = AnimalTrackerKalman(
     assignment=assignment,
     tracking_param = AnimalTrackerParamTracking(
         pix_per_mm=PIX_PER_MM,
+        crop_dimension_mm=(height/PIX_PER_MM, width/PIX_PER_MM),
         num_animals=num_animals,
         **ANIMAL_PARAM
     ),
