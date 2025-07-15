@@ -3,6 +3,8 @@ import cv2
 import time
 import matplotlib.pyplot as plt
 
+# IT'S BETTER TO DO BACKGROUND SUBTRACTION ON DOWNSAMPLED IMAGE
+
 # for reference: downsampling from 30ppm to 5ppm -> 6x
 n_repeats = 1000
 full_size = 2048
@@ -28,7 +30,7 @@ for factor in shrink_factors:
     new_size = int(full_size / factor)
     shape_resized = (new_size, new_size)
 
-    print(f'{factor=}')
+    print(f'{1/factor=}')
 
     start_resize = time.perf_counter()
     for _ in range(n_repeats):
