@@ -173,7 +173,7 @@ class EyesTrackerKalman(EyesTracker_CPU):
 
     def __init__(
             self, 
-            fps: int, 
+            fps: float, 
             model_order: int, 
             model_uncertainty: float = 0.2,
             measurement_uncertainty: float = 1.0,

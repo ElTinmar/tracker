@@ -166,7 +166,7 @@ class TailTrackerKalman(TailTracker_CPU):
 
     def __init__(
             self, 
-            fps: int, 
+            fps: float, 
             model_order: int, 
             model_uncertainty: float = 1.0,
             measurement_uncertainty: float = 1.0,
