@@ -2,7 +2,7 @@ from image_tools import  bwareafilter_props_cv2
 import numpy as np
 from numpy.typing import NDArray
 from typing import Optional, Tuple
-from .core import BodyTracker
+from .core import BodyTracker, BodyTrackerParamTracking
 from .utils import get_orientation, get_best_centroid_index
 from tracker.prepare_image import preprocess_image, Preprocessing
 from tracker.core import Resolution
@@ -60,10 +60,11 @@ class BodyTracker_CPU(BodyTracker):
     def preprocess(
         self,
         image: NDArray, 
+        background_image: NDArray, 
         centroid: Optional[NDArray] = None, # centroids in input space
         ) -> Optional[Tuple[Preprocessing, NDArray]]:
         
-        preproc = preprocess_image(image, centroid, self.tracking_param)
+        preproc = preprocess_image(image, background_image, centroid, self.tracking_param)
 
         if preproc is None:
             return None
@@ -79,7 +80,11 @@ class BodyTracker_CPU(BodyTracker):
             centroid_in_resized: Optional[NDArray] = None, # centroids in resized space
         ) -> Optional[Tuple[Tracking, NDArray]]:
 
-        mask = cv2.compare(preproc.image_processed, self.tracking_param.intensity, cv2.CMP_GT)
+        mask = cv2.compare(
+            preproc.image_processed, 
+            self.tracking_param.intensity, # type: ignore
+            cv2.CMP_GT
+        )
         props = bwareafilter_props_cv2(
             mask, 
             min_size = self.tracking_param.min_size_px,
@@ -135,8 +140,9 @@ class BodyTracker_CPU(BodyTracker):
     def track(
             self,
             image: NDArray, 
+            background_image: Optional[NDArray] = None,
             centroid: Optional[NDArray] = None, # centroids in global space
-            T_input_to_global: Optional[SimilarityTransform2D] = SimilarityTransform2D.identity()
+            T_input_to_global: SimilarityTransform2D = SimilarityTransform2D.identity()
         ) -> NDArray:
         '''
         centroid: centroid of the fish to track if it's already known.
@@ -147,12 +153,15 @@ class BodyTracker_CPU(BodyTracker):
             - scale of the full-resolution image, before resizing
         '''
 
+        if background_image is None:
+            background_image = np.zeros_like(image)
+
         centroid_in_input, T_global_to_input = self.transform_input_centroid(
             centroid,
             T_input_to_global
         )
 
-        preprocessing = self.preprocess(image, centroid_in_input)
+        preprocessing = self.preprocess(image, background_image, centroid_in_input)
         if preprocessing is None:
             return self.tracking_param.failed
         
@@ -183,6 +192,7 @@ class BodyTracker_CPU(BodyTracker):
                 mask, 
                 preproc.image_processed,
                 preproc.image_cropped,
+                preproc.background_image_cropped,
                 resolution.pix_per_mm_global,
                 resolution.pix_per_mm_input,
                 resolution.pix_per_mm_cropped,
@@ -284,16 +294,20 @@ class BodyTrackerKalman(BodyTracker_CPU):
     def track(
             self,
             image: NDArray, 
+            background_image: Optional[NDArray] = None,
             centroid: Optional[NDArray] = None, # centroids in global space
-            T_input_to_global: Optional[SimilarityTransform2D] = SimilarityTransform2D.identity()
+            T_input_to_global: SimilarityTransform2D = SimilarityTransform2D.identity()
         ) -> NDArray:
+
+        if background_image is None:
+            background_image = np.zeros_like(image)
 
         centroid_in_input, T_global_to_input = self.transform_input_centroid(
             centroid,
             T_input_to_global
         )
 
-        preprocessing = self.preprocess(image, centroid_in_input)
+        preprocessing = self.preprocess(image, background_image, centroid_in_input)
         if preprocessing is None:
             return self.return_prediction_if_tracking_failed(
                 preproc, #FIXME this is not decalred here (ZebVR Issue #48)

@@ -42,7 +42,7 @@ class AnimalTracker_CPU(AnimalTracker):
     def preprocess(
         self,
         image: NDArray, 
-        background_image: Optional[NDArray], 
+        background_image: NDArray, 
         centroid: Optional[NDArray] = None, # centroids in input space
         ) -> Optional[Preprocessing]:
         
@@ -56,9 +56,9 @@ class AnimalTracker_CPU(AnimalTracker):
         tracking = Tracking(num_animals=self.tracking_param.num_animals)
         mask = cv2.compare(
             preproc.image_processed, 
-            self.tracking_param.intensity, 
+            self.tracking_param.intensity, # type: ignore
             cv2.CMP_GT
-        )
+        ) 
         centroids_resized = bwareafilter_centroids_cv2(
             mask, 
             min_size = self.tracking_param.min_size_px,
@@ -106,6 +106,9 @@ class AnimalTracker_CPU(AnimalTracker):
         centroid: Optional[NDArray] = None, # centroid in global space
         T_input_to_global: SimilarityTransform2D = SimilarityTransform2D.identity() # input to global space transform
     ) -> NDArray:
+        
+        if background_image is None:
+            background_image = np.zeros_like(image)
         
         centroid_in_input, T_global_to_input = self.transform_input_centroid(
             centroid,
@@ -246,6 +249,9 @@ class AnimalTrackerKalman(AnimalTracker_CPU):
             centroid: Optional[NDArray] = None, # centroids in global space
             T_input_to_global: SimilarityTransform2D = SimilarityTransform2D.identity()
         ) -> NDArray:
+
+        if background_image is None:
+            background_image = np.zeros_like(image)
 
         centroid_in_input, T_global_to_input = self.transform_input_centroid(
             centroid,

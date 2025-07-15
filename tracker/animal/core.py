@@ -92,7 +92,7 @@ class AnimalTrackerParamOverlay:
     
 class Assignment(Protocol):
 
-    def update(self, centroids: NDArray) -> Tuple[NDArray, NDArray]:
+    def update(self, centroids: NDArray) -> NDArray:
         ...
 
 class AnimalTracker(Tracker):

@@ -36,10 +36,11 @@ class EyesTracker_CPU(EyesTracker):
     def preprocess(
         self,
         image: NDArray, 
+        background_image: NDArray, 
         centroid: Optional[NDArray] = None, # centroids in input space
         ) -> Optional[Preprocessing]:
         
-        return preprocess_image(image, centroid, self.tracking_param)
+        return preprocess_image(image, background_image, centroid, self.tracking_param)
 
 
     def track_resized(
@@ -114,8 +115,9 @@ class EyesTracker_CPU(EyesTracker):
     def track(
             self,
             image: NDArray, 
-            centroid: Optional[NDArray], 
-            T_input_to_global: Optional[SimilarityTransform2D] = SimilarityTransform2D.identity()
+            background_image: Optional[NDArray] = None, 
+            centroid: Optional[NDArray] = None, 
+            T_input_to_global: SimilarityTransform2D = SimilarityTransform2D.identity()
         ) -> NDArray:
         """
         output coordinates: 
@@ -123,12 +125,15 @@ class EyesTracker_CPU(EyesTracker):
             - scale of the full-resolution image, before resizing
         """
 
+        if background_image is None:
+            background_image = np.zeros_like(image)
+
         centroid_in_input, T_global_to_input = self.transform_input_centroid(
             centroid,
             T_input_to_global
         )
 
-        preproc = self.preprocess(image, centroid_in_input) 
+        preproc = self.preprocess(image, background_image, centroid_in_input) 
         if preproc is None:
             return self.tracking_param.failed
         
@@ -256,16 +261,20 @@ class EyesTrackerKalman(EyesTracker_CPU):
     def track(
             self,
             image: NDArray, 
+            background_image: Optional[NDArray] = None,
             centroid: Optional[NDArray] = None, # centroids in global space
-            T_input_to_global: Optional[SimilarityTransform2D] = SimilarityTransform2D.identity()
+            T_input_to_global: SimilarityTransform2D = SimilarityTransform2D.identity()
         ) -> NDArray:
 
+        if background_image is None:
+            background_image = np.zeros_like(image)
+            
         centroid_in_input, T_global_to_input = self.transform_input_centroid(
             centroid,
             T_input_to_global
         )
 
-        preproc = self.preprocess(image, centroid_in_input) 
+        preproc = self.preprocess(image, background_image, centroid_in_input) 
         if preproc is None:
             return self.return_prediction_if_tracking_failed(
                 preproc, #TODO this is None, make sure its p

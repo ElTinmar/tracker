@@ -26,7 +26,7 @@ class ParamTracking:
         # when loading from JSON, tuples are converted to list
 
         if isinstance(self.crop_dimension_mm, list):
-            self.crop_dimension_mm = tuple(self.crop_dimension_mm) 
+            self.crop_dimension_mm = tuple(self.crop_dimension_mm) # type: ignore
 
     def target_mm2px(self, val_mm: float) -> int:
         return int(val_mm * self.target_pix_per_mm) 
@@ -78,11 +78,13 @@ class Tracker(ABC):
     def track(
             self, 
             image: NDArray,
+            background_image: Optional[NDArray], 
             centroid: Optional[NDArray],
-            T_input_to_global: Optional[SimilarityTransform2D]
+            T_input_to_global: SimilarityTransform2D
         ) -> NDArray:
         '''
-        image: image to track, preferably background subtracted
+        image: image to track,
+        background_image: used for background subtraction
         centroid: centroid of object to track if known 
         T_input_to_global: 3x3 coordinate transformation matrix from image coordinates to global coordinates
         return numpy structured array

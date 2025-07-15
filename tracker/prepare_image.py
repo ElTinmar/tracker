@@ -8,13 +8,13 @@ from geometry import SimilarityTransform2D
 
 class Cropped(NamedTuple):
     image_cropped: NDArray
-    background_image_cropped: Optional[NDArray]
+    background_image_cropped: NDArray
     T_cropped_to_input: SimilarityTransform2D
     T_input_to_cropped: SimilarityTransform2D
 
 def crop(
         image: NDArray,
-        background_image: Optional[NDArray],
+        background_image: NDArray,
         crop_dimension_px: Tuple[int, int],
         vertical_offset_px: int = 0,
         centroid: Optional[NDArray] = None,
@@ -33,7 +33,7 @@ def crop(
     """
 
     if crop_dimension_px == (0,0) or image.shape[:2] == crop_dimension_px[::-1]:
-
+        
         return Cropped(
             image, 
             background_image, 
@@ -87,13 +87,13 @@ def crop(
 
 class Resized(NamedTuple):
     image_resized: NDArray 
-    background_image_resized: Optional[NDArray] 
+    background_image_resized: NDArray
     T_resized_to_cropped: SimilarityTransform2D 
     T_cropped_to_resized: SimilarityTransform2D
 
 def resize(
         image: NDArray,
-        background_image: Optional[NDArray],
+        background_image: NDArray,
         target_dimension_px: Tuple[int, int], 
     ) -> Resized:
     """
@@ -142,7 +142,9 @@ def resize(
 
 class Preprocessing(NamedTuple):
     image_cropped: NDArray
+    background_image_cropped: NDArray
     image_resized: NDArray
+    background_image_resized: NDArray
     image_subtracted: NDArray
     image_processed: NDArray
     T_cropped_to_input: SimilarityTransform2D
@@ -152,7 +154,7 @@ class Preprocessing(NamedTuple):
 
 def preprocess_image(
         image: NDArray, 
-        background_image: Optional[NDArray],
+        background_image: NDArray,
         centroid: Optional[NDArray], 
         params: ParamTracking
     ) -> Optional[Preprocessing]:
@@ -191,8 +193,10 @@ def preprocess_image(
     )
 
     return Preprocessing(
-        cropped.image_cropped, 
+        cropped.image_cropped,
+        cropped.background_image_cropped, 
         resized.image_resized, 
+        resized.background_image_resized, 
         image_subtracted,
         image_processed,
         cropped.T_cropped_to_input,
