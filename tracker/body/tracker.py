@@ -28,7 +28,7 @@ class BodyTracker_CPU(BodyTracker):
 
     def __init__(
         self, 
-        fps: Optional[int] = None, 
+        fps: Optional[float] = None, 
         history_sec: float = 0.2,
         *args, 
         **kwargs
