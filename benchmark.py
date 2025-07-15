@@ -22,11 +22,12 @@ end_full = time.perf_counter()
 avg_time_full = (end_full - start_full) / n_repeats
 
 # --- Benchmark resize then subtract ---
-img1_small = cv2.resize(img1, shape_resized, interpolation=cv2.INTER_NEAREST)
+#img1_small = cv2.resize(img1, shape_resized, interpolation=cv2.INTER_NEAREST)
 
 start_resize = time.perf_counter()
 for _ in range(n_repeats):
     img2_small = cv2.resize(img2, shape_resized, interpolation=cv2.INTER_NEAREST)
+    img1_small = cv2.resize(img1, shape_resized, interpolation=cv2.INTER_NEAREST)
     diff_small = img1_small - img2_small
 end_resize = time.perf_counter()
 avg_time_resize = (end_resize - start_resize) / n_repeats
