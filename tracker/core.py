@@ -53,7 +53,7 @@ class ParamTracking:
     @property
     def resized_dimension_px(self):
         if self.crop_dimension_mm == (0, 0): 
-            raise ValueError('Please provide crop dimension')
+            raise ValueError('Please provide valid crop dimension (mm)')
 
         # some video codec require height, width to be divisible by 2
         return (
@@ -65,7 +65,7 @@ class ParamTracking:
     def crop_dimension_px(self):
         # some video codec require height, width to be divisible by 2
         if self.crop_dimension_mm == (0, 0): 
-            raise ValueError('Please provide crop dimension')
+            raise ValueError('Please provide valid crop dimension (mm)')
         
         return (
             2* (self.source_mm2px(self.crop_dimension_mm[0])//2),
