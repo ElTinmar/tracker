@@ -187,7 +187,8 @@ def preprocess_image(
         contrast = params.contrast,
         gamma = params.gamma,
         blur_size_px = params.blur_sz_px,
-        medfilt_size_px = params.median_filter_sz_px
+        medfilt_size_px = params.median_filter_sz_px,
+        clip = False
     )
 
     return Preprocessing(
