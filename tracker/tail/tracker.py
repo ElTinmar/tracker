@@ -113,6 +113,8 @@ class TailTracker_CPU(TailTracker):
             - scale of the full-resolution image, before resizing
         """
         
+        self.tracking_param.input_image_dtype = image.dtype
+
         # only work with one channel
         image = im2gray(image)
 
@@ -264,6 +266,8 @@ class TailTrackerKalman(TailTracker_CPU):
             T_input_to_global: SimilarityTransform2D = SimilarityTransform2D.identity()
         ) -> NDArray:
 
+        self.tracking_param.input_image_dtype = image.dtype
+        
         # only work with one channel
         image = im2gray(image)
         

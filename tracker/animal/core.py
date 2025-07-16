@@ -2,7 +2,7 @@ from typing import Protocol, Tuple
 from dataclasses import dataclass
 from tracker.core import Tracker, TrackingOverlay
 import numpy as np
-from numpy.typing import NDArray
+from numpy.typing import NDArray, DTypeLike
 from tracker.core import ParamTracking
 import cv2
 from .assignment import NoAssignment
@@ -62,7 +62,7 @@ class AnimalTrackerParamTracking(ParamTracking):
             ('downsample_ratio', np.float32),
             ('mask', np.bool_, self.resized_dimension_px[::-1]),
             ('image_processed', np.float32, self.resized_dimension_px[::-1]),
-            ('image_downsampled', np.float32, self.downsampled_shape),
+            ('image_downsampled', self.input_image_dtype, self.downsampled_shape),
             ('pix_per_mm_global', np.float32),
             ('pix_per_mm_input', np.float32),
             ('pix_per_mm_cropped', np.float32),

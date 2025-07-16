@@ -126,6 +126,8 @@ class EyesTracker_CPU(EyesTracker):
             - scale of the full-resolution image, before resizing
         """
 
+        self.tracking_param.input_image_dtype = image.dtype
+        
         # only work with one channel
         image = im2gray(image)
 
@@ -269,6 +271,8 @@ class EyesTrackerKalman(EyesTracker_CPU):
             centroid: Optional[NDArray] = None, # centroids in global space
             T_input_to_global: SimilarityTransform2D = SimilarityTransform2D.identity()
         ) -> NDArray:
+
+        self.tracking_param.input_image_dtype = image.dtype
 
         # only work with one channel
         image = im2gray(image)

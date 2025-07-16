@@ -14,7 +14,7 @@ class SingleFishTracker_CPU(SingleFishTracker):
             centroid: Optional[NDArray] = None,
             T_input_to_global: SimilarityTransform2D = SimilarityTransform2D.identity()
         ) -> NDArray:
-
+        
         # only work with one channel
         image = im2gray(image)
 

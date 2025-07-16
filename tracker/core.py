@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from numpy.typing import NDArray 
+from numpy.typing import NDArray, DTypeLike
+import numpy as np
 from typing import Optional, Tuple
 from geometry import SimilarityTransform2D
 
@@ -22,6 +23,7 @@ class ParamTracking:
     blur_sz_mm: float = 0
     median_filter_sz_mm: float = 0
     background_polarity: float = -1
+    input_image_dtype: DTypeLike = np.uint8
 
     def __post_init__(self):
         # when loading from JSON, tuples are converted to list

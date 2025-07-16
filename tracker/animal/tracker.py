@@ -109,6 +109,7 @@ class AnimalTracker_CPU(AnimalTracker):
         
         # TODO this is bit of a hack
         self.tracking_param.crop_dimension_mm = (image.shape[1]/self.tracking_param.pix_per_mm, image.shape[0]/self.tracking_param.pix_per_mm) 
+        self.tracking_param.input_image_dtype = image.dtype
         
         # only work with one channel
         image = im2gray(image)
@@ -258,6 +259,7 @@ class AnimalTrackerKalman(AnimalTracker_CPU):
 
         # only work with one channel
         image = im2gray(image)
+        self.tracking_param.input_image_dtype = image.dtype
         
         if background_image is None:
             background_image = np.zeros_like(image)

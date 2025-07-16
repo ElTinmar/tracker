@@ -84,8 +84,8 @@ def crop(
     )
 
 class Resized(NamedTuple):
-    image_resized: NDArray 
-    background_image_resized: NDArray
+    image_resized: NDArray[np.float32] 
+    background_image_resized: NDArray[np.float32]
     T_resized_to_cropped: SimilarityTransform2D 
     T_cropped_to_resized: SimilarityTransform2D
 
@@ -107,8 +107,8 @@ def resize(
 
     if image.shape[:2] == target_dimension_px[::-1]:
         return Resized(
-            image, 
-            background_image, 
+            im2single(image), 
+            im2single(background_image), 
             SimilarityTransform2D.identity(), 
             SimilarityTransform2D.identity()
         )
@@ -143,10 +143,10 @@ def resize(
 class Preprocessing(NamedTuple):
     image_cropped: NDArray
     background_image_cropped: NDArray
-    image_resized: NDArray
-    background_image_resized: NDArray
-    image_subtracted: NDArray
-    image_processed: NDArray
+    image_resized: NDArray[np.float32]
+    background_image_resized: NDArray[np.float32]
+    image_subtracted: NDArray[np.float32]
+    image_processed: NDArray[np.float32]
     T_cropped_to_input: SimilarityTransform2D
     T_input_to_cropped: SimilarityTransform2D
     T_resized_to_cropped: SimilarityTransform2D
