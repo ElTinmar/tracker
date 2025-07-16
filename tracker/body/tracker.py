@@ -159,6 +159,7 @@ class BodyTracker_CPU(BodyTracker):
 
         if background_image is None:
             background_image = np.zeros_like(image)
+        background_image = im2gray(background_image)
 
         centroid_in_input, T_global_to_input = self.transform_input_centroid(
             centroid,
@@ -310,6 +311,7 @@ class BodyTrackerKalman(BodyTracker_CPU):
 
         if background_image is None:
             background_image = np.zeros_like(image)
+        background_image = im2gray(background_image)
 
         centroid_in_input, T_global_to_input = self.transform_input_centroid(
             centroid,

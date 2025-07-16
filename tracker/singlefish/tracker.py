@@ -20,6 +20,7 @@ class SingleFishTracker_CPU(SingleFishTracker):
 
         if background_image is None:
             background_image = np.zeros_like(image)
+        background_image = im2gray(background_image)
         
         # get animal centroids (only crude location is necessary)
         animals = self.tracking_param.animal.track(
