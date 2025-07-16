@@ -21,6 +21,8 @@ class SingleFishTracker_CPU(SingleFishTracker):
         if background_image is None:
             background_image = np.zeros_like(image)
         
+        print(f'before {image.max(), image.min(), background_image.max(), background_image.min()}')
+
         # get animal centroids (only crude location is necessary)
         animals = self.tracking_param.animal.track(
             image, 
@@ -28,6 +30,8 @@ class SingleFishTracker_CPU(SingleFishTracker):
             None, 
             T_input_to_global
         )
+
+        print(f'after {image.max(), image.min(), background_image.max(), background_image.min()}')
 
         if not animals['success']:
             return self.tracking_param.failed
