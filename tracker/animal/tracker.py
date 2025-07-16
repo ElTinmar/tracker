@@ -1,4 +1,4 @@
-from image_tools import bwareafilter_centroids_cv2
+from image_tools import bwareafilter_centroids_cv2, im2gray
 import numpy as np
 from numpy.typing import NDArray
 import cv2
@@ -109,6 +109,9 @@ class AnimalTracker_CPU(AnimalTracker):
         
         # TODO this is bit of a hack
         self.tracking_param.crop_dimension_mm = (image.shape[1]/self.tracking_param.pix_per_mm, image.shape[0]/self.tracking_param.pix_per_mm) 
+        
+        # only work with one channel
+        image = im2gray(image)
 
         if background_image is None:
             background_image = np.zeros_like(image)
@@ -253,6 +256,9 @@ class AnimalTrackerKalman(AnimalTracker_CPU):
             T_input_to_global: SimilarityTransform2D = SimilarityTransform2D.identity()
         ) -> NDArray:
 
+        # only work with one channel
+        image = im2gray(image)
+        
         if background_image is None:
             background_image = np.zeros_like(image)
 

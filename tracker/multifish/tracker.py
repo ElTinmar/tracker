@@ -1,7 +1,7 @@
 import numpy as np
 from typing import Optional, Tuple
 from numpy.typing import NDArray
-from image_tools import imrotate
+from image_tools import imrotate, im2gray
 from .core import MultiFishTracker
 from geometry import SimilarityTransform2D
 
@@ -14,6 +14,9 @@ class MultiFishTracker_CPU(MultiFishTracker):
             centroid: Optional[NDArray] = None,
             T_input_to_global: SimilarityTransform2D = SimilarityTransform2D.identity()
         ) -> NDArray:
+
+        # only work with one channel
+        image = im2gray(image)
 
         if background_image is None:
             background_image = np.zeros_like(image)

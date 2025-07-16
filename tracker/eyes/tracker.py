@@ -8,6 +8,7 @@ from tracker.prepare_image import preprocess_image, Preprocessing
 from tracker.core import Resolution
 from filterpy.common import kinematic_kf
 from dataclasses import dataclass
+from image_tools import im2gray
 
 @dataclass
 class Tracking:
@@ -124,6 +125,9 @@ class EyesTracker_CPU(EyesTracker):
             - (0,0) = fish centroid
             - scale of the full-resolution image, before resizing
         """
+
+        # only work with one channel
+        image = im2gray(image)
 
         if background_image is None:
             background_image = np.zeros_like(image)
@@ -266,6 +270,9 @@ class EyesTrackerKalman(EyesTracker_CPU):
             T_input_to_global: SimilarityTransform2D = SimilarityTransform2D.identity()
         ) -> NDArray:
 
+        # only work with one channel
+        image = im2gray(image)
+        
         if background_image is None:
             background_image = np.zeros_like(image)
             

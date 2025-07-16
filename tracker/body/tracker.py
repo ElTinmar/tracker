@@ -1,4 +1,4 @@
-from image_tools import  bwareafilter_props_cv2
+from image_tools import  bwareafilter_props_cv2, im2gray
 import numpy as np
 from numpy.typing import NDArray
 from typing import Optional, Tuple
@@ -153,6 +153,9 @@ class BodyTracker_CPU(BodyTracker):
             - scale of the full-resolution image, before resizing
         '''
 
+        # only work with one channel
+        image = im2gray(image)
+
         if background_image is None:
             background_image = np.zeros_like(image)
 
@@ -298,6 +301,9 @@ class BodyTrackerKalman(BodyTracker_CPU):
             centroid: Optional[NDArray] = None, # centroids in global space
             T_input_to_global: SimilarityTransform2D = SimilarityTransform2D.identity()
         ) -> NDArray:
+        
+        # only work with one channel
+        image = im2gray(image)
 
         if background_image is None:
             background_image = np.zeros_like(image)

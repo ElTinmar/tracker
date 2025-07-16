@@ -3,7 +3,7 @@ import numpy as np
 from numpy.typing import NDArray
 import cv2
 from tracker.core import ParamTracking
-from image_tools import enhance
+from image_tools import enhance, im2single
 from geometry import SimilarityTransform2D
 
 class Cropped(NamedTuple):
@@ -129,9 +129,13 @@ def resize(
     T_resized_to_cropped =  SimilarityTransform2D.scaling(s)
     T_cropped_to_resized =  SimilarityTransform2D.scaling(1.0/s)
 
+    # converting an image to float32 with values between 0 and 1 
+    # is very costly and can become the main bottleneck at high framerates
+    # and high resolution. We keep integer images as long as we can
+    # and convert resized images only.
     return Resized(
-        image_resized, 
-        background_image_resized, 
+        im2single(image_resized), 
+        im2single(background_image_resized), 
         T_resized_to_cropped, 
         T_cropped_to_resized
     )
