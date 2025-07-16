@@ -35,8 +35,8 @@ def crop(
     if image.shape[:2] == crop_dimension_px[::-1]:
         
         return Cropped(
-            image, 
-            background_image, 
+            image.copy(), 
+            background_image.copy(), 
             SimilarityTransform2D.identity(), 
             SimilarityTransform2D.identity()
         )
