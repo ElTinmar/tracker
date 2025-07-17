@@ -32,18 +32,16 @@ class FaceTracker(Tracker):
     ) -> NDArray:
 
         image = im2gray(image)     
-                
+
         # detect face
         faces = face_classifier.detectMultiScale(image, scaleFactor=1.2, minNeighbors=5)
         if len(faces) != 1:
-            print(f'faces detected {len(faces)}')
             return failure
                
         x, y, w, h = faces[0]
         faceROI = image[y:y+h,x:x+w]
         eyes = eyes_classifier.detectMultiScale(faceROI)
         if len(eyes) != 2:
-            print(f'eyes detected {len(eyes)}')
             return failure
         
         eye_centroids = np.zeros((2,2), dtype=np.float32)
