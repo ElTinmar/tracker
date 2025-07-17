@@ -6,6 +6,9 @@ from geometry import SimilarityTransform2D
 from image_tools import im2gray
 from .core import Tracker
 
+# NOTE: Haar cascades work poorly with tilted heads
+# Use Google's mediapipe?
+
 face_classifier = cv2.CascadeClassifier(cv2.data.haarcascades+"haarcascade_frontalface_alt2.xml")
 eyes_classifier =  cv2.CascadeClassifier(cv2.data.haarcascades+"haarcascade_eye_tree_eyeglasses.xml")
 dt = np.dtype([
