@@ -1,9 +1,9 @@
-from image_tools import  bwareafilter_props_cv2, im2gray
+from image_tools import filter_contours, filter_connected_comp,  im2gray
 import numpy as np
 from numpy.typing import NDArray
 from typing import Optional, Tuple
 from .core import BodyTracker, BodyTrackerParamTracking
-from .utils import get_orientation, get_best_centroid_index
+from .utils import detect_flips, get_best_centroid_index
 from tracker.prepare_image import preprocess_image, Preprocessing
 from tracker.core import Resolution
 from tracker.kalman_utils import kalman_update_wrap_angle
@@ -85,33 +85,27 @@ class BodyTracker_CPU(BodyTracker):
             self.tracking_param.intensity, # type: ignore
             cv2.CMP_GT
         )
-        props = bwareafilter_props_cv2(
+        blobs = filter_connected_comp(
             mask, 
             min_size = self.tracking_param.min_size_px,
             max_size = self.tracking_param.max_size_px, 
-            min_length = self.tracking_param.min_length_px,
-            max_length = self.tracking_param.max_length_px,
-            min_width = self.tracking_param.min_width_px,
-            max_width = self.tracking_param.max_width_px
+            min_length = None if self.tracking_param.min_length_px == 0 else self.tracking_param.min_length_px,
+            max_length = None if self.tracking_param.max_length_px == 0 else self.tracking_param.max_length_px,
+            min_width = None if self.tracking_param.min_width_px == 0 else self.tracking_param.min_width_px,
+            max_width = None if self.tracking_param.max_width_px == 0 else self.tracking_param.max_width_px
         )
 
-        if not props:
+        if not blobs:
             return None
         
         tracking = Tracking()
         
-        centroids_resized = np.array([[blob.centroid[1], blob.centroid[0]] for blob in props]) #(row, col) to (x,y)
+        centroids_resized = np.array([blob.centroid for blob in blobs]) 
         index = get_best_centroid_index(centroids_resized, centroid_in_resized)
-        tracking.centroid_resized = centroids_resized[index]
-        
-        coordinates_resized = np.fliplr(props[index].coords)
 
-        # TODO maybe here pass preproc.image_processed and check intensity profile along main axis 
-        tracking.body_axes = get_orientation(coordinates_resized, self.heading_history) 
-        if tracking.body_axes is None:
-            return None
-        
-        tracking.angle_rad = np.arctan2(tracking.body_axes[1,1], tracking.body_axes[0,1])
+        tracking.centroid_resized = blobs[index].centroid
+        tracking.body_axes = detect_flips(blobs[index].axes, self.heading_history)
+        tracking.angle_rad = blobs[index].angle_rad
 
         return tracking, mask
         

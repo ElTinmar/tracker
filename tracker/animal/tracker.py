@@ -1,4 +1,4 @@
-from image_tools import bwareafilter_centroids_cv2, im2gray
+from image_tools import im2gray, filter_contours_centroids, filter_connected_comp_centroids, filter_floodfill_centroid
 import numpy as np
 from numpy.typing import NDArray
 import cv2
@@ -59,16 +59,16 @@ class AnimalTracker_CPU(AnimalTracker):
             self.tracking_param.intensity, # type: ignore
             cv2.CMP_GT
         ) 
-        centroids_resized = bwareafilter_centroids_cv2(
+        centroids_resized = filter_connected_comp_centroids(
             mask, 
             min_size = self.tracking_param.min_size_px,
             max_size = self.tracking_param.max_size_px, 
-            min_length = self.tracking_param.min_length_px,
-            max_length = self.tracking_param.max_length_px,
-            min_width = self.tracking_param.min_width_px,
-            max_width = self.tracking_param.max_width_px
+            min_length = None if self.tracking_param.min_length_px == 0 else self.tracking_param.min_length_px,
+            max_length = None if self.tracking_param.max_length_px == 0 else self.tracking_param.max_length_px,
+            min_width = None if self.tracking_param.min_width_px == 0 else self.tracking_param.min_width_px,
+            max_width = None if self.tracking_param.max_width_px == 0 else self.tracking_param.max_width_px
         )     
-        
+
         if centroids_resized.size == 0:
             return None
         
