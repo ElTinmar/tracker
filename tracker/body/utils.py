@@ -16,7 +16,7 @@ def get_best_centroid_index(
         distances = np.linalg.norm(centroids - centroid, axis=1)
         closest_idx = np.argmin(distances)
     
-    return closest_idx
+    return int(closest_idx)
 
 def detect_flips(body_axes: NDArray, heading_history: Optional[deque]) -> NDArray:
 
@@ -26,7 +26,7 @@ def detect_flips(body_axes: NDArray, heading_history: Optional[deque]) -> NDArra
         original_heading = body_axes[:,0].copy()
 
         if heading_history:
-            past_heading = np.mean(heading_history, axis=0)
+            past_heading = np.mean(np.asarray(heading_history), axis=0)
             if np.dot(past_heading, body_axes[:,0]) < 0:
                 body_axes[:,0] = - body_axes[:,0]
         
