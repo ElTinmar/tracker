@@ -2,18 +2,15 @@ name: tracker
 channels:
 - conda-forge
 dependencies:
-- python == 3.8
+- python >= 3.8
 - ipython
 - numpy
 - scipy
-- scikit-learn
 - tqdm
-- pandas
-- seaborn
 - pip
 - numba
 - pip:
-  - opencv-python
+  - opencv-python-headless
   - snakeviz
   - filterpy
   - git+https://github.com/ElTinmar/video_tools.git@main

@@ -88,8 +88,8 @@ if __name__ == "__main__":
         frame = cv2.circle(frame, c, 5, (0,0,255), -1)
         frame = cv2.line(frame, c, x, (0,0,255))
         frame = cv2.line(frame, c, y, (0,0,255))
-        cv2.imshow('face_tracking', frame)
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
+        # cv2.imshow('face_tracking', frame)
+        # if cv2.waitKey(1) & 0xFF == ord('q'):
+        #     break
 
     cam.release()
