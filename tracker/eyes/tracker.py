@@ -7,13 +7,13 @@ from geometry import SimilarityTransform2D, angle_between_vectors
 from tracker.prepare_image import preprocess_image, Preprocessing
 from tracker.core import Resolution
 from filterpy.common import kinematic_kf
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from image_tools import im2gray
 
 @dataclass
 class Tracking:
-    left_eye: NDArray = np.zeros((), dtype=DTYPE_EYE)
-    right_eye: NDArray = np.zeros((), dtype=DTYPE_EYE)
+    left_eye: NDArray = field(default_factory=lambda: np.zeros((), dtype=DTYPE_EYE))
+    right_eye: NDArray = field(default_factory=lambda: np.zeros((), dtype=DTYPE_EYE))
 
 class EyesTracker_CPU(EyesTracker):
 

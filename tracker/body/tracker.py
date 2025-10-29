@@ -11,16 +11,20 @@ from geometry import SimilarityTransform2D
 import cv2
 from filterpy.common import kinematic_kf
 from collections import deque
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+
+
+vec2 = lambda: np.zeros((2,), np.float32)
+mat2 = lambda: np.zeros((2,2), np.float32)
 
 @dataclass
 class Tracking:
-    centroid_resized: NDArray = np.zeros((2,), np.float32)
-    centroid_cropped: NDArray = np.zeros((2,), np.float32)
-    centroid_input: NDArray = np.zeros((2,), np.float32)
-    centroid_global: NDArray = np.zeros((2,), np.float32)
-    body_axes: NDArray = np.zeros((2,2), np.float32)
-    body_axes_global: NDArray = np.zeros((2,2), np.float32)
+    centroid_resized: NDArray = field(default_factory=vec2)
+    centroid_cropped: NDArray = field(default_factory=vec2)
+    centroid_input: NDArray = field(default_factory=vec2)
+    centroid_global: NDArray = field(default_factory=vec2)
+    body_axes: NDArray = field(default_factory=mat2)
+    body_axes_global: NDArray = field(default_factory=mat2)
     angle_rad: float = 0.0
     angle_rad_global: float = 0.0
 

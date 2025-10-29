@@ -4,15 +4,15 @@ from tracker.animal import AnimalOverlay, AnimalTracker, AnimalOverlay_opencv, A
 from tracker.body import BodyOverlay, BodyTracker, BodyOverlay_opencv, BodyTracker_CPU
 from tracker.eyes import EyesOverlay, EyesTracker, EyesOverlay_opencv, EyesTracker_CPU
 from tracker.tail import TailOverlay, TailTracker, TailOverlay_opencv, TailTracker_CPU
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 import numpy as np
 
 @dataclass
 class MultiFishTrackerParamTracking:
-    animal: AnimalTracker = AnimalTracker_CPU()
-    body: Optional[BodyTracker] = BodyTracker_CPU()
-    eyes: Optional[EyesTracker] = EyesTracker_CPU()
-    tail: Optional[TailTracker] = TailTracker_CPU()
+    animal: AnimalTracker = field(default_factory=AnimalTracker_CPU)
+    body: Optional[BodyTracker] = field(default_factory=BodyTracker_CPU)
+    eyes: Optional[EyesTracker] = field(default_factory=EyesTracker_CPU)
+    tail: Optional[TailTracker] = field(default_factory=TailTracker_CPU)
 
     @property
     def dtype(self) -> np.dtype:
@@ -52,10 +52,10 @@ class MultiFishTrackerParamTracking:
 
 @dataclass
 class MultiFishTrackerParamOverlay:
-    animal: AnimalOverlay = AnimalOverlay_opencv()
-    body: Optional[BodyOverlay] = BodyOverlay_opencv()
-    eyes: Optional[EyesOverlay] = EyesOverlay_opencv()
-    tail: Optional[TailOverlay] = TailOverlay_opencv()
+    animal: AnimalOverlay = field(default_factory=AnimalOverlay_opencv)
+    body: Optional[BodyOverlay] = field(default_factory=BodyOverlay_opencv)
+    eyes: Optional[EyesOverlay] = field(default_factory=EyesOverlay_opencv)
+    tail: Optional[TailOverlay] = field(default_factory=TailOverlay_opencv)
         
 class MultiFishTracker(Tracker):
 
