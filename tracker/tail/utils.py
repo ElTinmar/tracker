@@ -5,16 +5,6 @@ from numpy.typing import NDArray
 from typing import Tuple
 from numba import njit, float32, int64
 
-# prevents long import time
-def async_numba_compile(func, *args, **kwargs):
-    import threading
-    def _compile():
-        try:
-            func(*args, **kwargs)
-        except Exception:
-            pass
-    threading.Thread(target=_compile, daemon=True).start()
-
 def interpolate_skeleton(skeleton: NDArray, n_pts_interp: int) -> NDArray:
     '''
     Parametric interpolation
@@ -31,10 +21,10 @@ def interpolate_skeleton(skeleton: NDArray, n_pts_interp: int) -> NDArray:
 
     return skeleton_interp
 
-# @njit(
-#     (float32, int64, float32, float32, float32, int64, float32, float32[:, :], float32)
-# )
-@njit
+@njit(
+    (float32, int64, float32, float32, float32, int64, float32, float32[:, :], float32), 
+    cache=True
+)
 def get_skeleton_ball(
         arc_rad: float, 
         n_pts_arc: int,
@@ -84,8 +74,8 @@ def get_skeleton_ball(
     return points, angles
 
 # run once  with dummy inputs to trigger compilation on import
-async_numba_compile(
-    get_skeleton_ball,
+dummy_image = np.zeros((1,1), dtype=np.float32)
+get_skeleton_ball(
     0.0, 
     1, 
     0.0, 
