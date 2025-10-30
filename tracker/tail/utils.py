@@ -5,6 +5,7 @@ from numpy.typing import NDArray
 from typing import Tuple
 from numba import njit, float32, int64
 
+# prevents long import time
 def async_numba_compile(func, *args, **kwargs):
     import threading
     def _compile():
