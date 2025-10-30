@@ -31,9 +31,10 @@ def interpolate_skeleton(skeleton: NDArray, n_pts_interp: int) -> NDArray:
 
     return skeleton_interp
 
-@njit(
-    (float32, int64, float32, float32, float32, int64, float32, float32[:, :], float32)
-)
+# @njit(
+#     (float32, int64, float32, float32, float32, int64, float32, float32[:, :], float32)
+# )
+@njit
 def get_skeleton_ball(
         arc_rad: float, 
         n_pts_arc: int,
@@ -83,18 +84,18 @@ def get_skeleton_ball(
     return points, angles
 
 # run once  with dummy inputs to trigger compilation on import
-# async_numba_compile(
-#     get_skeleton_ball,
-#     0.0, 
-#     1, 
-#     0.0, 
-#     0.0, 
-#     0.0, 
-#     1, 
-#     0.0, 
-#     np.zeros((1,1), dtype=np.float32),
-#     0.0
-# )
+async_numba_compile(
+    get_skeleton_ball,
+    0.0, 
+    1, 
+    0.0, 
+    0.0, 
+    0.0, 
+    1, 
+    0.0, 
+    np.zeros((1,1), dtype=np.float32),
+    0.0
+)
 
 def tail_skeleton_ball(
         image: NDArray,
