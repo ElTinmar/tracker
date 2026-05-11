@@ -17,10 +17,10 @@ setup(
         "tqdm",
         "numba",
         "filterpy",
-        "video_tools @ git+https://github.com/ElTinmar/video_tools.git@main",
-        "image_tools @ git+https://github.com/ElTinmar/image_tools.git@main",
-        "qt_widgets @ git+https://github.com/ElTinmar/qt_widgets.git@main",
-        "geometry @ git+https://github.com/ElTinmar/geometry.git@main",
-        "kalman @ git+https://github.com/ElTinmar/Kalman.git@main"
+        "video_tools @ git+https://github.com/ElTinmar/video_tools.git@v0.6.4",
+        "image_tools @ git+https://github.com/ElTinmar/image_tools.git@v0.9.2",
+        "qt_widgets @ git+https://github.com/ElTinmar/qt_widgets.git@v0.5.0",
+        "geometry @ git+https://github.com/ElTinmar/geometry.git@v0.3.0",
+        "kalman @ git+https://github.com/ElTinmar/Kalman.git@v0.1.7"
     ]
 )
