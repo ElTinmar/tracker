@@ -8,7 +8,6 @@ code to track zebrafish larvae:
     - eyes angle and vergence
     - tail skeleton
 
-and associated qt widgets to set parameters
 
 ```
 pip install git+https://github.com/ElTinmar/tracker.git@main
