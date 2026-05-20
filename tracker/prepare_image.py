@@ -139,6 +139,7 @@ def resize(
         T_resized_to_cropped, 
         T_cropped_to_resized
     )
+    # TODO Maybe return integer image here, and convert to float only if necessary? 
 
 class Preprocessing(NamedTuple):
     image_cropped: NDArray
