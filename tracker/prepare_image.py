@@ -179,7 +179,8 @@ def preprocess_image(
         target_dimension_px = params.resized_dimension_px, 
     )
 
-    # background subtraction on cropped/resized image 
+    # background subtraction on cropped/resized image
+    # NOTE this allocates a new array
     image_subtracted = np.maximum(0, params.background_polarity * (resized.image_resized - resized.background_image_resized))
 
     # enhance --------------------
