@@ -12,7 +12,8 @@ ANIMAL_PARAM = {
     'blur_sz_mm': 0.6,
     'median_filter_sz_mm': 0,
     'downsample_factor': 0.90,
-    'crop_offset_y_mm': 0
+    'crop_offset_y_mm': 0,
+    'background_polarity': 1
 }
 
 BODY_PARAM = {
@@ -29,7 +30,8 @@ BODY_PARAM = {
     'blur_sz_mm': 0.6,
     'median_filter_sz_mm': 0,
     'crop_dimension_mm': (7.5,7.5),
-    'crop_offset_y_mm': 0
+    'crop_offset_y_mm': 0,
+    'background_polarity': 1
 }
 
 EYES_PARAM = {
@@ -44,7 +46,8 @@ EYES_PARAM = {
     'blur_sz_mm': 0.1,
     'median_filter_sz_mm': 0,
     'crop_dimension_mm': (1,1.5),
-    'crop_offset_y_mm': -0.25
+    'crop_offset_y_mm': -0.25,
+    'background_polarity': 1
 }
 
 TAIL_PARAM = {
@@ -60,5 +63,6 @@ TAIL_PARAM = {
     'contrast': 3.0,
     'gamma': 1.0,
     'crop_dimension_mm': (3.5,3.5),
-    'crop_offset_y_mm': 2
+    'crop_offset_y_mm': 2,
+    'background_polarity': 1
 }
