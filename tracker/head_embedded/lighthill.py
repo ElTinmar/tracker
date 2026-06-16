@@ -1,3 +1,5 @@
+# adapted from Demarchi et al 2025, https://doi.org/10.1073/pnas.2510385122
+
 import numpy as np
 from collections import deque
 from .core import PositionEstimator, Position
