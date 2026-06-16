@@ -20,7 +20,9 @@ class HeadEmbedded_ParamTracking:
 
         dt_list = [
             ('success', np.bool_),
-            ('')
+            ('predicted_x', np.float32),
+            ('predicted_y', np.float32),
+            ('predicted_theta', np.float32),
             ('tail', self.tail.tracking_param.dtype)
         ]
         

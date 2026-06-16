@@ -47,8 +47,7 @@ class HeadEmbeddedTracker_CPU(HeadEmbeddedTracker):
         )
 
         position = self.tracking_param.position_estimator.estimate(tail['skeleton_global'])
-
-        arr = (True, tail)
+        arr = (True, position.x, position.y, position.theta, tail)
         res = np.array(
             arr,
             dtype=self.tracking_param.dtype
