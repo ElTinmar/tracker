@@ -2,7 +2,7 @@
 
 import numpy as np
 from collections import deque
-from .core import PositionEstimator, Position
+from .estimator import PositionEstimator, Position
 
 def get_tip_center(tail_skeleton: np.ndarray) -> np.ndarray:
     return (tail_skeleton[-2, :] + tail_skeleton[-1, :]) / 2
@@ -27,14 +27,14 @@ class LighthillEstimator(PositionEstimator):
 
     def __init__(
             self, 
-            forward_gain: float, 
-            angular_gain: float, 
-            time_window_ms: int,
-            framerate: int,
-            tau: float,
-            x: float,
-            y: float,
-            theta: float
+            forward_gain: float = 1.0, 
+            angular_gain: float = 1.0, 
+            time_window_ms: int = 60,
+            framerate: int = 120,
+            tau: float = 0.0,
+            x: float = 0.0,
+            y: float = 0.0,
+            theta: float = 0.0
         ):
     
         self.forward_gain = forward_gain
