@@ -19,7 +19,7 @@ def raise_to_power(signal, exponent):
     return np.sign(signal)*np.abs(signal)**exponent
 
 def ewma(new: float, old: float, alpha: float) -> float:
-    return new*alpha +  old*(1.0 - alpha)
+    return new*alpha + old*(1.0 - alpha)
 
 class LighthillEstimator(DisplacementEstimator):
 
