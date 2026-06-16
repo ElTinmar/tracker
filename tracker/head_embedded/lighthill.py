@@ -1,12 +1,12 @@
 import numpy as np
 from collections import deque
-from .core import DisplacementEstimator, Displacement
+from .core import PositionEstimator, Position
 
 def get_tip_center(tail_skeleton: np.ndarray) -> np.ndarray:
-    return (tail_skeleton[:,-2] + tail_skeleton[:,-1])/2
+    return (tail_skeleton[-2, :] + tail_skeleton[-1, :]) / 2
 
 def get_tip_direction(tail_skeleton: np.ndarray) -> np.ndarray:
-    return tail_skeleton[:,-1] - tail_skeleton[:,-2]
+    return tail_skeleton[-1, :] - tail_skeleton[-2, :]
 
 def cross2d(x: np.ndarray, y: np.ndarray) -> float | np.ndarray:
     """Calculates the 2D cross product (scalar or array output)."""
@@ -21,7 +21,7 @@ def raise_to_power(signal, exponent):
 def ewma(new: float, old: float, alpha: float) -> float:
     return new*alpha + old*(1.0 - alpha)
 
-class LighthillEstimator(DisplacementEstimator):
+class LighthillEstimator(PositionEstimator):
 
     def __init__(
             self, 
@@ -29,7 +29,10 @@ class LighthillEstimator(DisplacementEstimator):
             angular_gain: float, 
             time_window_ms: int,
             framerate: int,
-            tau: float
+            tau: float,
+            x: float,
+            y: float,
+            theta: float
         ):
     
         self.forward_gain = forward_gain
@@ -44,9 +47,13 @@ class LighthillEstimator(DisplacementEstimator):
         self.torque_history = deque(maxlen=window)
         self.forward_speed = 0.0
         self.angular_speed = 0.0
+    
+        self.x = x
+        self.y = y
+        self.theta = theta
 
 
-    def estimate(self, tail_skeleton: np.ndarray) -> Displacement:
+    def estimate(self, tail_skeleton: np.ndarray) -> Position:
         """
         tail skeleton: (N,2) numpy array 
             origin should be the center of rotation (swim-bladder)
@@ -56,6 +63,9 @@ class LighthillEstimator(DisplacementEstimator):
 
         self.tip_center_history.append(get_tip_center(tail_skeleton))
         self.tip_direction_history.append(get_tip_direction(tail_skeleton))
+
+        if len(self.tip_center_history) < 3:
+            return Position(x=self.x, y=self.y, theta=self.theta)
 
         tip_velocity = 0.5*self.framerate*(self.tip_center_history[-1]-self.tip_center_history[0])
         tip_position = self.tip_center_history[1]
@@ -79,9 +89,12 @@ class LighthillEstimator(DisplacementEstimator):
         self.angular_speed = ewma(angular_speed, self.angular_speed, self.alpha)
 
         dt = 1.0 / self.framerate
-        res = Displacement(
-            forward_mm = self.forward_speed * dt,
-            angular_rad = self.angular_speed * dt
-        )
-        return res
+        forward_step_mm = self.forward_speed * dt
+        angular_step_rad = self.angular_speed * dt
+
+        self.x += forward_step_mm * np.cos(self.theta)
+        self.y += forward_step_mm * np.sin(self.theta)
+        self.theta += angular_step_rad
+
+        return Position(x=self.x, y=self.y, theta=self.theta)
 

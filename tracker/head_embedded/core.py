@@ -53,12 +53,13 @@ class HeadEmbeddedOverlay(TrackingOverlay):
         self.overlay_param = overlay_param 
 
 @dataclass
-class Displacement:
-    forward_mm: float
-    angular_rad: float
+class Position:
+    x: float
+    y: float
+    theta: float
 
-class DisplacementEstimator(ABC):
+class PositionEstimator(ABC):
 
     @abstractmethod
-    def estimate(self, tail_skeleton: np.ndarray) -> Displacement:
+    def estimate(self, tail_skeleton: np.ndarray) -> Position:
         ...
