@@ -5,7 +5,9 @@ from tracker import (
     AnimalTracker_CPU, AnimalOverlay_opencv, AnimalTrackerParamTracking, AnimalTrackerParamOverlay,
     BodyTracker_CPU, BodyOverlay_opencv, BodyTrackerParamTracking, BodyTrackerParamOverlay,
     EyesTracker_CPU, EyesOverlay_opencv, EyesTrackerParamTracking, EyesTrackerParamOverlay,
-    TailTracker_CPU, TailOverlay_opencv, TailTrackerParamTracking, TailTrackerParamOverlay
+    TailTracker_CPU, TailOverlay_opencv, TailTrackerParamTracking, TailTrackerParamOverlay,
+    HeadEmbeddedTracker_CPU, HeadEmbeddedOverlay_opencv, HeadEmbedded_ParamTracking, HeadEmbedded_ParamOverlay,
+    LighthillPredictor
 )
 from tqdm import tqdm
 import cv2
@@ -92,6 +94,14 @@ tracker = SingleFishTracker_CPU(
     )
 )
 
+predictor = LighthillPredictor(forward_gain=0.05, angular_gain=1.0, framerate=fps)
+head_embedded_tracker = HeadEmbeddedTracker_CPU(
+    tracking_param = HeadEmbedded_ParamTracking(
+        tail=tail_tracker,
+        position_predictor=predictor
+    )
+)
+
 overlay = SingleFishOverlay_opencv(
     SingleFishTrackerParamOverlay(
         animal_overlay,
@@ -100,6 +110,13 @@ overlay = SingleFishOverlay_opencv(
         tail_overlay
     )
 )
+head_embedded_overlay = HeadEmbeddedOverlay_opencv(
+    HeadEmbedded_ParamOverlay(tail_overlay)
+)
+
+
+data = np.zeros((num_frames,3), np.float32)
+pred = np.zeros((num_frames,3), np.float32)
 
 try:
     for i in tqdm(range(num_frames)):
@@ -112,6 +129,14 @@ try:
 
         # track
         tracking = tracker.track(frame, background_image)
+        head_embedded_tracking = head_embedded_tracker.track(tracking['tail']['image_cropped'])
+        
+        data[i,:2] = tracking['body']['centroid_global']
+        data[i,2] = tracking['body']['angle_rad_global']
+
+        pred[i,0] = head_embedded_tracking['predicted_x']
+        pred[i,1] = head_embedded_tracking['predicted_y']
+        pred[i,2] = head_embedded_tracking['predicted_theta']
 
         # display tracking
         if DISPLAY:
@@ -131,3 +156,7 @@ try:
 finally:
     video_reader.close()
     cv2.destroyAllWindows()
+
+###
+
+import matplotlib.pyplot as plt
