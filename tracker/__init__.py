@@ -5,5 +5,6 @@ from .eyes import *
 from .tail import *
 from .multifish import *
 from .singlefish import *
+from .head_embedded import *
 from .prepare_image import *
 #from .face_tracker import FaceTracker
