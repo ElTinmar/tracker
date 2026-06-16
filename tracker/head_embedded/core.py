@@ -1,3 +1,4 @@
+from abc import ABC, abstractmethod
 from tracker.core import Tracker, TrackingOverlay
 from tracker.tail import TailOverlay, TailTracker, TailOverlay_opencv, TailTracker_CPU
 from dataclasses import dataclass, field
@@ -9,6 +10,9 @@ class HeadEmbedded_ParamTracking:
     centroid_x: float = 0.0
     centroid_y: float = 0.0 
     heading_angle_rad: float = 0.0
+    initial_VR_x: float = 0.0
+    initial_VR_y: float = 0.0
+    initial_VR_theta: float = 0.0
 
     @property
     def dtype(self) -> np.dtype:
@@ -47,3 +51,14 @@ class HeadEmbeddedOverlay(TrackingOverlay):
         super().__init__()
 
         self.overlay_param = overlay_param 
+
+@dataclass
+class Displacement:
+    forward_mm: float
+    angular_rad: float
+
+class DisplacementEstimator(ABC):
+
+    @abstractmethod
+    def estimate(self, tail_skeleton: np.ndarray) -> Displacement:
+        ...
