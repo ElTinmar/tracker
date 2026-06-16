@@ -27,7 +27,7 @@ VIDEOS = [
 ]
 
 # background subtracted video
-VIDEO_NUM = 2
+VIDEO_NUM = 0
 INPUT_VIDEO, PIX_PER_MM, BCKG_FILE = VIDEOS[VIDEO_NUM]
 
 video_reader = InMemory_OpenCV_VideoReader()
@@ -95,7 +95,7 @@ tracker = SingleFishTracker_CPU(
     )
 )
 
-predictor = LighthillPredictor(forward_gain=0.05, angular_gain=1.0, framerate=fps)
+predictor = LighthillPredictor(forward_gain=0.05, angular_gain=0.01, framerate=fps)
 head_embedded_tracker = HeadEmbeddedTracker_CPU(
     tracking_param = HeadEmbedded_ParamTracking(
         tail=tail_tracker,
@@ -168,4 +168,16 @@ plt.plot(data)
 plt.show()
 
 plt.plot(pred)
+plt.show()
+
+plt.plot(data[:,0])
+plt.plot(pred[:,0])
+plt.show()
+
+plt.plot(data[:,1])
+plt.plot(pred[:,1])
+plt.show()
+
+plt.plot(data[:,2])
+plt.plot(pred[:,2])
 plt.show()
