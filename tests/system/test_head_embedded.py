@@ -14,6 +14,7 @@ import cv2
 from geometry import SimilarityTransform2D
 from tests.config import ANIMAL_PARAM, BODY_PARAM, EYES_PARAM, TAIL_PARAM
 import numpy as np
+from qt_widgets import imshow, waitKey, destroyAllWindows
 
 DISPLAY=True
 DISPLAY_HEIGHT = 512
@@ -150,13 +151,18 @@ try:
             # cv2.imshow('tail_cropped', tail_overlay.overlay_cropped(tracking['tail']))
             # cv2.imshow('body_resized', body_overlay.overlay_processed(tracking['body']))
             # cv2.imshow('eyes_resized', eyes_overlay.overlay_processed(tracking['eyes']))
-            # cv2.imshow('tail_resized', tail_overlay.overlay_processed(tracking['tail']))
-            # cv2.waitKey(1)
+            imshow('tail_resized', tail_overlay.overlay_processed(tracking['tail']))
+            waitKey(1)
 
 finally:
     video_reader.close()
-    cv2.destroyAllWindows()
+    destroyAllWindows()
 
 ###
 
 import matplotlib.pyplot as plt
+plt.plot(data)
+plt.show()
+
+plt.plot(pred)
+plt.show()
