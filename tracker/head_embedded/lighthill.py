@@ -34,9 +34,7 @@ class LighthillEstimator(DisplacementEstimator):
     
         self.forward_gain = forward_gain
         self.angular_gain = angular_gain
-        self.time_window_ms = time_window_ms
         self.framerate = framerate
-        self.tau = tau
         self.alpha = 1-np.exp(-1/(framerate*tau)) if tau > 0 else 1.0
 
         window = int(time_window_ms/1000 * framerate)
