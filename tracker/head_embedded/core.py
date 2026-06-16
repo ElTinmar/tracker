@@ -5,14 +5,24 @@ from dataclasses import dataclass, field
 import numpy as np
 
 @dataclass
+class Position:
+    x: float
+    y: float
+    theta: float
+
+class PositionEstimator(ABC):
+
+    @abstractmethod
+    def estimate(self, tail_skeleton: np.ndarray) -> Position:
+        ...
+
+@dataclass
 class HeadEmbedded_ParamTracking:
     tail: TailTracker = field(default_factory=TailTracker_CPU)
+    position_estimator: PositionEstimator
     centroid_x: float = 0.0
     centroid_y: float = 0.0 
     heading_angle_rad: float = 0.0
-    initial_VR_x: float = 0.0
-    initial_VR_y: float = 0.0
-    initial_VR_theta: float = 0.0
 
     @property
     def dtype(self) -> np.dtype:
@@ -52,14 +62,3 @@ class HeadEmbeddedOverlay(TrackingOverlay):
 
         self.overlay_param = overlay_param 
 
-@dataclass
-class Position:
-    x: float
-    y: float
-    theta: float
-
-class PositionEstimator(ABC):
-
-    @abstractmethod
-    def estimate(self, tail_skeleton: np.ndarray) -> Position:
-        ...

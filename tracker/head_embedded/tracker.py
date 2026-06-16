@@ -46,7 +46,7 @@ class HeadEmbeddedTracker_CPU(HeadEmbeddedTracker):
             T_image_rot_to_global
         )
 
-        position = self.tracking_param.displacement_estimator.estimate(tail['skeleton_global'])
+        position = self.tracking_param.position_estimator.estimate(tail['skeleton_global'])
 
         arr = (True, tail)
         res = np.array(
