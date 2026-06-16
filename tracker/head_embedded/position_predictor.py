@@ -8,7 +8,7 @@ class Position:
     y: float
     theta: float
 
-class PositionEstimator(ABC):
+class PositionPredictor(ABC):
 
     @abstractmethod
     def estimate(self, tail_skeleton: np.ndarray) -> Position:

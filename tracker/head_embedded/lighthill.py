@@ -2,7 +2,7 @@
 
 import numpy as np
 from collections import deque
-from .estimator import PositionEstimator, Position
+from .position_predictor import PositionPredictor, Position
 
 def get_tip_center(tail_skeleton: np.ndarray) -> np.ndarray:
     return (tail_skeleton[-2, :] + tail_skeleton[-1, :]) / 2
@@ -23,7 +23,7 @@ def raise_to_power(signal, exponent):
 def ewma(new: float, old: float, alpha: float) -> float:
     return new*alpha + old*(1.0 - alpha)
 
-class LighthillEstimator(PositionEstimator):
+class LighthillPredictor(PositionPredictor):
 
     def __init__(
             self, 

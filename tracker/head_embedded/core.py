@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
 from tracker.core import Tracker, TrackingOverlay
 from tracker.tail import TailOverlay, TailTracker, TailOverlay_opencv, TailTracker_CPU
-from .estimator import PositionEstimator
-from .lighthill import LighthillEstimator
+from .position_predictor import PositionPredictor
+from .lighthill import LighthillPredictor
 from dataclasses import dataclass, field
 import numpy as np
 
@@ -10,7 +10,7 @@ import numpy as np
 @dataclass
 class HeadEmbedded_ParamTracking:
     tail: TailTracker = field(default_factory=TailTracker_CPU)
-    position_estimator: PositionEstimator = field(default_factory=LighthillEstimator)
+    position_estimator: PositionPredictor = field(default_factory=LighthillPredictor)
     centroid_x: float = 0.0
     centroid_y: float = 0.0 
     heading_angle_rad: float = 0.0
