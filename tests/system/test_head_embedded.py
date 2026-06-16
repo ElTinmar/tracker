@@ -132,8 +132,8 @@ try:
         tracking = tracker.track(frame, background_image)
         head_embedded_tracking = head_embedded_tracker.track(tracking['tail']['image_cropped'])
         
-        data[i,:2] = tracking['body']['centroid_global']
-        data[i,2] = tracking['body']['angle_rad_global']
+        data[i,:2] = tracking['body']['centroid_global']/tracking['body']['pix_per_mm_global']
+        data[i,2] = tracking['body']['angle_rad_global']/tracking['body']['pix_per_mm_global']
 
         pred[i,0] = head_embedded_tracking['predicted_x']
         pred[i,1] = head_embedded_tracking['predicted_y']
@@ -162,6 +162,9 @@ finally:
     destroyAllWindows()
 
 ###
+
+
+data -= data[0,:]
 
 import matplotlib.pyplot as plt
 plt.plot(data)
