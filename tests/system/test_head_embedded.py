@@ -141,9 +141,9 @@ try:
 
         # display tracking
         if DISPLAY:
-            T_scale = SimilarityTransform2D.scaling(tracking['animals']['downsample_ratio']) 
-            oly = overlay.overlay_global(tracking['animals']['image_downsampled'], tracking, T_scale)
-            r = cv2.resize(oly,(DISPLAY_HEIGHT, DISPLAY_WIDTH))
+            #T_scale = SimilarityTransform2D.scaling(tracking['animals']['downsample_ratio']) 
+            #oly = overlay.overlay_global(tracking['animals']['image_downsampled'], tracking, T_scale)
+            #r = cv2.resize(oly,(DISPLAY_HEIGHT, DISPLAY_WIDTH))
             # cv2.imshow('frame', frame)
             # cv2.imshow('global',r)
             # cv2.imshow('body_cropped', body_overlay.overlay_cropped(tracking['body']))
@@ -151,7 +151,10 @@ try:
             # cv2.imshow('tail_cropped', tail_overlay.overlay_cropped(tracking['tail']))
             # cv2.imshow('body_resized', body_overlay.overlay_processed(tracking['body']))
             # cv2.imshow('eyes_resized', eyes_overlay.overlay_processed(tracking['eyes']))
-            imshow('tail_resized', tail_overlay.overlay_processed(tracking['tail']))
+
+            oly = tail_overlay.overlay_processed(tracking['tail'])
+            r = cv2.resize(oly,(DISPLAY_HEIGHT, DISPLAY_WIDTH))
+            imshow('tail_resized', r)
             waitKey(1)
 
 finally:
