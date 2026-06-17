@@ -107,8 +107,8 @@ class LighthillPredictor(PositionPredictor):
         self.y += forward_step_mm * np.sin(self.theta)
 
         # transform back to image space
-        x = (self.x * pix_per_mm) #+ tail_skeleton[0,0]
-        y = (-self.y * pix_per_mm) #+ tail_skeleton[0,1]
+        x = (self.x * pix_per_mm) + tail_skeleton[0,0]
+        y = (-self.y * pix_per_mm) + tail_skeleton[0,1]
         theta = -self.theta
 
         coords_global = T.transform_points(np.array([x, y])).squeeze()
