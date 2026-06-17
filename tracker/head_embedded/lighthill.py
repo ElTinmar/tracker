@@ -3,12 +3,15 @@
 import numpy as np
 from collections import deque
 from .position_predictor import PositionPredictor, Position
+from geometry import SimilarityTransform2D
 
 def get_tip_center(tail_skeleton: np.ndarray) -> np.ndarray:
     return (tail_skeleton[-2, :] + tail_skeleton[-1, :]) / 2
 
+
 def get_tip_direction(tail_skeleton: np.ndarray) -> np.ndarray:
     return tail_skeleton[-1, :] - tail_skeleton[-2, :]
+
 
 def cross2d(x: np.ndarray, y: np.ndarray) -> float | np.ndarray:
     """Calculates the 2D cross product (scalar or array output)."""
@@ -17,11 +20,14 @@ def cross2d(x: np.ndarray, y: np.ndarray) -> float | np.ndarray:
 def perpendicular(v: np.ndarray) -> np.ndarray:
     return np.array([-v[1], v[0]])
 
+
 def raise_to_power(signal, exponent):
     return np.sign(signal)*np.abs(signal)**exponent
 
+
 def ewma(new: float, old: float, alpha: float) -> float:
     return new*alpha + old*(1.0 - alpha)
+
 
 class LighthillPredictor(PositionPredictor):
 
@@ -32,9 +38,6 @@ class LighthillPredictor(PositionPredictor):
             time_window_ms: int = 60,
             framerate: int = 120,
             tau: float = 0.0,
-            x: float = 0.0,
-            y: float = 0.0,
-            theta: float = 0.0
         ):
     
         self.forward_gain = forward_gain
@@ -47,30 +50,29 @@ class LighthillPredictor(PositionPredictor):
         self.tip_direction_history = deque(maxlen=2)
         self.force_history = deque(maxlen=window)
         self.torque_history = deque(maxlen=window)
+
         self.forward_speed = 0.0
         self.angular_speed = 0.0
-    
-        self.x = x
-        self.y = y
-        self.theta = theta
+        self.x = 0.0
+        self.y = 0.0
+        self.theta = 0.0
 
 
-    def estimate(self, tail_skeleton: np.ndarray) -> Position:
-        """
-        tail skeleton: (N,2) numpy array 
-        """
+    def estimate(
+            self, 
+            tail_skeleton: np.ndarray, # shape (N,2)
+            pix_per_mm: float,
+            T: SimilarityTransform2D = SimilarityTransform2D.identity()
+        ) -> Position:
 
-        # TODO: 
-        # - get skeleton in camera space in pixels
-        # - transform to right-handed space in mm to do the math
-        # - transform back the results to camera space in pixels 
+        # transform left-handed image space to right-handed coordinate system centered on
+        # first tail point, in world coordinates (mm)
+        tail_mm = tail_skeleton.copy() / pix_per_mm
+        tail_mm = (tail_mm - tail_mm[0, :]) 
+        tail_mm[:,1] = -tail_mm[:,1] 
 
-        # coord transform
-        tail_skeleton = (tail_skeleton - tail_skeleton[0, :]) 
-        tail_skeleton[:,1] = -tail_skeleton[:,1] 
-
-        self.tip_center_history.append(get_tip_center(tail_skeleton))
-        self.tip_direction_history.append(get_tip_direction(tail_skeleton))
+        self.tip_center_history.append(get_tip_center(tail_mm))
+        self.tip_direction_history.append(get_tip_direction(tail_mm))
 
         if len(self.tip_center_history) < 3:
             return Position(x=self.x, y=self.y, theta=self.theta)
@@ -103,6 +105,15 @@ class LighthillPredictor(PositionPredictor):
         self.theta += angular_step_rad 
         self.x += forward_step_mm * np.cos(self.theta) 
         self.y += forward_step_mm * np.sin(self.theta)
+
+        # transform back to image space
+        x = (self.x * pix_per_mm) #+ tail_skeleton[0,0]
+        y = (-self.y * pix_per_mm) #+ tail_skeleton[0,1]
+        theta = -self.theta
+
+        coords_global = T.transform_points(np.array([x, y])).squeeze()
+        t_angle = np.arctan2(T[1, 0], T[0, 0]) 
+        theta_global = theta + t_angle
         
-        return Position(x=self.x, y=self.y, theta=self.theta)
+        return Position(x=coords_global[0], y=coords_global[1], theta=theta_global)
 
