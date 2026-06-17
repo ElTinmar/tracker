@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 from abc import ABC, abstractmethod
 import numpy as np
+from geometry import SimilarityTransform2D
+
 
 @dataclass
 class Position:
@@ -11,5 +13,10 @@ class Position:
 class PositionPredictor(ABC):
 
     @abstractmethod
-    def estimate(self, tail_skeleton: np.ndarray) -> Position:
+    def estimate(
+            self, 
+            tail_skeleton: np.ndarray, 
+            pix_per_mm: float, 
+            T: SimilarityTransform2D = SimilarityTransform2D.identity()
+        ) -> Position:
         ...
