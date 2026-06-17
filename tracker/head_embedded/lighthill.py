@@ -93,10 +93,10 @@ class LighthillPredictor(PositionPredictor):
         dt = 1.0 / self.framerate
         forward_step_mm = self.forward_speed * dt
         angular_step_rad = self.angular_speed * dt
-
+        
+        self.theta += angular_step_rad
         self.x += forward_step_mm * np.cos(self.theta)
         self.y += forward_step_mm * np.sin(self.theta)
-        self.theta += angular_step_rad
-
+        
         return Position(x=self.x, y=self.y, theta=self.theta)
 
