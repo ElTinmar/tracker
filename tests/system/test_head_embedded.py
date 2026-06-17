@@ -95,7 +95,7 @@ tracker = SingleFishTracker_CPU(
     )
 )
 
-predictor = LighthillPredictor(forward_gain=0.03, angular_gain=0.0095, framerate=fps)
+predictor = LighthillPredictor(forward_gain=0.0475, angular_gain=0.0095, framerate=fps)
 head_embedded_tracker = HeadEmbeddedTracker_CPU(
     tracking_param = HeadEmbedded_ParamTracking(
         tail=tail_tracker,
@@ -174,14 +174,17 @@ plt.show()
 plt.plot(pred)
 plt.show()
 
+plt.figure()
 plt.plot(data[:,0])
 plt.plot(pred[:,0])
-plt.show()
+plt.show(block=False)
 
+plt.figure()
 plt.plot(data[:,1])
 plt.plot(pred[:,1])
-plt.show()
+plt.show(block=False)
 
+plt.figure()
 plt.plot(data[:,2])
 plt.plot(pred[:,2])
-plt.show()
+plt.show(block=False)
