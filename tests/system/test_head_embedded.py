@@ -95,7 +95,7 @@ tracker = SingleFishTracker_CPU(
     )
 )
 
-predictor = LighthillPredictor(forward_gain=0.048, angular_gain=0.0095, framerate=fps)
+predictor = LighthillPredictor(forward_gain=0.062, angular_gain=0.0092, framerate=fps)
 head_embedded_tracker = HeadEmbeddedTracker_CPU(
     tracking_param = HeadEmbedded_ParamTracking(
         tail=tail_tracker,
@@ -161,30 +161,50 @@ finally:
     video_reader.close()
     destroyAllWindows()
 
-###
+# transform coordinates
+rh_data = data.copy()
+rh_data[:, 1] = -rh_data[:, 1]
+rh_data[:, 2] = -rh_data[:, 2]
 
+x0, y0, theta0 = rh_data[0]
+T_trans = np.array([
+    [1, 0, -x0],
+    [0, 1, -y0],
+    [0, 0,   1]
+])
+c, s = np.cos(-theta0), np.sin(-theta0)
+R_rot = np.array([
+    [c, -s, 0],
+    [s,  c, 0],
+    [0,  0, 1]
+])
+T = R_rot @ T_trans 
+N = rh_data.shape[0]
+pos_hom = np.column_stack((rh_data[:, :2], np.ones(N)))
+pos_transformed = pos_hom @ T.T
+transformed_coords = np.empty_like(rh_data)
+transformed_coords[:, :2] = pos_transformed[:, :2]  
+transformed_coords[:, 2] = np.unwrap(rh_data[:, 2] - theta0)  
 
-data -= data[0,:]
-data[:,2] = np.unwrap(data[:,2])
 
 import matplotlib.pyplot as plt
-plt.plot(data)
+plt.plot(transformed_coords)
 plt.show()
 
 plt.plot(pred)
 plt.show()
 
 plt.figure()
-plt.plot(data[:,0])
+plt.plot(transformed_coords[:,0])
 plt.plot(pred[:,0])
 plt.show(block=False)
 
 plt.figure()
-plt.plot(data[:,1])
+plt.plot(transformed_coords[:,1])
 plt.plot(pred[:,1])
 plt.show(block=False)
 
 plt.figure()
-plt.plot(data[:,2])
+plt.plot(transformed_coords[:,2])
 plt.plot(pred[:,2])
 plt.show(block=False)
