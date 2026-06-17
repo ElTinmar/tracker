@@ -95,7 +95,7 @@ tracker = SingleFishTracker_CPU(
     )
 )
 
-predictor = LighthillPredictor(forward_gain=0.0475, angular_gain=0.0095, framerate=fps)
+predictor = LighthillPredictor(forward_gain=0.048, angular_gain=0.0095, framerate=fps)
 head_embedded_tracker = HeadEmbeddedTracker_CPU(
     tracking_param = HeadEmbedded_ParamTracking(
         tail=tail_tracker,
