@@ -22,7 +22,7 @@ def interpolate_skeleton(skeleton: NDArray, n_pts_interp: int) -> NDArray:
     return skeleton_interp
 
 @njit(
-    (float32, int64, float32, float32, float32, int64, float32, float32[:, :], float32), 
+    (float32, int64, float32, float32, float32, int64, float32, float32[:, :], int64), 
     cache=True
 )
 def get_skeleton_ball(
@@ -34,7 +34,7 @@ def get_skeleton_ball(
         n_tail_points: int,
         spacing: float,
         image: NDArray,
-        ball_radius_px: float
+        ball_radius_px: int64
     ) -> Tuple[NDArray, NDArray]:
 
     arc = np.linspace(-arc_rad, arc_rad, n_pts_arc) + start_angle
@@ -56,8 +56,14 @@ def get_skeleton_ball(
         height, width = image.shape
         for theta, u, v in zip(arc, xs, ys):
             s = 0
-            for i in range(height):
-                for j in range(width):
+
+            min_i = max(0, v - ball_radius_px)
+            max_i = min(height, v + ball_radius_px + 1)
+            min_j = max(0, u - ball_radius_px)
+            max_j = min(width, u + ball_radius_px + 1)
+
+            for i in range(min_i, max_i):
+                for j in range(min_j, max_j):
                     if ((j - u)**2 + (i - v)**2) <= ball_radius_px**2:
                         s += image[i,j]
 
