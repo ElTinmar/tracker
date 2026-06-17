@@ -58,10 +58,16 @@ class LighthillPredictor(PositionPredictor):
     def estimate(self, tail_skeleton: np.ndarray) -> Position:
         """
         tail skeleton: (N,2) numpy array 
-            origin should be the center of rotation (swim-bladder)
-            fish aligned with Y-axis facing up
-            units in mm
         """
+
+        # TODO: 
+        # - get skeleton in camera space in pixels
+        # - transform to right-handed space in mm to do the math
+        # - transform back the results to camera space in pixels 
+
+        # coord transform
+        tail_skeleton = (tail_skeleton - tail_skeleton[0, :]) 
+        tail_skeleton[:,1] = -tail_skeleton[:,1] 
 
         self.tip_center_history.append(get_tip_center(tail_skeleton))
         self.tip_direction_history.append(get_tip_direction(tail_skeleton))
@@ -77,9 +83,8 @@ class LighthillPredictor(PositionPredictor):
         u_parallel = -tip_direction/np.linalg.norm(tip_direction)
         v_perp = np.dot(tip_velocity, u_perpendicular)
         v_par = np.dot(tip_velocity, u_parallel)
-        coords = np.array([1.0, -1.0]) # y-axis increasing downwards
 
-        force = v_perp*(-v_par*u_perpendicular + 0.5*v_perp*u_parallel) * coords
+        force = v_perp*(-v_par*u_perpendicular + 0.5*v_perp*u_parallel) 
         torque = cross2d(tip_position, force)
 
         self.force_history.append(force[1])  
@@ -95,9 +100,9 @@ class LighthillPredictor(PositionPredictor):
         forward_step_mm = self.forward_speed * dt
         angular_step_rad = self.angular_speed * dt
         
-        self.theta += angular_step_rad
-        self.x += -forward_step_mm * np.sin(self.theta) # 90 deg rotation
-        self.y += forward_step_mm * np.cos(self.theta)
+        self.theta += angular_step_rad 
+        self.x += forward_step_mm * np.cos(self.theta) 
+        self.y += forward_step_mm * np.sin(self.theta)
         
         return Position(x=self.x, y=self.y, theta=self.theta)
 
