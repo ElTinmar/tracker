@@ -78,7 +78,7 @@ class LighthillPredictor(PositionPredictor):
         v_perp = np.dot(tip_velocity, u_perpendicular)
         v_par = np.dot(tip_velocity, u_parallel)
 
-        force = v_perp*(v_par*u_perpendicular + 0.5*v_perp*u_parallel)
+        force = v_perp*(-v_par*u_perpendicular + 0.5*v_perp*u_parallel)
         torque = cross2d(tip_position, force)
 
         self.force_history.append(force[1])
