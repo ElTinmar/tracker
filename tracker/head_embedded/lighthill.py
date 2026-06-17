@@ -95,8 +95,8 @@ class LighthillPredictor(PositionPredictor):
         angular_step_rad = self.angular_speed * dt
         
         self.theta += angular_step_rad
-        self.x += forward_step_mm * np.cos(self.theta)
-        self.y += forward_step_mm * np.sin(self.theta)
+        self.x += forward_step_mm * np.sin(self.theta) # 90 deg rotation?
+        self.y += -forward_step_mm * np.cos(self.theta)
         
         return Position(x=self.x, y=self.y, theta=self.theta)
 
