@@ -77,11 +77,12 @@ class LighthillPredictor(PositionPredictor):
         u_parallel = -tip_direction/np.linalg.norm(tip_direction)
         v_perp = np.dot(tip_velocity, u_perpendicular)
         v_par = np.dot(tip_velocity, u_parallel)
+        coords = np.array([1.0, -1.0]) # y-axis increasing downwards
 
-        force = v_perp*(-v_par*u_perpendicular + 0.5*v_perp*u_parallel)
+        force = v_perp*(-v_par*u_perpendicular + 0.5*v_perp*u_parallel) * coords
         torque = cross2d(tip_position, force)
 
-        self.force_history.append(-force[1]) # y-axis increasing downwards 
+        self.force_history.append(force[1])  
         self.torque_history.append(torque)
 
         forward_speed = max(0, self.forward_gain * raise_to_power(np.nanmean(self.force_history), 2/3))
