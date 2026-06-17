@@ -95,7 +95,7 @@ tracker = SingleFishTracker_CPU(
     )
 )
 
-predictor = LighthillPredictor(forward_gain=0.1, angular_gain=0.05, framerate=fps)
+predictor = LighthillPredictor(forward_gain=0.03, angular_gain=0.0095, framerate=fps)
 head_embedded_tracker = HeadEmbeddedTracker_CPU(
     tracking_param = HeadEmbedded_ParamTracking(
         tail=tail_tracker,
@@ -133,7 +133,7 @@ try:
         head_embedded_tracking = head_embedded_tracker.track(tracking['tail']['image_cropped'])
         
         data[i,:2] = tracking['body']['centroid_global']/tracking['body']['pix_per_mm_global']
-        data[i,2] = tracking['body']['angle_rad_global']/tracking['body']['pix_per_mm_global']
+        data[i,2] = tracking['body']['angle_rad_global']
 
         pred[i,0] = head_embedded_tracking['predicted_x']
         pred[i,1] = head_embedded_tracking['predicted_y']
@@ -141,11 +141,11 @@ try:
 
         # display tracking
         if DISPLAY:
-            #T_scale = SimilarityTransform2D.scaling(tracking['animals']['downsample_ratio']) 
-            #oly = overlay.overlay_global(tracking['animals']['image_downsampled'], tracking, T_scale)
-            #r = cv2.resize(oly,(DISPLAY_HEIGHT, DISPLAY_WIDTH))
+            T_scale = SimilarityTransform2D.scaling(tracking['animals']['downsample_ratio']) 
+            oly = overlay.overlay_global(tracking['animals']['image_downsampled'], tracking, T_scale)
+            r = cv2.resize(oly,(DISPLAY_HEIGHT, DISPLAY_WIDTH))
             # cv2.imshow('frame', frame)
-            # cv2.imshow('global',r)
+            imshow('global',r)
             # cv2.imshow('body_cropped', body_overlay.overlay_cropped(tracking['body']))
             # cv2.imshow('eyes_cropped', eyes_overlay.overlay_cropped(tracking['eyes']))
             # cv2.imshow('tail_cropped', tail_overlay.overlay_cropped(tracking['tail']))
@@ -165,6 +165,7 @@ finally:
 
 
 data -= data[0,:]
+data[:,2] = np.unwrap(data[:,2])
 
 import matplotlib.pyplot as plt
 plt.plot(data)
