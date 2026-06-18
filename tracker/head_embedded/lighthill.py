@@ -71,11 +71,25 @@ class LighthillPredictor(PositionPredictor):
         tail_mm = (tail_mm - tail_mm[0, :]) 
         tail_mm[:,1] = -tail_mm[:,1] 
 
+        def world_to_image(x_local, y_local, theta_local):
+            # transform back to image space
+            x = (x_local * pix_per_mm) + tail_skeleton[0,0]
+            y = (-y_local * pix_per_mm) + tail_skeleton[0,1]
+            theta = -theta_local
+
+            # extra transformation to a global space if needed
+            coords_global = T.transform_points(np.array([x, y])).squeeze()
+            t_angle = np.arctan2(T[1, 0], T[0, 0]) 
+            theta_global = theta + t_angle
+
+            return coords_global[0], coords_global[1], theta_global 
+
         self.tip_center_history.append(get_tip_center(tail_mm))
         self.tip_direction_history.append(get_tip_direction(tail_mm))
 
+        # if we don't have enough data to compute central difference, return early
         if len(self.tip_center_history) < 3:
-            return Position(x=self.x, y=self.y, theta=self.theta)
+            return Position(*world_to_image(self.x,self.y,self.theta))
 
         tip_velocity = 0.5*self.framerate*(self.tip_center_history[-1]-self.tip_center_history[0])
         tip_position = self.tip_center_history[1]
@@ -106,15 +120,5 @@ class LighthillPredictor(PositionPredictor):
         self.x += forward_step_mm * np.cos(self.theta) 
         self.y += forward_step_mm * np.sin(self.theta)
 
-        # transform back to image space
-        x = (self.x * pix_per_mm) + tail_skeleton[0,0]
-        y = (-self.y * pix_per_mm) + tail_skeleton[0,1]
-        theta = -self.theta
-
-        # extra transformation to a global space if needed
-        coords_global = T.transform_points(np.array([x, y])).squeeze()
-        t_angle = np.arctan2(T[1, 0], T[0, 0]) 
-        theta_global = theta + t_angle
-        
-        return Position(x=coords_global[0], y=coords_global[1], theta=theta_global)
+        return Position(*world_to_image(self.x,self.y,self.theta))
 
