@@ -95,7 +95,7 @@ tracker = SingleFishTracker_CPU(
     )
 )
 
-predictor = LighthillPredictor(forward_gain=0.062, angular_gain=0.0092, framerate=fps)
+predictor = LighthillPredictor(forward_gain=0.0, angular_gain=0.0, framerate=fps)
 head_embedded_tracker = HeadEmbeddedTracker_CPU(
     tracking_param = HeadEmbedded_ParamTracking(
         tail=tail_tracker,
@@ -130,7 +130,11 @@ try:
 
         # track
         tracking = tracker.track(frame, background_image)
-        head_embedded_tracking = head_embedded_tracker.track(tracking['tail']['image_cropped'])
+        T = tracking['tail']['T_input_to_global'] @ tracking['tail']['T_cropped_to_input']
+        head_embedded_tracking = head_embedded_tracker.track(
+            tracking['tail']['image_cropped'],
+            T_input_to_global=SimilarityTransform2D.from_array(T)
+        )
         
         data[i,:2] = tracking['body']['centroid_global']
         data[i,2] = tracking['body']['angle_rad_global']
@@ -162,17 +166,17 @@ finally:
     destroyAllWindows()
 
 # transform coordinates
-data = data - data[0]
-data[:,2] = np.unwrap(data[:,2])
+# data = data - data[0]
+# data[:,2] = np.unwrap(data[:,2])
 
-pred = pred - pred[2]
+# pred = pred - pred[2]
 
 import matplotlib.pyplot as plt
 plt.plot(data)
-plt.show()
+plt.show(block=False)
 
 plt.plot(pred)
-plt.show()
+plt.show(block=False)
 
 plt.figure()
 plt.plot(data[:,0])

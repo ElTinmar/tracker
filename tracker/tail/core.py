@@ -42,6 +42,12 @@ class TailTrackerParamTracking(ParamTracking):
             ('pix_per_mm_input', np.float32),
             ('pix_per_mm_cropped', np.float32),
             ('pix_per_mm_resized', np.float32),
+            ('T_input_to_global', np.float32, (3,3)),
+            ('T_global_to_input', np.float32, (3,3)),
+            ('T_cropped_to_input', np.float32, (3,3)),
+            ('T_input_to_cropped', np.float32, (3,3)),
+            ('T_resized_to_cropped', np.float32, (3,3)),
+            ('T_cropped_to_resized', np.float32, (3,3))
         ])
         return dt
 

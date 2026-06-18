@@ -160,6 +160,12 @@ class TailTracker_CPU(TailTracker):
                 resolution.pix_per_mm_input,
                 resolution.pix_per_mm_cropped,
                 resolution.pix_per_mm_resized,
+                T_input_to_global,
+                T_global_to_input,
+                preproc.T_cropped_to_input,
+                preproc.T_input_to_cropped,
+                preproc.T_resized_to_cropped,
+                preproc.T_cropped_to_resized
             ), 
             dtype= self.tracking_param.dtype
         )
@@ -253,6 +259,12 @@ class TailTrackerKalman(TailTracker_CPU):
                 resolution.pix_per_mm_input,
                 resolution.pix_per_mm_cropped,
                 resolution.pix_per_mm_resized,
+                T_input_to_global,
+                T_global_to_input,
+                preproc.T_cropped_to_input,
+                preproc.T_input_to_cropped,
+                preproc.T_resized_to_cropped,
+                preproc.T_cropped_to_resized
             ), 
             dtype= self.tracking_param.dtype
         )
@@ -325,6 +337,12 @@ class TailTrackerKalman(TailTracker_CPU):
                 resolution.pix_per_mm_input,
                 resolution.pix_per_mm_cropped,
                 resolution.pix_per_mm_resized,
+                T_input_to_global,
+                T_global_to_input,
+                preproc.T_cropped_to_input,
+                preproc.T_input_to_cropped,
+                preproc.T_resized_to_cropped,
+                preproc.T_cropped_to_resized
             ), 
             dtype= self.tracking_param.dtype
         )
