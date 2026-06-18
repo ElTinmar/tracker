@@ -17,6 +17,7 @@ def cross2d(x: np.ndarray, y: np.ndarray) -> float | np.ndarray:
     """Calculates the 2D cross product (scalar or array output)."""
     return x[..., 0] * y[..., 1] - x[..., 1] * y[..., 0]
 
+
 def perpendicular(v: np.ndarray) -> np.ndarray:
     return np.array([-v[1], v[0]])
 
@@ -33,8 +34,8 @@ class LighthillPredictor(PositionPredictor):
 
     def __init__(
             self, 
-            forward_gain: float = 1.0, 
-            angular_gain: float = 1.0, 
+            forward_gain: float = 0.08, 
+            angular_gain: float = 0.01, 
             time_window_ms: int = 30,
             framerate: int = 120,
             tau: float = 0.0,
