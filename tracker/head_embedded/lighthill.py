@@ -34,8 +34,8 @@ class LighthillPredictor(PositionPredictor):
 
     def __init__(
             self, 
-            forward_gain: float = 0.08, 
-            angular_gain: float = 0.01, 
+            forward_gain: float = 0.08, # (s/mm)^(1/3)
+            angular_gain: float = 0.01, # rad⋅s/mm^3
             time_window_ms: int = 30,
             framerate: int = 120,
             tau: float = 0.0,
