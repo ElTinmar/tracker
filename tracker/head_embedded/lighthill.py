@@ -35,7 +35,7 @@ class LighthillPredictor(PositionPredictor):
             self, 
             forward_gain: float = 1.0, 
             angular_gain: float = 1.0, 
-            time_window_ms: int = 60,
+            time_window_ms: int = 30,
             framerate: int = 120,
             tau: float = 0.0,
         ):
