@@ -15,8 +15,9 @@ from geometry import SimilarityTransform2D
 from tests.config import ANIMAL_PARAM, BODY_PARAM, EYES_PARAM, TAIL_PARAM
 import numpy as np
 from qt_widgets import imshow, waitKey, destroyAllWindows
+import matplotlib.pyplot as plt
 
-DISPLAY=True
+DISPLAY=False
 DISPLAY_HEIGHT = 512
 
 # background subtracted video
@@ -95,7 +96,7 @@ tracker = SingleFishTracker_CPU(
     )
 )
 
-predictor = LighthillPredictor(forward_gain=0.06, angular_gain=0.008, framerate=fps)
+predictor = LighthillPredictor(forward_gain=0.08, angular_gain=0.0095, framerate=fps)
 head_embedded_tracker = HeadEmbeddedTracker_CPU(
     tracking_param = HeadEmbedded_ParamTracking(
         tail=tail_tracker,
@@ -171,29 +172,40 @@ finally:
     destroyAllWindows()
 
 # transform coordinates
-# data = data - data[0]
-# data[:,2] = np.unwrap(data[:,2])
+data[:,2] = np.unwrap(data[:,2])
+data_vel = np.diff(data, axis=0)
+data_speed = np.sqrt(data_vel[:,0]**2 +data_vel[:,1]**2)
 
-# pred = pred - pred[2]
+pred_vel = np.diff(pred, axis=0)
+pred_speed = np.sqrt(pred_vel[:,0]**2 +pred_vel[:,1]**2)
 
-import matplotlib.pyplot as plt
-plt.plot(data)
+
+plt.figure()
+plt.plot(data_speed)
+plt.plot(pred_speed)
+plt.ylabel('forward speed')
 plt.show(block=False)
 
-plt.plot(pred)
+plt.figure()
+plt.plot(data_vel[:,2])
+plt.plot(pred_vel[:,2])
+plt.ylabel('angular speed')
 plt.show(block=False)
 
 plt.figure()
 plt.plot(data[:,0])
 plt.plot(pred[:,0])
+plt.ylabel('x')
 plt.show(block=False)
 
 plt.figure()
 plt.plot(data[:,1])
 plt.plot(pred[:,1])
+plt.ylabel('y')
 plt.show(block=False)
 
 plt.figure()
 plt.plot(data[:,2])
 plt.plot(pred[:,2])
+plt.ylabel('theta')
 plt.show(block=False)
