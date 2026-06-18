@@ -68,12 +68,6 @@ body_tracker = BodyTracker_CPU(
     ),
     fps = fps
 )
-eyes_tracker = EyesTracker_CPU(
-    tracking_param = EyesTrackerParamTracking(
-        pix_per_mm=PIX_PER_MM,
-        **EYES_PARAM
-    )
-)
 tail_tracker = TailTracker_CPU(
     tracking_param = TailTrackerParamTracking(
         pix_per_mm=PIX_PER_MM,
@@ -84,14 +78,12 @@ tail_tracker = TailTracker_CPU(
 # overlay
 animal_overlay = AnimalOverlay_opencv(AnimalTrackerParamOverlay())
 body_overlay = BodyOverlay_opencv(BodyTrackerParamOverlay())
-eyes_overlay = EyesOverlay_opencv(EyesTrackerParamOverlay())
 tail_overlay = TailOverlay_opencv(TailTrackerParamOverlay())
 
 tracker = SingleFishTracker_CPU(
     SingleFishTrackerParamTracking(
         animal=animal_tracker,
         body=body_tracker, 
-        eyes=eyes_tracker, 
         tail=tail_tracker
     )
 )
@@ -108,7 +100,6 @@ overlay = SingleFishOverlay_opencv(
     SingleFishTrackerParamOverlay(
         animal_overlay,
         body_overlay,
-        eyes_overlay,
         tail_overlay
     )
 )
