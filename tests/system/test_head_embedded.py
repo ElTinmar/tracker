@@ -95,7 +95,7 @@ tracker = SingleFishTracker_CPU(
     )
 )
 
-predictor = LighthillPredictor(forward_gain=0.0, angular_gain=0.0, framerate=fps)
+predictor = LighthillPredictor(forward_gain=0.06, angular_gain=0.008, framerate=fps)
 head_embedded_tracker = HeadEmbeddedTracker_CPU(
     tracking_param = HeadEmbedded_ParamTracking(
         tail=tail_tracker,
@@ -118,6 +118,8 @@ head_embedded_overlay = HeadEmbeddedOverlay_opencv(
 
 data = np.zeros((num_frames,3), np.float32)
 pred = np.zeros((num_frames,3), np.float32)
+T = SimilarityTransform2D.identity()
+T_fixed_to_freely_swimming = SimilarityTransform2D.from_array(T)
 
 try:
     for i in tqdm(range(num_frames)):
@@ -130,10 +132,13 @@ try:
 
         # track
         tracking = tracker.track(frame, background_image)
-        T = tracking['tail']['T_input_to_global'] @ tracking['tail']['T_cropped_to_input']
+        if i == 0:
+            T = tracking['tail']['T_input_to_global'] @ tracking['tail']['T_cropped_to_input']
+            T_fixed_to_freely_swimming = SimilarityTransform2D.from_array(T)
+
         head_embedded_tracking = head_embedded_tracker.track(
             tracking['tail']['image_cropped'],
-            T_input_to_global=SimilarityTransform2D.from_array(T)
+            T_input_to_global=T_fixed_to_freely_swimming
         )
         
         data[i,:2] = tracking['body']['centroid_global']

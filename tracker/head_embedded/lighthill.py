@@ -111,6 +111,7 @@ class LighthillPredictor(PositionPredictor):
         y = (-self.y * pix_per_mm) + tail_skeleton[0,1]
         theta = -self.theta
 
+        # extra transformation to a global space if needed
         coords_global = T.transform_points(np.array([x, y])).squeeze()
         t_angle = np.arctan2(T[1, 0], T[0, 0]) 
         theta_global = theta + t_angle
