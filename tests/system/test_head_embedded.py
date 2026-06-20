@@ -136,9 +136,9 @@ try:
         data[i,:2] = tracking['body']['centroid_global']
         data[i,2] = tracking['body']['angle_rad_global']
 
-        pred[i,0] = head_embedded_tracking['predicted_x']
-        pred[i,1] = head_embedded_tracking['predicted_y']
-        pred[i,2] = head_embedded_tracking['predicted_theta']
+        pred[i,0] = head_embedded_tracking['virtual_x']
+        pred[i,1] = head_embedded_tracking['virtual_y']
+        pred[i,2] = head_embedded_tracking['virtual_theta']
 
         # display tracking
         if DISPLAY:
