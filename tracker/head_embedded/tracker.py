@@ -46,12 +46,20 @@ class HeadEmbeddedTracker_CPU(HeadEmbeddedTracker):
             T_image_rot_to_global
         )
 
-        position = self.tracking_param.position_predictor.estimate(
+        virtual_position = self.tracking_param.position_predictor.estimate(
             tail['skeleton_input'], 
             tail['pix_per_mm_input'],
             T_image_rot_to_global
         )
-        arr = (True, position.x, position.y, position.theta, tail)
+        arr = (
+            True, 
+            self.tracking_param.centroid_x,
+            self.tracking_param.centroid_y,
+            self.tracking_param.heading_angle_rad,
+            virtual_position.x, 
+            virtual_position.y,
+            virtual_position.theta, 
+            tail)
         res = np.array(
             arr,
             dtype=self.tracking_param.dtype
