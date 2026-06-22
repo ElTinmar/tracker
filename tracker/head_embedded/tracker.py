@@ -42,7 +42,7 @@ class HeadEmbeddedTracker_CPU(HeadEmbeddedTracker):
         tail = self.tracking_param.tail.track(
             image_rot, 
             background_rot, 
-            np.array([self.tracking_param.centroid_x, self.tracking_param.centroid_y]), 
+            centroid, 
             T_image_rot_to_global
         )
 
