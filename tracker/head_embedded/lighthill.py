@@ -106,8 +106,8 @@ class LighthillPredictor(PositionPredictor):
         self.force_history.append(force[1])  
         self.torque_history.append(torque)
 
-        forward_speed = np.nanmax(0, self.forward_gain * raise_to_power(np.nanmean(self.force_history), 2/3))
-        forward_speed = np.nan_to_num(forward_speed, nan=self.forward_speed)
+        forward_speed = self.forward_gain * raise_to_power(np.nanmean(self.force_history), 2/3)
+        forward_speed = max(0, np.nan_to_num(forward_speed, nan=self.forward_speed))
         angular_speed = self.angular_gain * np.nanmean(self.torque_history)
         angular_speed = np.nan_to_num(angular_speed, nan=self.angular_speed)
 
