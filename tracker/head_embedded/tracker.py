@@ -59,7 +59,8 @@ class HeadEmbeddedTracker_CPU(HeadEmbeddedTracker):
             virtual_position.x, 
             virtual_position.y,
             virtual_position.theta, 
-            tail)
+            tail
+        )
         res = np.array(
             arr,
             dtype=self.tracking_param.dtype
