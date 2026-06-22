@@ -85,7 +85,7 @@ class LighthillPredictor(PositionPredictor):
             return coords_global[0], coords_global[1], theta_global 
 
         # transform left-handed image space to right-handed coordinate system centered on
-        # first tail point, in world coordinates (mm)
+        # first tail point, in world coordinates (mm), forward axis y=[0, 1]
         tail_mm = tail_skeleton.copy() / pix_per_mm
         tail_mm = (tail_mm - tail_mm[0, :]) 
         tail_mm[:,1] = -tail_mm[:,1] 
