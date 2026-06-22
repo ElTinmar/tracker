@@ -69,6 +69,7 @@ class LighthillPredictor(PositionPredictor):
             pix_per_mm: float,
             T: SimilarityTransform2D = SimilarityTransform2D.identity()
         ) -> Position:
+        # tail skeleton with fish head oriented north
 
         def world_to_image(x_local, y_local, theta_local):
             # transform back to image space
