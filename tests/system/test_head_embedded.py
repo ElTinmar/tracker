@@ -170,12 +170,23 @@ data_speed = np.sqrt(data_vel[:,0]**2 +data_vel[:,1]**2)
 pred_vel = np.diff(pred, axis=0)
 pred_speed = np.sqrt(pred_vel[:,0]**2 +pred_vel[:,1]**2)
 
+def moving_average(data, window_size):
+    window = np.ones(window_size) / window_size
+    return np.convolve(data, window, mode='same')
+
+
+plt.figure()
+plt.plot(moving_average(data_speed,int(30*fps/1000)))
+plt.plot(pred_speed)
+plt.ylabel('forward speed')
+plt.show(block=False)
 
 plt.figure()
 plt.plot(data_speed)
 plt.plot(pred_speed)
 plt.ylabel('forward speed')
 plt.show(block=False)
+
 
 plt.figure()
 plt.plot(data_vel[:,2])
