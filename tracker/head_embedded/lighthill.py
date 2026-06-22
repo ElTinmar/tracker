@@ -58,19 +58,12 @@ class LighthillPredictor(PositionPredictor):
         self.y = 0.0
         self.theta = 0.0
 
-
     def estimate(
             self, 
             tail_skeleton: np.ndarray, # shape (N,2)
             pix_per_mm: float,
             T: SimilarityTransform2D = SimilarityTransform2D.identity()
         ) -> Position:
-
-        # transform left-handed image space to right-handed coordinate system centered on
-        # first tail point, in world coordinates (mm)
-        tail_mm = tail_skeleton.copy() / pix_per_mm
-        tail_mm = (tail_mm - tail_mm[0, :]) 
-        tail_mm[:,1] = -tail_mm[:,1] 
 
         def world_to_image(x_local, y_local, theta_local):
             # transform back to image space
@@ -84,6 +77,12 @@ class LighthillPredictor(PositionPredictor):
             theta_global = theta + t_angle
 
             return coords_global[0], coords_global[1], theta_global 
+
+        # transform left-handed image space to right-handed coordinate system centered on
+        # first tail point, in world coordinates (mm)
+        tail_mm = tail_skeleton.copy() / pix_per_mm
+        tail_mm = (tail_mm - tail_mm[0, :]) 
+        tail_mm[:,1] = -tail_mm[:,1] 
 
         self.tip_center_history.append(get_tip_center(tail_mm))
         self.tip_direction_history.append(get_tip_direction(tail_mm))
@@ -107,8 +106,10 @@ class LighthillPredictor(PositionPredictor):
         self.force_history.append(force[1])  
         self.torque_history.append(torque)
 
-        forward_speed = max(0, self.forward_gain * raise_to_power(np.nanmean(self.force_history), 2/3))
+        forward_speed = np.nanmax(0, self.forward_gain * raise_to_power(np.nanmean(self.force_history), 2/3))
+        forward_speed = np.nan_to_num(forward_speed, nan=self.forward_speed)
         angular_speed = self.angular_gain * np.nanmean(self.torque_history)
+        angular_speed = np.nan_to_num(angular_speed, nan=self.angular_speed)
 
         self.forward_speed = ewma(forward_speed, self.forward_speed, self.alpha)
         self.angular_speed = ewma(angular_speed, self.angular_speed, self.alpha)
@@ -120,6 +121,7 @@ class LighthillPredictor(PositionPredictor):
         self.theta += angular_step_rad 
         self.x += forward_step_mm * np.cos(self.theta) 
         self.y += forward_step_mm * np.sin(self.theta)
+
 
         return Position(*world_to_image(self.x,self.y,self.theta))
 
