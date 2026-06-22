@@ -13,6 +13,10 @@ def get_tip_direction(tail_skeleton: np.ndarray) -> np.ndarray:
     return tail_skeleton[-1, :] - tail_skeleton[-2, :]
 
 
+def get_heading_direction(tail_skeleton: np.ndarray) -> np.ndarray:
+    return tail_skeleton[0, :] - tail_skeleton[1, :]
+
+
 def cross2d(x: np.ndarray, y: np.ndarray) -> float | np.ndarray:
     """Calculates the 2D cross product (scalar or array output)."""
     return x[..., 0] * y[..., 1] - x[..., 1] * y[..., 0]
@@ -49,6 +53,7 @@ class LighthillPredictor(PositionPredictor):
         window = int(time_window_ms/1000 * framerate)
         self.tip_center_history = deque(maxlen=3)
         self.tip_direction_history = deque(maxlen=2)
+        #self.heading_direction_history = deque(maxlen=2)
         self.force_history = deque(maxlen=window)
         self.torque_history = deque(maxlen=window)
 
@@ -86,6 +91,7 @@ class LighthillPredictor(PositionPredictor):
 
         self.tip_center_history.append(get_tip_center(tail_mm))
         self.tip_direction_history.append(get_tip_direction(tail_mm))
+        #self.heading_direction_history.append(get_heading_direction(tail_mm))
 
         # if we don't have enough data to compute central difference, return early
         if len(self.tip_center_history) < 3:
@@ -94,7 +100,10 @@ class LighthillPredictor(PositionPredictor):
         tip_velocity = 0.5*self.framerate*(self.tip_center_history[-1]-self.tip_center_history[0])
         tip_position = self.tip_center_history[1]
         tip_direction = self.tip_direction_history[0]
+        #heading_direction = self.heading_direction_history[0]
 
+        #u_forward = heading_direction/np.linalg.norm(heading_direction)
+        u_forward = np.array([0.0, 1.0])
         u_perpendicular = perpendicular(tip_direction)/np.linalg.norm(tip_direction)
         u_parallel = -tip_direction/np.linalg.norm(tip_direction)
         v_perp = np.dot(tip_velocity, u_perpendicular)
@@ -103,7 +112,7 @@ class LighthillPredictor(PositionPredictor):
         force = v_perp*(-v_par*u_perpendicular + 0.5*v_perp*u_parallel) 
         torque = cross2d(tip_position, force)
 
-        self.force_history.append(force[1])  
+        self.force_history.append(force @ u_forward)  
         self.torque_history.append(torque)
 
         forward_speed = self.forward_gain * raise_to_power(np.nanmean(self.force_history), 2/3)
@@ -121,7 +130,6 @@ class LighthillPredictor(PositionPredictor):
         self.theta += angular_step_rad 
         self.x += forward_step_mm * np.cos(self.theta) 
         self.y += forward_step_mm * np.sin(self.theta)
-
 
         return Position(*world_to_image(self.x,self.y,self.theta))
 
