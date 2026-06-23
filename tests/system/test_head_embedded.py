@@ -164,6 +164,9 @@ finally:
 
 # transform coordinates
 data[:,2] = np.unwrap(data[:,2])
+pred[:,2] = np.unwrap(pred[:,2])
+
+
 data_vel = np.diff(data, axis=0)
 data_speed = np.sqrt(data_vel[:,0]**2 +data_vel[:,1]**2)
 
