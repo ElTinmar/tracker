@@ -17,6 +17,6 @@ class PositionPredictor(ABC):
             self, 
             tail_skeleton: np.ndarray, 
             pix_per_mm: float, 
-            T: SimilarityTransform2D = SimilarityTransform2D.identity()
+            T_input_to_global: SimilarityTransform2D = SimilarityTransform2D.identity()
         ) -> Position:
         ...

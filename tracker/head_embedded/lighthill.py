@@ -67,7 +67,7 @@ class LighthillPredictor(PositionPredictor):
             self, 
             tail_skeleton: np.ndarray, # shape (N,2)
             pix_per_mm: float,
-            T: SimilarityTransform2D = SimilarityTransform2D.identity()
+            T_input_to_global: SimilarityTransform2D = SimilarityTransform2D.identity()
         ) -> Position:
         # tail skeleton with fish head oriented north
 
@@ -78,8 +78,8 @@ class LighthillPredictor(PositionPredictor):
             theta = -theta_local
 
             # extra transformation to a global space if needed
-            coords_global = T.transform_points(np.array([x, y])).squeeze()
-            angle_global = T.transform_angles(theta)
+            coords_global = T_input_to_global.transform_points(np.array([x, y])).squeeze()
+            angle_global = T_input_to_global.transform_angles(theta)
 
             return coords_global[0], coords_global[1], angle_global[0] 
 

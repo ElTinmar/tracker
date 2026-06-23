@@ -22,7 +22,7 @@ class HeadEmbeddedTracker_CPU(HeadEmbeddedTracker):
             background_image = np.zeros_like(image)
         background_image = im2gray(background_image)
         
-        # rotate the animal so that it's vertical head up
+        # head north, tail south, rotation around fish centroid
         image_rot, centroid_rot = imrotate(
             image, 
             self.tracking_param.centroid_x, self.tracking_param.centroid_y,
