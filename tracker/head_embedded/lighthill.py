@@ -79,10 +79,9 @@ class LighthillPredictor(PositionPredictor):
 
             # extra transformation to a global space if needed
             coords_global = T.transform_points(np.array([x, y])).squeeze()
-            t_angle = np.arctan2(T[1, 0], T[0, 0]) 
-            theta_global = theta + t_angle
+            angle_global = T.transform_angles(theta)
 
-            return coords_global[0], coords_global[1], theta_global 
+            return coords_global[0], coords_global[1], angle_global[0] 
 
         # transform left-handed image space to right-handed coordinate system centered on
         # first tail point, in world coordinates (mm), forward axis y=[0, 1]

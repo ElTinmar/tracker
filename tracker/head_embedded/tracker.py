@@ -41,6 +41,7 @@ class HeadEmbeddedTracker_CPU(HeadEmbeddedTracker):
 
         centroid_input = np.array([self.tracking_param.centroid_x, self.tracking_param.centroid_y])
         centroid_global = T_input_to_global.transform_points(centroid_input).squeeze()
+        heading_global = T_input_to_global.transform_angles(self.tracking_param.heading_angle_rad)[0]
 
         tail = self.tracking_param.tail.track(
             image_rot, 
@@ -56,9 +57,9 @@ class HeadEmbeddedTracker_CPU(HeadEmbeddedTracker):
         )
         arr = (
             True, 
-            self.tracking_param.centroid_x, # TODO transform to global
-            self.tracking_param.centroid_y, # TODO transform to global
-            self.tracking_param.heading_angle_rad, # TODO transform to global
+            centroid_global[0], 
+            centroid_global[1],
+            heading_global,
             virtual_position.x, 
             virtual_position.y,
             virtual_position.theta, 
