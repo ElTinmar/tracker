@@ -39,10 +39,13 @@ class HeadEmbeddedTracker_CPU(HeadEmbeddedTracker):
         T0 = SimilarityTransform2D.translation(-centroid_rot[0], -centroid_rot[1])
         T_image_rot_to_global = T_input_to_global @ T @ R @ T0
 
+        centroid_input = np.array([self.tracking_param.centroid_x, self.tracking_param.centroid_y])
+        centroid_global = T_input_to_global.transform_points(centroid_input).squeeze()
+
         tail = self.tracking_param.tail.track(
             image_rot, 
             background_rot, 
-            centroid, 
+            centroid_global, 
             T_image_rot_to_global
         )
 
