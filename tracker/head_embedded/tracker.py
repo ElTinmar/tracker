@@ -56,9 +56,9 @@ class HeadEmbeddedTracker_CPU(HeadEmbeddedTracker):
         )
         arr = (
             True, 
-            self.tracking_param.centroid_x,
-            self.tracking_param.centroid_y,
-            self.tracking_param.heading_angle_rad,
+            self.tracking_param.centroid_x, # TODO transform to global
+            self.tracking_param.centroid_y, # TODO transform to global
+            self.tracking_param.heading_angle_rad, # TODO transform to global
             virtual_position.x, 
             virtual_position.y,
             virtual_position.theta, 
