@@ -2,8 +2,9 @@
 
 import numpy as np
 from collections import deque
-from .position_predictor import PositionPredictor, Position
 from geometry import SimilarityTransform2D
+from .position_predictor import PositionPredictor, Position
+from .boundaries import Boundary, NoBoundary  
 
 def get_tip_center(tail_skeleton: np.ndarray) -> np.ndarray:
     return (tail_skeleton[-2, :] + tail_skeleton[-1, :]) / 2
@@ -43,12 +44,14 @@ class LighthillPredictor(PositionPredictor):
             time_window_ms: int = 30,
             framerate: int = 120,
             tau: float = 0.0,
+            boundary: Boundary = None  
         ):
     
         self.forward_gain = forward_gain
         self.angular_gain = angular_gain
         self.framerate = framerate
         self.alpha = 1-np.exp(-1/(framerate*tau)) if tau > 0 else 1.0
+        self.boundary = boundary or NoBoundary()
 
         window = int(time_window_ms/1000 * framerate)
         self.tip_center_history = deque(maxlen=3)
@@ -127,9 +130,11 @@ class LighthillPredictor(PositionPredictor):
         forward_step_mm = self.forward_speed * dt
         angular_step_rad = self.angular_speed * dt
         
-        self.theta += angular_step_rad 
-        self.x += forward_step_mm * np.cos(self.theta) 
-        self.y += forward_step_mm * np.sin(self.theta)
+        new_theta = self.theta + angular_step_rad 
+        new_x = self.x + forward_step_mm * np.cos(self.theta) 
+        new_y = self.y + forward_step_mm * np.sin(self.theta)
+
+        self.x, self.y, self.theta = self.boundary.enforce(new_x, new_y, new_theta)
 
         return Position(*world_to_image(self.x,self.y,self.theta))
 
